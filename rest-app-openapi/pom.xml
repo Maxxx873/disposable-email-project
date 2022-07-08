@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.disposableemail</groupId>
+        <artifactId>disposable-email-project</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>rest-app-openapi</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>rest-app-openapi</name>
+    <description>OpenAPI generated server</description>
+    <properties>
+        <spring.boot.mainclass>com.disposableemail.rest.OpenApiGeneratedServerApplication</spring.boot.mainclass>
+        <project-base-package>com.disposableemail.rest</project-base-package>
+        <openapi-generator-maven-plugin.version>6.0.1</openapi-generator-maven-plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>${spring.boot.mainclass}</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>
+                                repackage
+                            </goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator-maven-plugin.version}</version>
+                <configuration>
+
+                    <configOptions>
+                        <oas3>true</oas3>
+                        <useSpringController>true</useSpringController>
+                        <useSpringfox>false</useSpringfox>
+                        <ignoreFileOverride>true</ignoreFileOverride>
+                    </configOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.parent.basedir}/openapi-spec/openapi.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>${project-base-package}.api</apiPackage>
+                            <modelPackage>com.disposableemail.model</modelPackage>
+                            <invokerPackage>${project-base-package}.app</invokerPackage>
+                            <skipValidateSpec>false</skipValidateSpec>
+                            <strictSpec>true</strictSpec>
+                            <generateModels>true</generateModels>
+                            <generateModelTests>true</generateModelTests>
+                            <generateApiTests>true</generateApiTests>
+                            <configOptions>
+                                <delegatePattern>true</delegatePattern>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

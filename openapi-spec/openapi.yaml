@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: disposable-email-project
-  description: ''
+  description: 'Disposable Email Project API'
   version: 0.0.1
 servers:
   - url: /
@@ -1504,6 +1504,3 @@ components:
       type: apiKey
       in: header
       name: Authorization
-  security:
-    - apiKey: []
-tags: []
