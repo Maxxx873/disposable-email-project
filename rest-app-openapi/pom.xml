@@ -15,6 +15,8 @@
         <spring.boot.mainclass>com.disposableemail.rest.OpenApiGeneratedServerApplication</spring.boot.mainclass>
         <project-base-package>com.disposableemail.rest</project-base-package>
         <openapi-generator-maven-plugin.version>6.0.1</openapi-generator-maven-plugin.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -51,7 +53,6 @@
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <version>${openapi-generator-maven-plugin.version}</version>
                 <configuration>
-
                     <configOptions>
                         <oas3>true</oas3>
                         <useSpringController>true</useSpringController>
@@ -73,8 +74,9 @@
                             <skipValidateSpec>false</skipValidateSpec>
                             <strictSpec>true</strictSpec>
                             <generateModels>true</generateModels>
-                            <generateModelTests>true</generateModelTests>
-                            <generateApiTests>true</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateAliasAsModel>false</generateAliasAsModel>
+                            <generateApiTests>false</generateApiTests>
                             <configOptions>
                                 <delegatePattern>true</delegatePattern>
                             </configOptions>

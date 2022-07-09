@@ -10,8 +10,6 @@ paths:
   /accounts:
     post:
       operationId: postAccountCollection
-      tags:
-        - Account
       responses:
         '201':
           description: Account resource created
@@ -92,8 +90,6 @@ paths:
   /accounts/{id}:
     get:
       operationId: getAccountItem
-      tags:
-        - Account
       responses:
         '200':
           description: Account resource
@@ -144,8 +140,6 @@ paths:
       deprecated: false
     delete:
       operationId: deleteAccountItem
-      tags:
-        - Account
       responses:
         '204':
           description: Account resource deleted
@@ -170,8 +164,6 @@ paths:
   /domains:
     get:
       operationId: getDomainCollection
-      tags:
-        - Domain
       responses:
         '200':
           description: Domain collection
@@ -292,8 +284,6 @@ paths:
   /domains/{id}:
     get:
       operationId: getDomainItem
-      tags:
-        - Domain
       responses:
         '200':
           description: Domain resource
@@ -346,8 +336,6 @@ paths:
   /me:
     get:
       operationId: get_meAccountItem
-      tags:
-        - Account
       responses:
         '200':
           description: Account resource
@@ -389,8 +377,6 @@ paths:
   /messages:
     get:
       operationId: getMessageCollection
-      tags:
-        - Message
       responses:
         '200':
           description: Message collection
@@ -511,8 +497,6 @@ paths:
   /messages/{id}:
     get:
       operationId: getMessageItem
-      tags:
-        - Message
       responses:
         '200':
           description: Message resource
@@ -563,8 +547,6 @@ paths:
       deprecated: false
     delete:
       operationId: deleteMessageItem
-      tags:
-        - Message
       responses:
         '204':
           description: Message resource deleted
@@ -587,8 +569,6 @@ paths:
       deprecated: false
     patch:
       operationId: patchMessageItem
-      tags:
-        - Message
       responses:
         '200':
           description: Message resource updated
@@ -664,8 +644,6 @@ paths:
   /sources/{id}:
     get:
       operationId: getSourceItem
-      tags:
-        - Source
       responses:
         '200':
           description: Source resource
@@ -718,8 +696,6 @@ paths:
   /token:
     post:
       operationId: postCredentialsItem
-      tags:
-        - Token
       responses:
         '200':
           description: Get JWT token
