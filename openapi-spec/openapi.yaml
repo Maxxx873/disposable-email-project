@@ -16,7 +16,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Account-account.read'
+                $ref: '#/components/schemas/Account'
           links:
             GetAccountItem:
               operationId: getAccountItem
@@ -35,7 +35,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Account-account.write'
+              $ref: '#/components/schemas/Account.write'
         required: true
       deprecated: false
     parameters: []
@@ -48,7 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Account-account.read'
+                $ref: '#/components/schemas/Account'
         '404':
           description: Resource not found
       summary: Retrieves a Account resource.
@@ -155,7 +155,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Account-account.read'
+                $ref: '#/components/schemas/Account'
         '404':
           description: Resource not found
       summary: Retrieves a Account resource.
@@ -174,7 +174,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Message-messages.read'
+                  $ref: '#/components/schemas/Messages'
       summary: Retrieves the collection of Message resources.
       description: Retrieves the collection of Message resources.
       parameters:
@@ -201,7 +201,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message-message.read'
+                $ref: '#/components/schemas/Message'
         '404':
           description: Resource not found
       summary: Retrieves a Message resource.
@@ -249,7 +249,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message-message.write'
+                $ref: '#/components/schemas/Message.write'
           links:
             GetMessageItem:
               operationId: getMessageItem
@@ -281,7 +281,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Message-message.write'
+              $ref: '#/components/schemas/Message.write'
         required: true
       deprecated: false
     parameters: []
@@ -294,7 +294,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Source-source.read'
+                $ref: '#/components/schemas/Source'
         '404':
           description: Resource not found
       summary: Retrieves a Source resource.
@@ -337,7 +337,7 @@ paths:
     parameters: []
 components:
   schemas:
-    Account-account.read:
+    Account:
       type: object
       description: ''
       properties:
@@ -346,8 +346,6 @@ components:
           type: string
         address:
           format: email
-          externalDocs:
-            url: https://schema.org/email
           type: string
         quota:
           type: integer
@@ -365,7 +363,7 @@ components:
           format: date-time
       required:
         - address
-    Account-account.write:
+    Account.write:
       type: object
       description: ''
       properties:
@@ -374,8 +372,6 @@ components:
           type: string
         address:
           format: email
-          externalDocs:
-            url: https://schema.org/email
           type: string
         password:
           type: string
@@ -401,7 +397,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-    Message-message.read:
+    Message:
       type: object
       description: ''
       properties:
@@ -420,52 +416,39 @@ components:
             address: from@example.com
             name: John Doe
           readOnly: true
-          externalDocs:
-            url: https://schema.org/sender
-          type: array
-          items:
-            type: string
-          nullable: true
+          $ref: '#/components/schemas/Address'
         to:
           type: array
           items:
-            type: array
-            items:
-              example:
-                  address: receiver@example.com
-                  name: John Doe
-              readOnly: true
-              externalDocs:
-                url: https://schema.org/recipient
-              nullable: true
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: receiver1@example.com
+              name: John Doe
+            - address: receiver2@example.com
+              name: Doe John
+          readOnly: true
         cc:
           type: array
           items:
-            type: array
-            items:
-              example:
-                - address: cc@example.com
-                  name: John Doe
-              readOnly: true
-              externalDocs:
-                url: https://schema.org/ccRecipient
-              nullable: true
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: cc1@example.com
+              name: John Doe
+            - address: cc2@example.com
+              name: Doe John
+          readOnly: true
         bcc:
           type: array
           items:
-            type: array
-            items:
-              example:
-                - address: bcc@example.com
-                  name: John Doe
-              readOnly: true
-              externalDocs:
-                url: https://schema.org/bccRecipient
-              nullable: true
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: bcc1@example.com
+              name: John Doe
+            - address: bcc2@example.com
+              name: Doe John
+          readOnly: true
         subject:
           readOnly: true
-          externalDocs:
-            url: https://schema.org/about
           type: string
         seen:
           type: boolean
@@ -498,48 +481,45 @@ components:
         attachments:
           type: array
           items:
-            type: array
-            items:
-              example:
-                - id: ATTACH000001
-                  filename: happy.png
-                  contentType: image/png
-                  disposition: attachment
-                  transferEncoding: base64
-                  related: false
-                  size: 666
-                  downloadUrl: /messages/id/attachment/ATTACH000001
-          externalDocs:
-            url: https://schema.org/messageAttachment
+            $ref: '#/components/schemas/Attachment'
+          example:
+            - id: ATTACH000001
+              filename: happy.png
+              contentType: image/png
+              disposition: attachment
+              transferEncoding: base64
+              related: false
+              size: 20
+              downloadUrl: /messages/id/attachment/ATTACH000001
+            - id: ATTACH000002
+              filename: happy.png
+              contentType: image/png
+              disposition: attachment
+              transferEncoding: base64
+              related: false
+              size: 240
+              downloadUrl: /messages/id/attachment/ATTACH000002
         size:
           readOnly: true
-          externalDocs:
-            url: https://schema.org/fileSize
           type: integer
         downloadUrl:
           readOnly: true
-          externalDocs:
-            url: http://schema.org/contentUrl
           type: string
         createdAt:
           readOnly: true
-          externalDocs:
-            url: https://schema.org/dateSent
           type: string
           format: date-time
         updatedAt:
           readOnly: true
-          externalDocs:
-            url: https://schema.org/dateReceived
           type: string
           format: date-time
-    Message-message.write:
+    Message.write:
       type: object
       description: ''
       properties:
         seen:
           type: boolean
-    Message-messages.read:
+    Messages:
       type: object
       description: ''
       properties:
@@ -555,36 +535,25 @@ components:
           type: string
         from:
           example:
-          - address: from@example.com
-            name: John Doe
+            - address: from@example.com
+              name: John Doe
           readOnly: true
-          externalDocs:
-            url: https://schema.org/sender
-          type: array
-          items:
-            type: string
-          nullable: true
+          $ref: '#/components/schemas/Address'
         to:
           type: array
           items:
-            type: array
-            items:
-              example:
-                - address: receiver@example.com
-                  name: John Doe
-              readOnly: true
-              externalDocs:
-                url: https://schema.org/recipient
-              nullable: true
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: receiver1@example.com
+              name: John Doe
+            - address: receiver2@example.com
+              name: Doe John
+          readOnly: true
         subject:
           readOnly: true
-          externalDocs:
-            url: https://schema.org/about
           type: string
         intro:
           readOnly: true
-          externalDocs:
-            url: https://schema.org/backstory
           type: string
         seen:
           type: boolean
@@ -595,27 +564,19 @@ components:
           type: boolean
         size:
           readOnly: true
-          externalDocs:
-            url: https://schema.org/fileSize
           type: integer
         downloadUrl:
           readOnly: true
-          externalDocs:
-            url: http://schema.org/contentUrl
           type: string
         createdAt:
           readOnly: true
-          externalDocs:
-            url: https://schema.org/dateSent
           type: string
           format: date-time
         updatedAt:
           readOnly: true
-          externalDocs:
-            url: https://schema.org/dateReceived
           type: string
           format: date-time
-    Source-source.read:
+    Source:
       type: object
       description: ''
       properties:
@@ -641,6 +602,34 @@ components:
         password:
           type: string
           example: password
+    Address:
+      type: object
+      properties:
+        address:
+          type: string
+          example: connor@example.com
+        name:
+          type: string
+          example: Jon Connor
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: string
+        filename:
+          type: string
+        contentType:
+          type: string
+        disposition:
+          type: string
+        transferEncoding:
+          type: string
+        related:
+          type: boolean
+        size:
+          type: integer
+        downloadUrl:
+          type: string
   responses: {}
   parameters: {}
   examples: {}
