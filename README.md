@@ -1,1 +1,2 @@
-[dsp-mail-rest-app-openapi.herokuapp.com](dsp-mail-rest-app-openapi.herokuapp.com/)
+
+<a href="https://dsp-mail-rest-app-openapi.herokuapp.com/">Demo API</a>

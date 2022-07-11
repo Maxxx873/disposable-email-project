@@ -14,31 +14,7 @@ paths:
         '201':
           description: Account resource created
           content:
-            application/ld+json:
-              schema:
-                $ref: '#/components/schemas/Account.jsonld-account.read'
-            application/hal+json:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
             application/json:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            text/xml:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            application/x-yaml:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            text/csv:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            text/html:
               schema:
                 $ref: '#/components/schemas/Account-account.read'
           links:
@@ -57,31 +33,7 @@ paths:
       requestBody:
         description: The new Account resource
         content:
-          application/ld+json:
-            schema:
-              $ref: '#/components/schemas/Account.jsonld-account.write'
-          application/hal+json:
-            schema:
-              $ref: '#/components/schemas/Account-account.write'
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Account-account.write'
           application/json:
-            schema:
-              $ref: '#/components/schemas/Account-account.write'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Account-account.write'
-          text/xml:
-            schema:
-              $ref: '#/components/schemas/Account-account.write'
-          application/x-yaml:
-            schema:
-              $ref: '#/components/schemas/Account-account.write'
-          text/csv:
-            schema:
-              $ref: '#/components/schemas/Account-account.write'
-          text/html:
             schema:
               $ref: '#/components/schemas/Account-account.write'
         required: true
@@ -94,31 +46,7 @@ paths:
         '200':
           description: Account resource
           content:
-            application/ld+json:
-              schema:
-                $ref: '#/components/schemas/Account.jsonld-account.read'
-            application/hal+json:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
             application/json:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            text/xml:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            application/x-yaml:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            text/csv:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            text/html:
               schema:
                 $ref: '#/components/schemas/Account-account.read'
         '404':
@@ -168,98 +96,7 @@ paths:
         '200':
           description: Domain collection
           content:
-            application/ld+json:
-              schema:
-                type: object
-                properties:
-                  hydra:member:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Domain.jsonld'
-                  hydra:totalItems:
-                    type: integer
-                    minimum: 0
-                  hydra:view:
-                    type: object
-                    properties:
-                      '@id':
-                        type: string
-                        format: iri-reference
-                      '@type':
-                        type: string
-                      hydra:first:
-                        type: string
-                        format: iri-reference
-                      hydra:last:
-                        type: string
-                        format: iri-reference
-                      hydra:previous:
-                        type: string
-                        format: iri-reference
-                      hydra:next:
-                        type: string
-                        format: iri-reference
-                  hydra:search:
-                    type: object
-                    properties:
-                      '@type':
-                        type: string
-                      hydra:template:
-                        type: string
-                      hydra:variableRepresentation:
-                        type: string
-                      hydra:mapping:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            '@type':
-                              type: string
-                            variable:
-                              type: string
-                            property:
-                              type: string
-                              nullable: true
-                            required:
-                              type: boolean
-                required:
-                  - hydra:member
-            application/hal+json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Domain'
-            application/vnd.api+json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Domain'
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Domain'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Domain'
-            text/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Domain'
-            application/x-yaml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Domain'
-            text/csv:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Domain'
-            text/html:
               schema:
                 type: array
                 items:
@@ -288,31 +125,7 @@ paths:
         '200':
           description: Domain resource
           content:
-            application/ld+json:
-              schema:
-                $ref: '#/components/schemas/Domain.jsonld'
-            application/hal+json:
-              schema:
-                $ref: '#/components/schemas/Domain'
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Domain'
             application/json:
-              schema:
-                $ref: '#/components/schemas/Domain'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Domain'
-            text/xml:
-              schema:
-                $ref: '#/components/schemas/Domain'
-            application/x-yaml:
-              schema:
-                $ref: '#/components/schemas/Domain'
-            text/csv:
-              schema:
-                $ref: '#/components/schemas/Domain'
-            text/html:
               schema:
                 $ref: '#/components/schemas/Domain'
         '404':
@@ -340,31 +153,7 @@ paths:
         '200':
           description: Account resource
           content:
-            application/ld+json:
-              schema:
-                $ref: '#/components/schemas/Account.jsonld-account.read'
-            application/hal+json:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
             application/json:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            text/xml:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            application/x-yaml:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            text/csv:
-              schema:
-                $ref: '#/components/schemas/Account-account.read'
-            text/html:
               schema:
                 $ref: '#/components/schemas/Account-account.read'
         '404':
@@ -381,98 +170,7 @@ paths:
         '200':
           description: Message collection
           content:
-            application/ld+json:
-              schema:
-                type: object
-                properties:
-                  hydra:member:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Message.jsonld-messages.read'
-                  hydra:totalItems:
-                    type: integer
-                    minimum: 0
-                  hydra:view:
-                    type: object
-                    properties:
-                      '@id':
-                        type: string
-                        format: iri-reference
-                      '@type':
-                        type: string
-                      hydra:first:
-                        type: string
-                        format: iri-reference
-                      hydra:last:
-                        type: string
-                        format: iri-reference
-                      hydra:previous:
-                        type: string
-                        format: iri-reference
-                      hydra:next:
-                        type: string
-                        format: iri-reference
-                  hydra:search:
-                    type: object
-                    properties:
-                      '@type':
-                        type: string
-                      hydra:template:
-                        type: string
-                      hydra:variableRepresentation:
-                        type: string
-                      hydra:mapping:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            '@type':
-                              type: string
-                            variable:
-                              type: string
-                            property:
-                              type: string
-                              nullable: true
-                            required:
-                              type: boolean
-                required:
-                  - hydra:member
-            application/hal+json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message-messages.read'
-            application/vnd.api+json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message-messages.read'
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message-messages.read'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message-messages.read'
-            text/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message-messages.read'
-            application/x-yaml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message-messages.read'
-            text/csv:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message-messages.read'
-            text/html:
               schema:
                 type: array
                 items:
@@ -501,31 +199,7 @@ paths:
         '200':
           description: Message resource
           content:
-            application/ld+json:
-              schema:
-                $ref: '#/components/schemas/Message.jsonld-message.read'
-            application/hal+json:
-              schema:
-                $ref: '#/components/schemas/Message-message.read'
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Message-message.read'
             application/json:
-              schema:
-                $ref: '#/components/schemas/Message-message.read'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Message-message.read'
-            text/xml:
-              schema:
-                $ref: '#/components/schemas/Message-message.read'
-            application/x-yaml:
-              schema:
-                $ref: '#/components/schemas/Message-message.read'
-            text/csv:
-              schema:
-                $ref: '#/components/schemas/Message-message.read'
-            text/html:
               schema:
                 $ref: '#/components/schemas/Message-message.read'
         '404':
@@ -573,31 +247,7 @@ paths:
         '200':
           description: Message resource updated
           content:
-            application/ld+json:
-              schema:
-                $ref: '#/components/schemas/Message.jsonld-message.write'
-            application/hal+json:
-              schema:
-                $ref: '#/components/schemas/Message-message.write'
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Message-message.write'
             application/json:
-              schema:
-                $ref: '#/components/schemas/Message-message.write'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Message-message.write'
-            text/xml:
-              schema:
-                $ref: '#/components/schemas/Message-message.write'
-            application/x-yaml:
-              schema:
-                $ref: '#/components/schemas/Message-message.write'
-            text/csv:
-              schema:
-                $ref: '#/components/schemas/Message-message.write'
-            text/html:
               schema:
                 $ref: '#/components/schemas/Message-message.write'
           links:
@@ -629,13 +279,7 @@ paths:
       requestBody:
         description: The updated Message resource
         content:
-          application/merge-patch+json:
-            schema:
-              $ref: '#/components/schemas/Message-message.write'
-          application/ld+json:
-            schema:
-              $ref: '#/components/schemas/Message-message.write'
-          application/vnd.api+json:
+          application/json:
             schema:
               $ref: '#/components/schemas/Message-message.write'
         required: true
@@ -648,31 +292,7 @@ paths:
         '200':
           description: Source resource
           content:
-            application/ld+json:
-              schema:
-                $ref: '#/components/schemas/Source.jsonld-source.read'
-            application/hal+json:
-              schema:
-                $ref: '#/components/schemas/Source-source.read'
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Source-source.read'
             application/json:
-              schema:
-                $ref: '#/components/schemas/Source-source.read'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Source-source.read'
-            text/xml:
-              schema:
-                $ref: '#/components/schemas/Source-source.read'
-            application/x-yaml:
-              schema:
-                $ref: '#/components/schemas/Source-source.read'
-            text/csv:
-              schema:
-                $ref: '#/components/schemas/Source-source.read'
-            text/html:
               schema:
                 $ref: '#/components/schemas/Source-source.read'
         '404':
@@ -762,140 +382,10 @@ components:
       required:
         - address
         - password
-    Account.jsonld-account.read:
-      type: object
-      description: ''
-      properties:
-        '@context':
-          readOnly: true
-          oneOf:
-            - type: string
-            - type: object
-              properties:
-                '@vocab':
-                  type: string
-                hydra:
-                  type: string
-                  enum:
-                    - http://www.w3.org/ns/hydra/core#
-              required:
-                - '@vocab'
-                - hydra
-              additionalProperties: true
-        '@id':
-          readOnly: true
-          type: string
-        '@type':
-          readOnly: true
-          type: string
-        id:
-          readOnly: true
-          type: string
-        address:
-          format: email
-          externalDocs:
-            url: https://schema.org/email
-          type: string
-        quota:
-          type: integer
-        used:
-          type: integer
-        isDisabled:
-          type: boolean
-        isDeleted:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - address
-    Account.jsonld-account.write:
-      type: object
-      description: ''
-      properties:
-        '@context':
-          readOnly: true
-          oneOf:
-            - type: string
-            - type: object
-              properties:
-                '@vocab':
-                  type: string
-                hydra:
-                  type: string
-                  enum:
-                    - http://www.w3.org/ns/hydra/core#
-              required:
-                - '@vocab'
-                - hydra
-              additionalProperties: true
-        '@id':
-          readOnly: true
-          type: string
-        '@type':
-          readOnly: true
-          type: string
-        id:
-          readOnly: true
-          type: string
-        address:
-          format: email
-          externalDocs:
-            url: https://schema.org/email
-          type: string
-        password:
-          type: string
-      required:
-        - address
-        - password
     Domain:
       type: object
       description: ''
       properties:
-        id:
-          readOnly: true
-          type: string
-        domain:
-          type: string
-        isActive:
-          type: boolean
-        isPrivate:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-    Domain.jsonld:
-      type: object
-      description: ''
-      properties:
-        '@id':
-          readOnly: true
-          type: string
-        '@type':
-          readOnly: true
-          type: string
-        '@context':
-          readOnly: true
-          oneOf:
-            - type: string
-            - type: object
-              properties:
-                '@vocab':
-                  type: string
-                hydra:
-                  type: string
-                  enum:
-                    - http://www.w3.org/ns/hydra/core#
-              required:
-                - '@vocab'
-                - hydra
-              additionalProperties: true
         id:
           readOnly: true
           type: string
@@ -942,7 +432,7 @@ components:
             type: array
             items:
               example:
-                - address: receiver@example.com
+                  address: receiver@example.com
                   name: John Doe
               readOnly: true
               externalDocs:
@@ -1065,287 +555,7 @@ components:
           type: string
         from:
           example:
-            address: from@example.com
-            name: John Doe
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/sender
-          type: array
-          items:
-            type: string
-          nullable: true
-        to:
-          type: array
-          items:
-            type: array
-            items:
-              example:
-                - address: receiver@example.com
-                  name: John Doe
-              readOnly: true
-              externalDocs:
-                url: https://schema.org/recipient
-              nullable: true
-        subject:
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/about
-          type: string
-        intro:
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/backstory
-          type: string
-        seen:
-          type: boolean
-        isDeleted:
-          type: boolean
-        hasAttachments:
-          readOnly: true
-          type: boolean
-        size:
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/fileSize
-          type: integer
-        downloadUrl:
-          readOnly: true
-          externalDocs:
-            url: http://schema.org/contentUrl
-          type: string
-        createdAt:
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/dateSent
-          type: string
-          format: date-time
-        updatedAt:
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/dateReceived
-          type: string
-          format: date-time
-    Message.jsonld-message.read:
-      type: object
-      description: ''
-      properties:
-        '@context':
-          readOnly: true
-          oneOf:
-            - type: string
-            - type: object
-              properties:
-                '@vocab':
-                  type: string
-                hydra:
-                  type: string
-                  enum:
-                    - http://www.w3.org/ns/hydra/core#
-              required:
-                - '@vocab'
-                - hydra
-              additionalProperties: true
-        '@id':
-          readOnly: true
-          type: string
-        '@type':
-          readOnly: true
-          type: string
-        id:
-          readOnly: true
-          type: string
-        accountId:
-          readOnly: true
-          type: string
-          format: iri-reference
-        msgid:
-          readOnly: true
-          type: string
-        from:
-          example:
-            address: from@example.com
-            name: John Doe
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/sender
-          type: array
-          items:
-            type: string
-          nullable: true
-        to:
-          type: array
-          items:
-            type: array
-            items:
-              example:
-                - address: receiver@example.com
-                  name: John Doe
-              readOnly: true
-              externalDocs:
-                url: https://schema.org/recipient
-              nullable: true
-        cc:
-          type: array
-          items:
-            type: array
-            items:
-              example:
-                - address: cc@example.com
-                  name: John Doe
-              readOnly: true
-              externalDocs:
-                url: https://schema.org/ccRecipient
-              nullable: true
-        bcc:
-          type: array
-          items:
-            type: array
-            items:
-              example:
-                - address: bcc@example.com
-                  name: John Doe
-              readOnly: true
-              externalDocs:
-                url: https://schema.org/bccRecipient
-              nullable: true
-        subject:
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/about
-          type: string
-        seen:
-          type: boolean
-        flagged:
-          readOnly: true
-          type: boolean
-        isDeleted:
-          type: boolean
-        verifications:
-          readOnly: true
-          type: array
-          items:
-            type: string
-        retention:
-          type: boolean
-        retentionDate:
-          type: string
-          format: date-time
-        text:
-          readOnly: true
-          type: string
-        html:
-          readOnly: true
-          type: array
-          items:
-            type: string
-        hasAttachments:
-          readOnly: true
-          type: boolean
-        attachments:
-          type: array
-          items:
-            type: array
-            items:
-              example:
-                - id: ATTACH000001
-                  filename: happy.png
-                  contentType: image/png
-                  disposition: attachment
-                  transferEncoding: base64
-                  related: false
-                  size: 666
-                  downloadUrl: /messages/id/attachment/ATTACH000001
-              externalDocs:
-                url: https://schema.org/messageAttachment
-        size:
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/fileSize
-          type: integer
-        downloadUrl:
-          readOnly: true
-          externalDocs:
-            url: http://schema.org/contentUrl
-          type: string
-        createdAt:
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/dateSent
-          type: string
-          format: date-time
-        updatedAt:
-          readOnly: true
-          externalDocs:
-            url: https://schema.org/dateReceived
-          type: string
-          format: date-time
-    Message.jsonld-message.write:
-      type: object
-      description: ''
-      properties:
-        '@context':
-          readOnly: true
-          oneOf:
-            - type: string
-            - type: object
-              properties:
-                '@vocab':
-                  type: string
-                hydra:
-                  type: string
-                  enum:
-                    - http://www.w3.org/ns/hydra/core#
-              required:
-                - '@vocab'
-                - hydra
-              additionalProperties: true
-        '@id':
-          readOnly: true
-          type: string
-        '@type':
-          readOnly: true
-          type: string
-        seen:
-          type: boolean
-    Message.jsonld-messages.read:
-      type: object
-      description: ''
-      properties:
-        '@id':
-          readOnly: true
-          type: string
-        '@type':
-          readOnly: true
-          type: string
-        '@context':
-          readOnly: true
-          oneOf:
-            - type: string
-            - type: object
-              properties:
-                '@vocab':
-                  type: string
-                hydra:
-                  type: string
-                  enum:
-                    - http://www.w3.org/ns/hydra/core#
-              required:
-                - '@vocab'
-                - hydra
-              additionalProperties: true
-        id:
-          readOnly: true
-          type: string
-        accountId:
-          readOnly: true
-          type: string
-          format: iri-reference
-        msgid:
-          readOnly: true
-          type: string
-        from:
-          example:
-            address: from@example.com
+          - address: from@example.com
             name: John Doe
           readOnly: true
           externalDocs:
@@ -1413,46 +623,7 @@ components:
           readOnly: true
           type: string
         downloadUrl:
-          externalDocs:
-            url: http://schema.org/contentUrl
           type: string
-          nullable: true
-        data:
-          type: string
-    Source.jsonld-source.read:
-      type: object
-      description: ''
-      properties:
-        '@context':
-          readOnly: true
-          oneOf:
-            - type: string
-            - type: object
-              properties:
-                '@vocab':
-                  type: string
-                hydra:
-                  type: string
-                  enum:
-                    - http://www.w3.org/ns/hydra/core#
-              required:
-                - '@vocab'
-                - hydra
-              additionalProperties: true
-        '@id':
-          readOnly: true
-          type: string
-        '@type':
-          readOnly: true
-          type: string
-        id:
-          readOnly: true
-          type: string
-        downloadUrl:
-          externalDocs:
-            url: http://schema.org/contentUrl
-          type: string
-          nullable: true
         data:
           type: string
     Token:
