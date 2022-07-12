@@ -4,12 +4,18 @@ info:
   description: 'Disposable Email Project API'
   version: 0.0.1
 servers:
-  - url: /v1
+  - url: /api/v1
     description: ''
 paths:
   /accounts:
     post:
-      operationId: postAccountCollection
+      operationId: createAccountItem
+      requestBody:
+        description: The new Account Resource
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
       responses:
         '201':
           description: Account resource created
