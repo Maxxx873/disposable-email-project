@@ -4,7 +4,7 @@ info:
   description: 'Disposable Email Project API'
   version: 0.0.1
 servers:
-  - url: /
+  - url: /v1
     description: ''
 paths:
   /accounts:
@@ -25,22 +25,23 @@ paths:
               description: The `id` value returned in the response can be used as the `id` parameter in `GET /accounts/{id}`.
         '400':
           description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '422':
           description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Creates a Account resource.
       description: Creates a Account resource.
-      parameters: []
-      requestBody:
-        description: The new Account resource
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Account.write'
-        required: true
-      deprecated: false
     parameters: []
   /accounts/{id}:
     get:
+      security:
+        - bearerAuth: []
       operationId: getAccountItem
       responses:
         '200':
@@ -51,6 +52,10 @@ paths:
                 $ref: '#/components/schemas/Account'
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Retrieves a Account resource.
       description: Retrieves a Account resource.
       parameters:
@@ -67,12 +72,22 @@ paths:
           allowReserved: false
       deprecated: false
     delete:
+      security:
+        - bearerAuth: []
       operationId: deleteAccountItem
       responses:
         '204':
           description: Account resource deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Removes the Account resource.
       description: Removes the Account resource.
       parameters:
@@ -130,6 +145,10 @@ paths:
                 $ref: '#/components/schemas/Domain'
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Retrieves a Domain resource.
       description: Retrieves a Domain resource.
       parameters:
@@ -148,6 +167,8 @@ paths:
     parameters: []
   /me:
     get:
+      security:
+        - bearerAuth: []
       operationId: get_meAccountItem
       responses:
         '200':
@@ -158,6 +179,10 @@ paths:
                 $ref: '#/components/schemas/Account'
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Retrieves a Account resource.
       description: Retrieves a Account resource.
       parameters: []
@@ -165,6 +190,8 @@ paths:
     parameters: []
   /messages:
     get:
+      security:
+        - bearerAuth: []
       operationId: getMessageCollection
       responses:
         '200':
@@ -194,6 +221,8 @@ paths:
     parameters: []
   /messages/{id}:
     get:
+      security:
+        - bearerAuth: []
       operationId: getMessageItem
       responses:
         '200':
@@ -204,6 +233,10 @@ paths:
                 $ref: '#/components/schemas/Message'
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Retrieves a Message resource.
       description: Retrieves a Message resource.
       parameters:
@@ -220,12 +253,18 @@ paths:
           allowReserved: false
       deprecated: false
     delete:
+      security:
+        - bearerAuth: []
       operationId: deleteMessageItem
       responses:
         '204':
           description: Message resource deleted
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Removes the Message resource.
       description: Removes the Message resource.
       parameters:
@@ -242,6 +281,8 @@ paths:
           allowReserved: false
       deprecated: false
     patch:
+      security:
+        - bearerAuth: []
       operationId: patchMessageItem
       responses:
         '200':
@@ -249,7 +290,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message.write'
+                $ref: '#/components/schemas/Message'
           links:
             GetMessageItem:
               operationId: getMessageItem
@@ -258,10 +299,22 @@ paths:
               description: The `id` value returned in the response can be used as the `id` parameter in `GET /messages/{id}`.
         '400':
           description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '422':
           description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Updates the Message resource.
       description: Updates the Message resource.
       parameters:
@@ -281,12 +334,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Message.write'
+              $ref: '#/components/schemas/Message'
         required: true
       deprecated: false
     parameters: []
   /sources/{id}:
     get:
+      security:
+        - bearerAuth: []
       operationId: getSourceItem
       responses:
         '200':
@@ -297,6 +352,10 @@ paths:
                 $ref: '#/components/schemas/Source'
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Retrieves a Source resource.
       description: Retrieves a Source resource.
       parameters:
@@ -363,21 +422,6 @@ components:
           format: date-time
       required:
         - address
-    Account.write:
-      type: object
-      description: ''
-      properties:
-        id:
-          readOnly: true
-          type: string
-        address:
-          format: email
-          type: string
-        password:
-          type: string
-      required:
-        - address
-        - password
     Domain:
       type: object
       description: ''
@@ -513,12 +557,6 @@ components:
           readOnly: true
           type: string
           format: date-time
-    Message.write:
-      type: object
-      description: ''
-      properties:
-        seen:
-          type: boolean
     Messages:
       type: object
       description: ''
@@ -630,6 +668,14 @@ components:
           type: integer
         downloadUrl:
           type: string
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      description: ErrorResponse
   responses: {}
   parameters: {}
   examples: {}
@@ -640,3 +686,7 @@ components:
       type: apiKey
       in: header
       name: Authorization
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
