@@ -8,19 +8,19 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>rest-app-openapi</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
     <name>rest-app-openapi</name>
     <description>OpenAPI generated server</description>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <spring.boot.mainclass>com.disposableemail.rest.OpenApiGeneratedServerApplication</spring.boot.mainclass>
+        <spring.boot.mainclass>com.disposableemail.OpenApiGeneratedServerApplication</spring.boot.mainclass>
         <project-base-package>com.disposableemail.rest</project-base-package>
         <openapi-generator-maven-plugin.version>6.0.1</openapi-generator-maven-plugin.version>
         <spring-boot-maven-plugin.version>2.7.1</spring-boot-maven-plugin.version>
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -71,7 +71,7 @@
                             <inputSpec>${project.parent.basedir}/openapi-spec/openapi.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>${project-base-package}.api</apiPackage>
-                            <modelPackage>com.disposableemail.model</modelPackage>
+                            <modelPackage>${project-base-package}.model</modelPackage>
                             <invokerPackage>${project-base-package}.app</invokerPackage>
                             <skipValidateSpec>false</skipValidateSpec>
                             <strictSpec>true</strictSpec>

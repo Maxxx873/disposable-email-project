@@ -1,4 +1,4 @@
-package com.disposableemail.rest;
+package com.disposableemail;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,2 +1,7 @@
 server:
   port: ${PORT:8088}
+
+authorization:
+  service: keycloak
+
+
