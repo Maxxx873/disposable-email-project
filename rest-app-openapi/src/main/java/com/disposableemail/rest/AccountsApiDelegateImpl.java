@@ -5,8 +5,10 @@ import com.disposableemail.rest.api.AccountsApiDelegate;
 import com.disposableemail.rest.model.Account;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.rest.model.ErrorResponse;
+import com.disposableemail.service.api.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AccountsApiDelegateImpl implements AccountsApiDelegate {
+
+    private final AuthorizationService authorizationService;
 
     @Override
     public ResponseEntity<ErrorResponse> deleteAccountItem(String id) {
@@ -27,6 +31,9 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
 
     @Override
     public ResponseEntity<Account> createAccountItem(Credentials credentials) {
-        return AccountsApiDelegate.super.createAccountItem(credentials);
+        log.info("createAccountItem({})", credentials.getAddress());
+        var account = new Account();
+        account.setAddress(authorizationService.createUser(credentials));
+        return new ResponseEntity<>(account, HttpStatus.CREATED);
     }
 }

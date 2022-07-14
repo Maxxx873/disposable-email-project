@@ -4,4 +4,6 @@ server:
 authorization:
   service: keycloak
 
+keycloak:
+  server:
 

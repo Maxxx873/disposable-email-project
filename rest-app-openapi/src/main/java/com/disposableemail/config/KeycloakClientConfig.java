@@ -21,21 +21,26 @@ public class KeycloakClientConfig {
     @Value("${keycloak.server.client}")
     private String client;
 
+    @Value("${keycloak.server.url}")
+    private String serverUrl;
+
     @Bean
-    public Keycloak keycloak(@Value("${keycloak.server.url}") String serverUrl){
+    public Keycloak keycloak(){
         return Keycloak.getInstance(serverUrl, realm, username, password, client);
     }
 
     @Bean
     public UserRepresentation userRepresentation(){
-        return new UserRepresentation();
+        var userRepresentation = new UserRepresentation();
+        userRepresentation.setEnabled(true);
+        return userRepresentation;
     }
 
     @Bean
     public CredentialRepresentation credentialRepresentation() {
-        CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
-        credentialRepresentation.setType("password");
+        var credentialRepresentation = new CredentialRepresentation();
         credentialRepresentation.setTemporary(false);
+        credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
         return credentialRepresentation;
     }
 
