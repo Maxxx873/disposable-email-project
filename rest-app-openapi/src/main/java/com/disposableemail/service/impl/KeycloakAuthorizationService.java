@@ -46,8 +46,6 @@ public class KeycloakAuthorizationService implements AuthorizationService {
         Keycloak instance = Keycloak.getInstance(serverUrl, realm, credentials.getAddress(),
                 credentials.getPassword(),client);
         var tokenManager = instance.tokenManager();
-        var token = new Token();
-        token.setToken(tokenManager.getAccessTokenString());
-        return token;
+        return new Token(tokenManager.getAccessTokenString());
     }
 }

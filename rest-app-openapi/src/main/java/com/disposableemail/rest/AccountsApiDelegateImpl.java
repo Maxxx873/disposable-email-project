@@ -32,8 +32,9 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     @Override
     public ResponseEntity<Account> createAccountItem(Credentials credentials) {
         log.info("createAccountItem({})", credentials.getAddress());
-        var account = new Account();
-        account.setAddress(authorizationService.createUser(credentials));
+        var account = Account.builder()
+                .address(authorizationService.createUser(credentials))
+                .build();
         return new ResponseEntity<>(account, HttpStatus.CREATED);
     }
 }
