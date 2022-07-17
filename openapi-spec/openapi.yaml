@@ -35,6 +35,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Not registered Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '422':
           description: Unprocessable entity
           content:
@@ -43,11 +49,11 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       summary: Creates a Account resource.
       description: Creates a Account resource.
-    parameters: []
+    parameters: [ ]
   /accounts/{id}:
     get:
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: getAccountItem
       responses:
         '200':
@@ -79,7 +85,7 @@ paths:
       deprecated: false
     delete:
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: deleteAccountItem
       responses:
         '204':
@@ -87,7 +93,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/Account'
         '404':
           description: Resource not found
           content:
@@ -109,7 +115,7 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: []
+    parameters: [ ]
   /domains:
     get:
       operationId: getDomainCollection
@@ -138,7 +144,7 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: []
+    parameters: [ ]
   /domains/{id}:
     get:
       operationId: getDomainItem
@@ -170,11 +176,11 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: []
+    parameters: [ ]
   /me:
     get:
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: get_meAccountItem
       responses:
         '200':
@@ -191,13 +197,13 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       summary: Retrieves a Account resource.
       description: Retrieves a Account resource.
-      parameters: []
+      parameters: [ ]
       deprecated: false
-    parameters: []
+    parameters: [ ]
   /messages:
     get:
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: getMessageCollection
       responses:
         '200':
@@ -224,11 +230,11 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: []
+    parameters: [ ]
   /messages/{id}:
     get:
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: getMessageItem
       responses:
         '200':
@@ -260,7 +266,7 @@ paths:
       deprecated: false
     delete:
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: deleteMessageItem
       responses:
         '204':
@@ -288,7 +294,7 @@ paths:
       deprecated: false
     patch:
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: patchMessageItem
       responses:
         '200':
@@ -343,11 +349,11 @@ paths:
               $ref: '#/components/schemas/Message'
         required: true
       deprecated: false
-    parameters: []
+    parameters: [ ]
   /sources/{id}:
     get:
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: getSourceItem
       responses:
         '200':
@@ -377,11 +383,17 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: []
+    parameters: [ ]
   /token:
     post:
       operationId: postCredentialsItem
       responses:
+        '401':
+          description: Not registered Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '200':
           description: Get JWT token
           content:
@@ -390,7 +402,7 @@ paths:
                 $ref: '#/components/schemas/Token'
       summary: Get JWT token to login.
       description: ''
-      parameters: []
+      parameters: [ ]
       requestBody:
         description: Generate new JWT Token
         content:
@@ -399,7 +411,7 @@ paths:
               $ref: '#/components/schemas/Credentials'
         required: false
       deprecated: false
-    parameters: []
+    parameters: [ ]
 components:
   schemas:
     Account:
@@ -682,11 +694,11 @@ components:
         message:
           type: string
       description: ErrorResponse
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
+  responses: { }
+  parameters: { }
+  examples: { }
+  requestBodies: { }
+  headers: { }
   securitySchemes:
     apiKey:
       type: apiKey

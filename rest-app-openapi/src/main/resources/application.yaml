@@ -1,8 +1,18 @@
+spring:
+  application:
+    name: disposable-email-project-API
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      database: disposableemail
+  mongodb:
+    embedded:
+      version: 3.4.6
+
 server:
   port: ${PORT:8088}
 
 authorization:
-  service: keycloak
+  service: ${AUTHORIZATION_SERVICE:keycloak}
 
-keycloak:
-  server:

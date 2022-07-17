@@ -25,12 +25,12 @@ public class KeycloakClientConfig {
     private String serverUrl;
 
     @Bean
-    public Keycloak keycloak(){
+    public Keycloak keycloak() {
         return Keycloak.getInstance(serverUrl, realm, username, password, client);
     }
 
     @Bean
-    public UserRepresentation userRepresentation(){
+    public UserRepresentation userRepresentation() {
         var userRepresentation = new UserRepresentation();
         userRepresentation.setEnabled(true);
         return userRepresentation;

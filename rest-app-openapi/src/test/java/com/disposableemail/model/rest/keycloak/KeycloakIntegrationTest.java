@@ -1,60 +1,90 @@
 package com.disposableemail.model.rest.keycloak;
 
+import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 
-import java.time.Duration;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @Slf4j
-@Testcontainers
+@TestPropertySource(properties = {"authorization.service=keycloak"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class KeycloakIntegrationTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
+
+    @Autowired
+    public Keycloak keycloak;
 
     @Autowired
     public AuthorizationService authorizationService;
 
-    @Container
-    public static GenericContainer<?> keycloakContainer = new GenericContainer<>(DockerImageName.parse("quay.io/keycloak/keycloak:18.0.1"))
-            .withExposedPorts(8080)
-            .withEnv("KEYCLOAK_ADMIN", "admin")
-            .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin")
-            .withEnv("KC_DB", "dev-mem")
-            .withCommand("start-dev")
-            .waitingFor(Wait.forHttp("/admin").forPort(8080).withStartupTimeout(Duration.ofMinutes(2)));
+    private static final Credentials credentials = new Credentials("test@test.org", "password");
 
-    @DynamicPropertySource
-    private static void dynamicProperties(DynamicPropertyRegistry registry) {
-        keycloakContainer.start();
-        String keycloakHost = keycloakContainer.getHost();
-        Integer keycloakPort = keycloakContainer.getMappedPort(8080);
-        String keycloakServerUrl = String.format("http://%s:%s", keycloakHost, keycloakPort);
-        registry.add("keycloak.server.url", () -> keycloakServerUrl);
-        registry.add("keycloak.server.password", () -> "admin");
+    @AfterEach
+    void clearUsers() {
+        List<RealmRepresentation> realmReps = keycloak.realms().findAll();
+        for (RealmRepresentation realmRep : realmReps) {
+            String realm = realmRep.getRealm();
+            List<UserRepresentation> userReps = keycloak.realm(realm).users().list();
+            userReps.forEach(user -> {
+                if (user.getUsername().equals(credentials.getAddress())) {
+                    keycloak.realm(realm).users().delete(user.getId());
+                }
+            });
+        }
     }
 
     @Test
-    void shouldSuccessfullyAddUserTest() {
+    void shouldSuccessfullyAddUser() {
         log.debug("shouldSuccessfullyAddUserTest()");
-        var credentials = new Credentials("test@test", "password");
 
-        authorizationService.createUser(credentials);
+        var response = authorizationService.createUser(credentials);
 
-        assertThat(authorizationService.createUser(credentials)).isEqualTo(credentials.getAddress());
+        assertThat(response.getStatusInfo()).isEqualTo(Response.Status.CREATED);
     }
 
+    @Test
+    void shouldConflictAddUserIfUserAlreadyExisting() {
+        log.debug("shouldConflictAddUserIfUserAlreadyExisting()");
+
+        var response = authorizationService.createUser(credentials);
+
+        assertThatThrownBy(() -> authorizationService.createUser(credentials))
+                .isInstanceOf(AccountAlreadyRegisteredException.class);
+    }
+
+    @Test
+    void shouldSuccessfullyGetToken() {
+        log.debug("shouldSuccessfullyGetToken()");
+
+        authorizationService.createUser(credentials);
+        var token = authorizationService.getToken(credentials);
+
+        assertThat(token.getToken().length()).isPositive();
+    }
+
+    @Test
+    void shouldFailedGetTokenIfAccountNotRegistered() {
+        log.debug("shouldFailedGetTokenIfAccountNotRegistered()");
+
+        assertThatThrownBy(() -> authorizationService.getToken(credentials))
+                .isInstanceOf(NotAuthorizedException.class);
+    }
 
 }
 
