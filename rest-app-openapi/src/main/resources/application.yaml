@@ -1,6 +1,17 @@
+server:
+  port: ${PORT:8088}
+
+authorization:
+  service: ${AUTHORIZATION_SERVICE:keycloak}
+
 spring:
-  application:
-    name: disposable-email-project-API
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_JWT_SET_URI}
+          issuer-uri: ${KEYCLOAK_REALM_ISSUER_URL}
+
   data:
     mongodb:
       host: ${MONGODB_HOST:localhost}
@@ -10,9 +21,11 @@ spring:
     embedded:
       version: 3.4.6
 
-server:
-  port: ${PORT:8088}
-
-authorization:
-  service: ${AUTHORIZATION_SERVICE:keycloak}
+keycloak:
+  server:
+    url: ${KEYCLOAK_SERVER_URL}
+    realm: ${KEYCLOAK_SERVER_REALM}
+    username: ${KEYCLOAK_SERVER_USERNAME}
+    password: ${KEYCLOAK_SERVER_PASSWORD}
+    client: ${KEYCLOAK_SERVER_CLIENT}
 

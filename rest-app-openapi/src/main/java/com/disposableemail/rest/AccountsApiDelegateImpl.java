@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -28,12 +29,16 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     private final AccountMapper accountMapper;
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Account>> deleteAccountItem(String id, ServerWebExchange exchange) {
 
         return accountRepository
                 .findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
-                .flatMap(accountEntity -> accountRepository.delete(accountEntity).then(Mono.just(accountEntity)))
+                .flatMap(accountEntity -> {
+                    log.info("Deleted Account Id: {}", id);
+                    return accountRepository.delete(accountEntity).then(Mono.just(accountEntity));
+                })
                 .map(accountMapper::accountEntityToAccount)
                 .map(account -> ResponseEntity.status(HttpStatus.NO_CONTENT)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -41,6 +46,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Account>> getAccountItem(String id, ServerWebExchange exchange) {
 
         return accountRepository.findById(id)
@@ -57,7 +63,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     public Mono<ResponseEntity<Account>> createAccountItem(Mono<Credentials> credentials, ServerWebExchange exchange) {
 
         return credentials.flatMap(accountService::createAccountInAuthorizationServiceAndSaveToDb).map(accountEntity -> {
-            log.info("Saved account {}", accountEntity.toString());
+            log.info("Saved Account: {}", accountEntity.toString());
             return ResponseEntity.status(HttpStatus.CREATED)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(accountMapper.accountEntityToAccount(accountEntity));

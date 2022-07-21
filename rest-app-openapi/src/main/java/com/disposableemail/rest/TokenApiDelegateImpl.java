@@ -22,6 +22,7 @@ public class TokenApiDelegateImpl implements TokenApiDelegate {
 
     @Override
     public Mono<ResponseEntity<Token>> postCredentialsItem(Mono<Credentials> credentials, ServerWebExchange exchange) {
+
         return credentials.flatMap(accountService::getTokenFromAuthorizationService)
                 .map(token -> ResponseEntity.status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)

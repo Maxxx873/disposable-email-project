@@ -53,7 +53,7 @@ paths:
   /accounts/{id}:
     get:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: getAccountItem
       responses:
         '200':
@@ -85,7 +85,7 @@ paths:
       deprecated: false
     delete:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: deleteAccountItem
       responses:
         '204':
@@ -180,7 +180,7 @@ paths:
   /me:
     get:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: get_meAccountItem
       responses:
         '200':
@@ -203,7 +203,7 @@ paths:
   /messages:
     get:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: getMessageCollection
       responses:
         '200':
@@ -234,7 +234,7 @@ paths:
   /messages/{id}:
     get:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: getMessageItem
       responses:
         '200':
@@ -266,7 +266,7 @@ paths:
       deprecated: false
     delete:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: deleteMessageItem
       responses:
         '204':
@@ -294,7 +294,7 @@ paths:
       deprecated: false
     patch:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: patchMessageItem
       responses:
         '200':
@@ -353,7 +353,7 @@ paths:
   /sources/{id}:
     get:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: getSourceItem
       responses:
         '200':
@@ -700,10 +700,6 @@ components:
   requestBodies: { }
   headers: { }
   securitySchemes:
-    apiKey:
-      type: apiKey
-      in: header
-      name: Authorization
     bearerAuth:
       type: http
       scheme: bearer

@@ -4,7 +4,6 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.Version;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -33,8 +32,5 @@ public class AccountEntity {
     @LastModifiedBy
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @Version
-    private Integer version;
 
 }
