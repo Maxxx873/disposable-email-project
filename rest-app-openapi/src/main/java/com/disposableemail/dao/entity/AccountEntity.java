@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class AccountEntity {
     @Setter(AccessLevel.NONE)
     private String id;
 
+    @Indexed(unique = true)
     private String address;
     private Integer quota;
     private Integer used;

@@ -36,4 +36,10 @@ public class AccountServiceImpl implements AccountService {
         log.info("Getting token for an Account | ({})", credentials.getAddress());
         return Mono.just(authorizationService.getToken(credentials));
     }
+
+    @Override
+    public Mono<AccountEntity> getAccountFromAddress(String address) {
+        log.info("Getting Account from address | ({})", address);
+        return accountRepository.findByAddress(address);
+    }
 }

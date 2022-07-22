@@ -10,7 +10,11 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 import javax.ws.rs.core.Response;
 import java.util.Collections;
@@ -29,6 +33,8 @@ public class KeycloakAuthorizationService implements AuthorizationService {
     private final Keycloak keycloak;
     private final UserRepresentation userRepresentation;
     private final CredentialRepresentation credentialRepresentation;
+
+    private final String USERNAME_CLAIM = "preferred_username";
 
     @Override
     public Response createUser(Credentials credentials) {
@@ -53,5 +59,15 @@ public class KeycloakAuthorizationService implements AuthorizationService {
                 credentials.getPassword(), client);
         var tokenManager = instance.tokenManager();
         return new Token(tokenManager.getAccessTokenString());
+    }
+
+    @Override
+    public Mono<String> getUserName(ServerWebExchange exchange) {
+
+        log.info("Getting user name from {}}", USERNAME_CLAIM);
+        return ReactiveSecurityContextHolder.getContext()
+                .map(context -> context.getAuthentication().getPrincipal())
+                .cast(Jwt.class)
+                .map(jwt -> jwt.getClaimAsString(USERNAME_CLAIM));
     }
 }
