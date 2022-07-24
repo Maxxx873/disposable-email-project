@@ -11,5 +11,4 @@ public class OpenApiGeneratedServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(OpenApiGeneratedServerApplication.class, args);
     }
-
 }

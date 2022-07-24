@@ -3,6 +3,7 @@ package com.disposableemail.rest;
 
 import com.disposableemail.dao.mapper.AccountMapper;
 import com.disposableemail.dao.repository.AccountRepository;
+import com.disposableemail.exception.AccountNotFoundException;
 import com.disposableemail.rest.api.AccountsApiDelegate;
 import com.disposableemail.rest.model.Account;
 import com.disposableemail.rest.model.Credentials;
@@ -16,8 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import javax.ws.rs.NotFoundException;
 
 @Slf4j
 @Service
@@ -34,7 +33,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
 
         return accountRepository
                 .findById(id)
-                .switchIfEmpty(Mono.error(new NotFoundException()))
+                .switchIfEmpty(Mono.error(new AccountNotFoundException()))
                 .flatMap(accountEntity -> {
                     log.info("Deleted Account Id: {}", id);
                     return accountRepository.delete(accountEntity).then(Mono.just(accountEntity));
@@ -56,7 +55,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(accountMapper.accountEntityToAccount(accountEntity));
                 })
-                .switchIfEmpty(Mono.error(new NotFoundException()));
+                .switchIfEmpty(Mono.error(new AccountNotFoundException()));
     }
 
     @Override

@@ -29,6 +29,7 @@
         <keycloak-admin-client.version>18.0.2</keycloak-admin-client.version>
         <testcontainers.version>1.17.3</testcontainers.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+        <mongock-bom.version>5.0.41</mongock-bom.version>
     </properties>
     <dependencies>
         <dependency>

@@ -5,6 +5,9 @@ authorization:
   service: ${AUTHORIZATION_SERVICE:keycloak}
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
+
   security:
     oauth2:
       resourceserver:
@@ -17,9 +20,13 @@ spring:
       host: ${MONGODB_HOST:localhost}
       port: ${MONGODB_PORT:27017}
       database: disposableemail
+      embedded:
+        version: 3.4.6
+
   mongodb:
     embedded:
       version: 3.4.6
+
 
 keycloak:
   server:

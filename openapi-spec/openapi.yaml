@@ -49,7 +49,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       summary: Creates a Account resource.
       description: Creates a Account resource.
-    parameters: [ ]
+    parameters: []
   /accounts/{id}:
     get:
       security:
@@ -115,7 +115,7 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: [ ]
+    parameters: []
   /domains:
     get:
       operationId: getDomainCollection
@@ -131,9 +131,9 @@ paths:
       summary: Retrieves the collection of Domain resources.
       description: Retrieves the collection of Domain resources.
       parameters:
-        - name: page
+        - name: size
           in: query
-          description: The collection page number
+          description: The collection size
           required: false
           deprecated: false
           allowEmptyValue: true
@@ -144,7 +144,7 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: [ ]
+    parameters: []
   /domains/{id}:
     get:
       operationId: getDomainItem
@@ -176,7 +176,7 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: [ ]
+    parameters: []
   /me:
     get:
       security:
@@ -197,9 +197,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       summary: Retrieves a Account resource.
       description: Retrieves a Account resource.
-      parameters: [ ]
+      parameters: []
       deprecated: false
-    parameters: [ ]
+    parameters: []
   /messages:
     get:
       security:
@@ -217,9 +217,9 @@ paths:
       summary: Retrieves the collection of Message resources.
       description: Retrieves the collection of Message resources.
       parameters:
-        - name: page
+        - name: size
           in: query
-          description: The collection page number
+          description: The collection size
           required: false
           deprecated: false
           allowEmptyValue: true
@@ -230,7 +230,7 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: [ ]
+    parameters: []
   /messages/{id}:
     get:
       security:
@@ -349,7 +349,7 @@ paths:
               $ref: '#/components/schemas/Message'
         required: true
       deprecated: false
-    parameters: [ ]
+    parameters: []
   /sources/{id}:
     get:
       security:
@@ -383,7 +383,7 @@ paths:
           explode: false
           allowReserved: false
       deprecated: false
-    parameters: [ ]
+    parameters: []
   /token:
     post:
       operationId: postCredentialsItem
@@ -402,7 +402,7 @@ paths:
                 $ref: '#/components/schemas/Token'
       summary: Get JWT token to login.
       description: ''
-      parameters: [ ]
+      parameters: []
       requestBody:
         description: Generate new JWT Token
         content:
@@ -411,7 +411,7 @@ paths:
               $ref: '#/components/schemas/Credentials'
         required: false
       deprecated: false
-    parameters: [ ]
+    parameters: []
 components:
   schemas:
     Account:
@@ -691,14 +691,11 @@ components:
       properties:
         code:
           type: string
+          description: A code specific to the particular message
         message:
           type: string
+          description: The related error message
       description: ErrorResponse
-  responses: { }
-  parameters: { }
-  examples: { }
-  requestBodies: { }
-  headers: { }
   securitySchemes:
     bearerAuth:
       type: http

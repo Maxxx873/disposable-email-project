@@ -10,7 +10,10 @@ import com.disposableemail.service.api.AccountService;
 import com.disposableemail.service.api.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -22,6 +25,8 @@ public class AccountServiceImpl implements AccountService {
     private final AuthorizationService authorizationService;
     private final CredentialsMapper credentialsMapper;
     private final AccountMapper accountMapper;
+
+    private final String USER_NAME_CLAIM = "preferred_username";
 
     @Override
     public Mono<AccountEntity> createAccountInAuthorizationServiceAndSaveToDb(Credentials credentials) {
@@ -38,8 +43,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Mono<AccountEntity> getAccountFromAddress(String address) {
-        log.info("Getting Account from address | ({})", address);
-        return accountRepository.findByAddress(address);
+    public Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange) {
+        log.info("Getting user name from {}}", USER_NAME_CLAIM);
+        return ReactiveSecurityContextHolder.getContext()
+                .map(context -> context.getAuthentication().getPrincipal())
+                .cast(Jwt.class)
+                .map(jwt -> jwt.getClaimAsString(USER_NAME_CLAIM)).flatMap(accountRepository::findByAddress);
     }
 }

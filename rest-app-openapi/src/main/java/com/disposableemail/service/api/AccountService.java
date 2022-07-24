@@ -3,9 +3,8 @@ package com.disposableemail.service.api;
 import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.rest.model.Token;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import java.security.Principal;
 
 public interface AccountService {
 
@@ -13,5 +12,5 @@ public interface AccountService {
 
     Mono<Token> getTokenFromAuthorizationService(Credentials credentials);
 
-    Mono<AccountEntity> getAccountFromAddress (String address);
+    Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange);
 }
