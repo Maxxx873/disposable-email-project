@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.NotAuthorizedException;
 
 @Slf4j
@@ -32,6 +33,27 @@ public class CustomExceptionHandler {
         log.error("Exception: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse(String.valueOf(HttpStatus.NOT_FOUND.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DomainNotAvailableException.class)
+    public final ResponseEntity<ErrorResponse> handleDomainNotFoundException(DomainNotAvailableException ex) {
+        log.error("Exception: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(String.valueOf(HttpStatus.UNPROCESSABLE_ENTITY.value()), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public final ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
+        log.error("Exception: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(String.valueOf(HttpStatus.BAD_REQUEST.value()), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<ErrorResponse> handleException(Exception ex) {
+        log.error("Exception: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(String.valueOf(HttpStatus.BAD_REQUEST.value()), "Bad request, something wrong");
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
 }

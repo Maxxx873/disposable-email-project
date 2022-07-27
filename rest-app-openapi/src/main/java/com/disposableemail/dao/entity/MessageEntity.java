@@ -6,16 +6,19 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Email;
 import java.util.List;
 
 @Data
 @Builder
+@Document
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@AllArgsConstructor
 public class MessageEntity {
 
     @Id
@@ -24,7 +27,10 @@ public class MessageEntity {
 
     private String accountId;
     private String msgid;
+
+    @Email
     private Address from;
+
     private List<Address> to;
     private List<Address> cc;
     private List<Address> bcc;

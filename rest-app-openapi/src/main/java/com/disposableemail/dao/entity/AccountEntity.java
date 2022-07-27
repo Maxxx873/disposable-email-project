@@ -5,25 +5,30 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @Builder
+@Document
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@AllArgsConstructor
 public class AccountEntity {
 
     @Id
     @Setter(AccessLevel.NONE)
     private String id;
 
+    @Email
     @Indexed(unique = true)
     private String address;
+
     private Integer quota;
     private Integer used;
     private Boolean isDisabled;
@@ -38,6 +43,7 @@ public class AccountEntity {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     private List<MessageEntity> messages;
+
     private DomainEntity domain;
 
 }

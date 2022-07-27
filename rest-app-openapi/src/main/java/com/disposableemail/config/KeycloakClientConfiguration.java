@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnProperty(prefix = "authorization", name = "service", havingValue = "keycloak", matchIfMissing = true)
-public class KeycloakClientConfig {
+public class KeycloakClientConfiguration {
 
     @Value("${keycloak.server.realm}")
     private String realm;

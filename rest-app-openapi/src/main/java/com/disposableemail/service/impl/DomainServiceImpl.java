@@ -36,6 +36,16 @@ public class DomainServiceImpl implements DomainService {
                         .isPrivate(true)
                         .isActive(false)
                         .domain("example.xyz")
+                        .build(),
+                DomainEntity.builder()
+                        .isPrivate(false)
+                        .isActive(true)
+                        .domain("example.biz")
+                        .build(),
+                DomainEntity.builder()
+                        .isPrivate(false)
+                        .isActive(true)
+                        .domain("example.usa")
                         .build()
         );
 
@@ -45,4 +55,5 @@ public class DomainServiceImpl implements DomainService {
                         .flatMap(domainRepository::saveAll))
                 .thenMany(domainRepository.findByIdNotNullOrderByCreatedAtDesc(PageRequest.ofSize(size)));
     }
+
 }

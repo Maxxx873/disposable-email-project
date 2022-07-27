@@ -13,4 +13,6 @@ public interface AccountService {
     Mono<Token> getTokenFromAuthorizationService(Credentials credentials);
 
     Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange);
+
+    String getDomainFromEmailAddress(String address);
 }

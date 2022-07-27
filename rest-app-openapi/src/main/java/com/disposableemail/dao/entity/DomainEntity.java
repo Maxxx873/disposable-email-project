@@ -5,14 +5,16 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 @Builder
+@Document
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@AllArgsConstructor
 public class DomainEntity {
 
     @Id
@@ -23,6 +25,7 @@ public class DomainEntity {
     private String domain;
 
     private Boolean isActive;
+
     private Boolean isPrivate;
 
     @CreatedDate
