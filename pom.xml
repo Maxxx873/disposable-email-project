@@ -29,6 +29,7 @@
         <keycloak-admin-client.version>18.0.2</keycloak-admin-client.version>
         <testcontainers.version>1.17.3</testcontainers.version>
         <org.mapstruct.version>1.5.1.Final</org.mapstruct.version>
+        <resilience4j-spring-boot2.version>1.7.1</resilience4j-spring-boot2.version>
     </properties>
     <dependencies>
         <dependency>
@@ -51,6 +52,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
 
         <!-- data -->
 
@@ -65,6 +74,30 @@
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
             <version>${keycloak-admin-client.version}</version>
+        </dependency>
+
+        <!-- retry -->
+
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot2</artifactId>
+            <version>${resilience4j-spring-boot2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-annotations</artifactId>
+            <version>${resilience4j-spring-boot2.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-retry</artifactId>
+            <version>${resilience4j-spring-boot2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-reactor</artifactId>
+            <version>${resilience4j-spring-boot2.version}</version>
         </dependency>
 
         <!-- openapi -->
