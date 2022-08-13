@@ -2,8 +2,8 @@ package com.disposableemail.config;
 
 import io.github.resilience4j.retry.RetryRegistry;
 import io.github.resilience4j.retry.annotation.Retry;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -18,16 +18,15 @@ import java.util.Objects;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class JwtDecoderConfiguration {
 
-    @Autowired
-    private ApplicationContext context;
-    @Autowired
-    private RetryRegistry registry;
+    private final ApplicationContext context;
+    private final RetryRegistry registry;
 
     @PostConstruct
     public void postConstruct() {
-        registry.retry("retryAuthorizationService").getEventPublisher().onRetry(ev -> log.info("messsage: {}", ev));
+        registry.retry("retryAuthorizationService").getEventPublisher().onRetry(ev -> log.info("Connect to Authorization Service: {}", ev));
     }
 
     @Retry(name = "retryAuthorizationService", fallbackMethod = "exitApplication")

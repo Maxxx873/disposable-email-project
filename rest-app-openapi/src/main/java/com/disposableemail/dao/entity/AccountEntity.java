@@ -44,6 +44,4 @@ public class AccountEntity {
 
     private List<MessageEntity> messages;
 
-    private DomainEntity domain;
-
 }

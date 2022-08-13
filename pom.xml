@@ -12,7 +12,7 @@
     <groupId>com.disposableemail</groupId>
     <artifactId>disposable-email-project</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>disposable-email-project</name>
+    <name>Disposable Email Project</name>
     <description>Aggregator for Disposable email project applications</description>
 
     <modules>

@@ -1,7 +1,6 @@
 package com.disposableemail.config;
 
-import io.github.resilience4j.retry.annotation.Retry;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
@@ -10,18 +9,17 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
+@RequiredArgsConstructor
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class SecurityConfiguration {
 
-    @Autowired
-    private JwtDecoderConfiguration decoderConfiguration;
+    private final JwtDecoderConfiguration decoderConfiguration;
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuerUri;
 
     @Bean
-    @Retry(name = "retryAuthorizationService")
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf().disable()

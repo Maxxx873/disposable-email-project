@@ -5,11 +5,13 @@ import com.disposableemail.dao.mapper.AccountMapper;
 import com.disposableemail.dao.mapper.CredentialsMapper;
 import com.disposableemail.dao.repository.AccountRepository;
 import com.disposableemail.dao.repository.DomainRepository;
+import com.disposableemail.exception.AccountNotFoundException;
 import com.disposableemail.exception.DomainNotAvailableException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.rest.model.Token;
 import com.disposableemail.service.api.AccountService;
 import com.disposableemail.service.api.AuthorizationService;
+import com.disposableemail.service.api.MailServerClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -28,20 +30,22 @@ public class AccountServiceImpl implements AccountService {
     private final CredentialsMapper credentialsMapper;
     private final AccountMapper accountMapper;
     private final DomainRepository domainRepository;
+
+    private final MailServerClientService mailServerClientService;
     private final String USER_NAME_CLAIM = "preferred_username";
 
     @Override
     public Mono<AccountEntity> createAccountInAuthorizationServiceAndSaveToDb(Credentials credentials) {
         log.info("Creating an Account | ({})", credentials.getAddress());
         return domainRepository.findByDomain(getDomainFromEmailAddress(credentials.getAddress()))
-                .doOnError(throwable -> log.error("Trying to find domain", throwable))
+                .doOnError(throwable -> log.error("Trying to find a Domain", throwable))
                 .map(domainEntity -> {
                     log.info("Using a Domain: {}", domainEntity.toString());
                     if (domainEntity.getIsActive() && !domainEntity.getIsPrivate()) {
                         authorizationService.createUser(credentials);
+                        mailServerClientService.createUser(credentials);
                         var accountEntity = accountMapper
                                 .accountToAccountEntity(credentialsMapper.credentialsToAccount(credentials));
-                        accountEntity.setDomain(domainEntity);
                         return accountRepository.save(accountEntity);
                     } else {
                         return Mono.just(new AccountEntity());
@@ -52,17 +56,35 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Mono<Token> getTokenFromAuthorizationService(Credentials credentials) {
-        log.info("Getting token for an Account | ({})", credentials.getAddress());
+        log.info("Getting a Token for an Account | ({})", credentials.getAddress());
         return Mono.just(authorizationService.getToken(credentials));
     }
 
     @Override
     public Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange) {
-        log.info("Getting user name from {}}", USER_NAME_CLAIM);
+        log.info("Getting user name from {}", USER_NAME_CLAIM);
         return ReactiveSecurityContextHolder.getContext()
                 .map(context -> context.getAuthentication().getPrincipal())
                 .cast(Jwt.class)
                 .map(jwt -> jwt.getClaimAsString(USER_NAME_CLAIM)).flatMap(accountRepository::findByAddress);
+    }
+
+    @Override
+    public Mono<AccountEntity> getAccount(String id) {
+        log.info("Getting an Account {}}", id);
+        return accountRepository.findById(id);
+    }
+
+    @Override
+    public Mono<AccountEntity> deleteAccount(String id) {
+        log.info("Deleting an Account {}}", id);
+        return accountRepository
+                .findById(id)
+                .switchIfEmpty(Mono.error(new AccountNotFoundException()))
+                .flatMap(accountEntity -> {
+                    log.info("Account {} is deleted", id);
+                    return accountRepository.delete(accountEntity).then(Mono.just(accountEntity));
+                });
     }
 
     @Override

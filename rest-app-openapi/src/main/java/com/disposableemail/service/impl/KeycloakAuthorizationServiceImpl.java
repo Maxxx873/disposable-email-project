@@ -18,7 +18,7 @@ import java.util.Collections;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class KeycloakAuthorizationService implements AuthorizationService {
+public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
 
     @Value("${keycloak.server.realm}")
     private String realm;

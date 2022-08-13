@@ -8,7 +8,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>rest-app-openapi</artifactId>
-    <name>rest-app-openapi</name>
+    <name>Disposable Email :: REST-API</name>
     <description>OpenAPI generated server</description>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

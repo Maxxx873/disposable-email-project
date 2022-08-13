@@ -5,6 +5,8 @@ authorization:
   service: ${AUTHORIZATION_SERVICE:keycloak}
 
 spring:
+  config:
+    import: optional:.env[.properties]
   main:
     allow-bean-definition-overriding: true
 
@@ -20,13 +22,11 @@ spring:
       host: ${MONGODB_HOST:localhost}
       port: ${MONGODB_PORT:27017}
       database: disposableemail
-      embedded:
-        version: 3.4.6
+      auto-index-creation: true
 
   mongodb:
     embedded:
       version: 3.4.6
-
 
 keycloak:
   server:
@@ -35,6 +35,10 @@ keycloak:
     username: ${KEYCLOAK_SERVER_USERNAME}
     password: ${KEYCLOAK_SERVER_PASSWORD}
     client: ${KEYCLOAK_SERVER_CLIENT:admin-cli}
+
+mail-server:
+  name: ${MAIL_SERVER_NAME:Apache James}
+  base-url: ${MAIL_SERVER_BASE_URL}
 
 logging:
   level.root: info
@@ -46,3 +50,6 @@ resilience4j.retry:
       waitDuration: 5s
       retryExceptions:
         - org.springframework.web.client.HttpServerErrorException
+    retryMailService:
+      maxAttempts: 5
+      waitDuration: 5s

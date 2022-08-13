@@ -2,7 +2,6 @@ package com.disposableemail.rest;
 
 
 import com.disposableemail.dao.mapper.AccountMapper;
-import com.disposableemail.dao.repository.AccountRepository;
 import com.disposableemail.exception.AccountNotFoundException;
 import com.disposableemail.rest.api.AccountsApiDelegate;
 import com.disposableemail.rest.model.Account;
@@ -24,20 +23,13 @@ import reactor.core.publisher.Mono;
 public class AccountsApiDelegateImpl implements AccountsApiDelegate {
 
     private final AccountService accountService;
-    private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
 
     @Override
     @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Account>> deleteAccountItem(String id, ServerWebExchange exchange) {
 
-        return accountRepository
-                .findById(id)
-                .switchIfEmpty(Mono.error(new AccountNotFoundException()))
-                .flatMap(accountEntity -> {
-                    log.info("Deleted Account Id: {}", id);
-                    return accountRepository.delete(accountEntity).then(Mono.just(accountEntity));
-                })
+        return accountService.deleteAccount(id)
                 .map(accountMapper::accountEntityToAccount)
                 .map(account -> ResponseEntity.status(HttpStatus.NO_CONTENT)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -48,7 +40,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Account>> getAccountItem(String id, ServerWebExchange exchange) {
 
-        return accountRepository.findById(id)
+        return accountService.getAccount(id)
                 .map(accountEntity -> {
                     log.info("Retrieved Account: {}", accountEntity.toString());
                     return ResponseEntity.status(HttpStatus.OK)

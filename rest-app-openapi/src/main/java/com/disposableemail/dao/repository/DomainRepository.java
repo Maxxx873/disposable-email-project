@@ -15,4 +15,5 @@ public interface DomainRepository extends ReactiveMongoRepository<DomainEntity, 
     Flux<DomainEntity> findByIdNotNullOrderByCreatedAtDesc(Pageable pageable);
 
     Mono<DomainEntity> findByDomain(String domainName);
+
 }
