@@ -1,6 +1,7 @@
 package com.disposableemail.exception;
 
 import com.disposableemail.rest.model.ErrorResponse;
+import com.mongodb.MongoWriteException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,13 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(AccountAlreadyRegisteredException.class)
     public final ResponseEntity<ErrorResponse> handleAccountAlreadyRegisteredException(AccountAlreadyRegisteredException ex) {
+        log.error("Exception: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(String.valueOf(HttpStatus.CONFLICT.value()), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(MongoWriteException.class)
+    public final ResponseEntity<ErrorResponse> handleMongoWriteException(MongoWriteException ex) {
         log.error("Exception: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse(String.valueOf(HttpStatus.CONFLICT.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);

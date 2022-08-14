@@ -35,7 +35,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         userRepresentation.setUsername(credentials.getAddress());
         credentialRepresentation.setValue(credentials.getPassword());
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
-        Response response = keycloak.realm(realm).users().create(userRepresentation);
+        var response = keycloak.realm(realm).users().create(userRepresentation);
         if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {
             log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
                     response.getStatus(), response.getStatusInfo());
