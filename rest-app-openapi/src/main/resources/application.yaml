@@ -23,10 +23,13 @@ spring:
       port: ${MONGODB_PORT:27017}
       database: disposableemail
       auto-index-creation: true
-
-  mongodb:
-    embedded:
-      version: 3.4.6
+    elasticsearch:
+      client:
+        reactive:
+          endpoints: ${ELASTICSEARCH_ENDPOINTS:localhost:9200}
+  elasticsearch:
+    rest:
+      uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
 
 keycloak:
   server:

@@ -30,7 +30,6 @@ public class AccountServiceImpl implements AccountService {
     private final CredentialsMapper credentialsMapper;
     private final AccountMapper accountMapper;
     private final DomainRepository domainRepository;
-
     private final MailServerClientService mailServerClientService;
     private final String USER_NAME_CLAIM = "preferred_username";
 
@@ -62,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange) {
-        log.info("Getting user name from {}", USER_NAME_CLAIM);
+        log.info("Getting an Account from {}", USER_NAME_CLAIM);
         return ReactiveSecurityContextHolder.getContext()
                 .map(context -> context.getAuthentication().getPrincipal())
                 .cast(Jwt.class)

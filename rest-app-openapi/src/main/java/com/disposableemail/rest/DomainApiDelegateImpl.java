@@ -1,7 +1,7 @@
 package com.disposableemail.rest;
 
 import com.disposableemail.dao.mapper.DomainMapper;
-import com.disposableemail.exception.AccountNotFoundException;
+import com.disposableemail.exception.DomainNotAvailableException;
 import com.disposableemail.rest.api.DomainsApiDelegate;
 import com.disposableemail.rest.model.Domain;
 import com.disposableemail.service.api.DomainService;
@@ -41,6 +41,6 @@ public class DomainApiDelegateImpl implements DomainsApiDelegate {
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(domainMapper.domainEntityToDomain(domainEntity));
                 })
-                .switchIfEmpty(Mono.error(new AccountNotFoundException()));
+                .switchIfEmpty(Mono.error(new DomainNotAvailableException()));
     }
 }

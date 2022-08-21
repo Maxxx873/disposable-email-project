@@ -28,8 +28,28 @@ services:
 
   elasticsearch:
     image: blacktop/elasticsearch:7.10.2
+    ports:
+      - "9200:9200"
     environment:
       - discovery.type=single-node
+    networks:
+      - james
+
+  elastichq:
+    image: elastichq/elasticsearch-hq
+    ports:
+      - "5000:5000"
+    environment:
+      - HQ_DEFAULT_URL=http://elasticsearch:9200
+    networks:
+      - james
+
+  kibana:
+    image: blacktop/kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
     networks:
       - james
 

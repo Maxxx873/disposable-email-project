@@ -1,0 +1,20 @@
+server:
+  port: ${PORT:8088}
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      database: disposableemail
+      auto-index-creation: true
+
+  mongodb:
+    embedded:
+      version: 3.4.6
+
+logging:
+  level.root: info

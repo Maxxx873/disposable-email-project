@@ -25,7 +25,6 @@ public class DomainEntity {
     private String domain;
 
     private Boolean isActive;
-
     private Boolean isPrivate;
 
     @CreatedDate

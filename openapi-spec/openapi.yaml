@@ -474,11 +474,13 @@ components:
           readOnly: true
           type: string
         from:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
           example:
-            address: from@example.com
-            name: John Doe
+            - address: receiver1@example.com
+              name: John Doe
           readOnly: true
-          $ref: '#/components/schemas/Address'
         to:
           type: array
           items:
@@ -512,9 +514,9 @@ components:
         subject:
           readOnly: true
           type: string
-        seen:
+        isUnread:
           type: boolean
-        flagged:
+        isFlagged:
           readOnly: true
           type: boolean
         isDeleted:
@@ -537,7 +539,7 @@ components:
           type: array
           items:
             type: string
-        hasAttachments:
+        hasAttachment:
           readOnly: true
           type: boolean
         attachments:
@@ -590,11 +592,13 @@ components:
           readOnly: true
           type: string
         from:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
           example:
-            - address: from@example.com
+            - address: receiver1@example.com
               name: John Doe
           readOnly: true
-          $ref: '#/components/schemas/Address'
         to:
           type: array
           items:
@@ -608,14 +612,11 @@ components:
         subject:
           readOnly: true
           type: string
-        intro:
-          readOnly: true
-          type: string
-        seen:
+        isUnread:
           type: boolean
         isDeleted:
           type: boolean
-        hasAttachments:
+        hasAttachment:
           readOnly: true
           type: boolean
         size:

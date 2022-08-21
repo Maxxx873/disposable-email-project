@@ -3,59 +3,49 @@ package com.disposableemail.dao.entity;
 import com.disposableemail.rest.model.Address;
 import com.disposableemail.rest.model.Attachment;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import javax.validation.constraints.Email;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
 @Builder
-@Document
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
 @AllArgsConstructor
+@Document(indexName = "mailbox_v1")
 public class MessageEntity {
 
-    @Id
-    @Setter(AccessLevel.NONE)
-    private String id;
-
+    private String messageId;
     private String accountId;
     private String msgid;
-
-    @Email
-    private Address from;
-
+    private List<Address> from;
     private List<Address> to;
     private List<Address> cc;
     private List<Address> bcc;
     private String subject;
-    private Boolean seen;
-    private Boolean flagged;
+    private Boolean isUnread;
+    private Boolean isFlagged;
     private Boolean isDeleted;
     private List<String> verifications;
     private Boolean retention;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private java.time.LocalDateTime retentionDate;
+    private LocalDateTime retentionDate;
 
-    private String text;
-    private List<String> html;
-    private Boolean hasAttachments;
+    private String textBody;
+    private List<String> htmlBody;
+    private Boolean hasAttachment;
     private List<Attachment> attachments;
     private Integer size;
     private String downloadUrl;
 
-    @CreatedDate
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private java.time.LocalDateTime createdAt;
+    @Field(type = FieldType.Date, format = DateFormat.date, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private OffsetDateTime date;
 
-    @LastModifiedBy
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private java.time.LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 }

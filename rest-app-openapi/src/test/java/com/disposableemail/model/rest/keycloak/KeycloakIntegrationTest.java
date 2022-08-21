@@ -1,5 +1,6 @@
 package com.disposableemail.model.rest.keycloak;
 
+import com.disposableemail.config.TestConfig;
 import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.AuthorizationService;
@@ -12,6 +13,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.ws.rs.NotAuthorizedException;
@@ -22,6 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @Slf4j
+@ActiveProfiles("test")
+@ContextConfiguration(classes = TestConfig.class)
 @TestPropertySource(properties = {"authorization.service=keycloak"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -62,7 +67,7 @@ public class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
     void shouldConflictAddUserIfUserAlreadyExisting() {
         log.debug("shouldConflictAddUserIfUserAlreadyExisting()");
 
-        var response = authorizationService.createUser(credentials);
+        authorizationService.createUser(credentials);
 
         assertThatThrownBy(() -> authorizationService.createUser(credentials))
                 .isInstanceOf(AccountAlreadyRegisteredException.class);

@@ -43,6 +43,13 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(MessageNotFoundException.class)
+    public final ResponseEntity<ErrorResponse> handleMessageNotFoundException(MessageNotFoundException ex) {
+        log.error("Exception: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(String.valueOf(HttpStatus.NOT_FOUND.value()), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(DomainNotAvailableException.class)
     public final ResponseEntity<ErrorResponse> handleDomainNotFoundException(DomainNotAvailableException ex) {
         log.error("Exception: {}", ex.getMessage());
