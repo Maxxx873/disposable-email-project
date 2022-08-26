@@ -38,9 +38,9 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
     @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Message>> getMessageItem(String id, ServerWebExchange exchange) {
 
-        return messageService.getMessage(id)
+        return messageService.getMessage(id, exchange)
                 .map(messageEntity -> {
-                    log.info("Retrieved Account: {}", messageEntity.toString());
+                    log.info("Retrieved Message: {}", messageEntity.toString());
                     return ResponseEntity.status(HttpStatus.OK)
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(messageMapper.messageEntityToMessage(messageEntity));

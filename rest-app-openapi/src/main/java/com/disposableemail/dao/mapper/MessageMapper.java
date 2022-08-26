@@ -15,6 +15,7 @@ public interface MessageMapper {
     @Mapping(source = "messageId", target = "id")
     @Mapping(source = "textBody", target = "text")
     @Mapping(source = "htmlBody", target = "html")
+    @Mapping(source = "mimeMessageID", target = "msgid")
     @Mapping(target = "createdAt", expression = "java(messageEntity.getDate().toLocalDateTime())")
     Message messageEntityToMessage(MessageEntity messageEntity);
 
@@ -25,6 +26,7 @@ public interface MessageMapper {
     }
 
     @Mapping(source = "messageId", target = "id")
+    @Mapping(source = "mimeMessageID", target = "msgid")
     @Mapping(target = "createdAt", expression = "java(messageEntity.getDate().toLocalDateTime())")
     Messages messageEntityToMessages(MessageEntity messageEntity);
 

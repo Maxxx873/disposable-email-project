@@ -8,5 +8,5 @@ import reactor.core.publisher.Mono;
 public interface MessageService {
     Flux<MessageEntity> getMessages(ServerWebExchange exchange);
 
-    Mono<MessageEntity> getMessage(String addressTo);
+    Mono<MessageEntity> getMessage(String id, ServerWebExchange exchange);
 }

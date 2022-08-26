@@ -521,16 +521,6 @@ components:
           type: boolean
         isDeleted:
           type: boolean
-        verifications:
-          readOnly: true
-          type: array
-          items:
-            type: string
-        retention:
-          type: boolean
-        retentionDate:
-          type: string
-          format: date-time
         text:
           readOnly: true
           type: string

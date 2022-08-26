@@ -9,10 +9,10 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface MessageRepository extends ReactiveElasticsearchRepository<MessageEntity, String> {
-    @Query("{\"match_phrase\": {\"to.address.raw\": \"?0\"}}")
+    @Query("{\"match\": {\"to.address.raw\": \"?0\"}}")
     Flux<MessageEntity> findByAddressTo(String addressTo);
 
-    Mono<MessageEntity> findByMessageId(String id);
-
+    @Query("{\"bool\": {\"must\": [{ \"match\":{ \"to.address.raw\": \"?0\"}},{ \"match\": { \"messageId\": \"?1\"}}]}}")
+    Mono<MessageEntity> findByAddressToAndMessageId(String addressTo, String messageId);
 
 }

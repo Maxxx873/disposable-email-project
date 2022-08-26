@@ -65,7 +65,10 @@ public class AccountServiceImpl implements AccountService {
         return ReactiveSecurityContextHolder.getContext()
                 .map(context -> context.getAuthentication().getPrincipal())
                 .cast(Jwt.class)
-                .map(jwt -> jwt.getClaimAsString(USER_NAME_CLAIM)).flatMap(accountRepository::findByAddress);
+                .map(jwt -> {
+                    log.info("Retrieved User name {} from JWT", jwt.getClaimAsString(USER_NAME_CLAIM));
+                    return  jwt.getClaimAsString(USER_NAME_CLAIM);
+                }).flatMap(accountRepository::findByAddress);
     }
 
     @Override

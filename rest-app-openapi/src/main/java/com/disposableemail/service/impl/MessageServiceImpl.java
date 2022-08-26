@@ -2,7 +2,6 @@ package com.disposableemail.service.impl;
 
 import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.dao.entity.MessageEntity;
-import com.disposableemail.dao.repository.AccountRepository;
 import com.disposableemail.dao.repository.MessageRepository;
 import com.disposableemail.service.api.AccountService;
 import com.disposableemail.service.api.MessageService;
@@ -20,7 +19,6 @@ import reactor.core.publisher.Mono;
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final AccountRepository accountRepository;
     private final AccountService accountService;
 
     @Override
@@ -33,15 +31,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Mono<MessageEntity> getMessage(String id) {
+    public Mono<MessageEntity> getMessage(String id, ServerWebExchange exchange) {
         log.info("Getting a Message {}", id);
 
-        return messageRepository.findByMessageId(id).map(messageEntity -> {
-            var address = messageEntity.getTo().stream().findFirst().get().getAddress();
-            var account = accountRepository.findByAddress(address).map(AccountEntity::getId);
-            account.subscribe(messageEntity::setAccountId);
-            return messageEntity;
-        });
+        return  accountService.getAccountFromJwt(exchange)
+                .map(AccountEntity::getAddress)
+                .flatMap(address -> messageRepository.findByAddressToAndMessageId(address, id));
     }
-
 }
