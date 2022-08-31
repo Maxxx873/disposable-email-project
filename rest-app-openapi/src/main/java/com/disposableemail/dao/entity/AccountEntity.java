@@ -10,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder
@@ -22,7 +21,6 @@ import java.util.List;
 public class AccountEntity {
 
     @Id
-    @Setter(AccessLevel.NONE)
     private String id;
 
     @Email
@@ -36,12 +34,10 @@ public class AccountEntity {
 
     @CreatedDate
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @LastModifiedBy
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    private List<MessageEntity> messages;
+    private LocalDateTime updatedAt;
 
 }

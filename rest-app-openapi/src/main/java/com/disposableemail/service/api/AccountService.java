@@ -16,7 +16,9 @@ public interface AccountService {
 
     String getDomainFromEmailAddress(String address);
 
-    Mono<AccountEntity> getAccount(String id);
+    Mono<AccountEntity> getAccountById(String id);
+
+    Mono<AccountEntity> getAccountByAddress(String address);
 
     Mono<AccountEntity> deleteAccount(String id);
 }

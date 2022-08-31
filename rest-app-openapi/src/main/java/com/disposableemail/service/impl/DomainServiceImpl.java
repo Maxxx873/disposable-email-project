@@ -28,7 +28,7 @@ public class DomainServiceImpl implements DomainService {
         log.info("Getting a Domains collection | Size {}", size);
         return mailServerClientService.getDomains()
                 .flatMap(domainEntity -> domainRepository.findByDomain(domainEntity.getDomain()).switchIfEmpty(Mono.defer(() -> {
-                    log.info("Added new domain from {} | {} ", mailServerName, domainEntity.getDomain());
+                    log.info("Added a new Domain from {} | {} ", mailServerName, domainEntity.getDomain());
                     return domainRepository.save(domainEntity);
                 })))
                 .thenMany(domainRepository.findByIdNotNullOrderByCreatedAtDesc(PageRequest.ofSize(size)));

@@ -2,6 +2,7 @@ package com.disposableemail.rest;
 
 import com.disposableemail.dao.mapper.MessageMapper;
 import com.disposableemail.exception.MessageNotFoundException;
+import com.disposableemail.exception.MessagesNotFoundException;
 import com.disposableemail.rest.api.MessagesApiDelegate;
 import com.disposableemail.rest.model.Message;
 import com.disposableemail.rest.model.Messages;
@@ -30,8 +31,31 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
     public Mono<ResponseEntity<Flux<Messages>>> getMessageCollection(Integer size, ServerWebExchange exchange) {
 
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(messageService.getMessages(exchange).map(messageMapper::messageEntityToMessages)));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(messageService.getMessagesFromElasticsearchAndSaveToDb(size, exchange)
+                                .map(messageMapper::messageEntityToMessages)))
+                .switchIfEmpty(Mono.error(new MessagesNotFoundException()));
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Mono<ResponseEntity<Void>> deleteMessageItem(String id, ServerWebExchange exchange) {
+
+        return messageService.deleteMessage(id, exchange)
+                .switchIfEmpty(Mono.error(new MessageNotFoundException()))
+                .map(value -> ResponseEntity.noContent().build());
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Mono<ResponseEntity<Message>> patchMessageItem(String id, Mono<Message> message, ServerWebExchange exchange) {
+
+        return messageMapper.messageToMessageEntity(message).flatMap(messageEntity ->
+                messageService.updateMessage(id, messageEntity, exchange))
+                .switchIfEmpty(Mono.error(new MessageNotFoundException()))
+                .map(messageEntity -> ResponseEntity.status(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(messageMapper.messageEntityToMessage(messageEntity)));
     }
 
     @Override

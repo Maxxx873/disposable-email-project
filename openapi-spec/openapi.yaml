@@ -195,8 +195,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      summary: Retrieves a Account resource.
-      description: Retrieves a Account resource.
+      summary: Retrieves an Account resource.
+      description: Retrieves an Account resource.
       parameters: []
       deprecated: false
     parameters: []

@@ -40,7 +40,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Account>> getAccountItem(String id, ServerWebExchange exchange) {
 
-        return accountService.getAccount(id)
+        return accountService.getAccountById(id)
                 .map(accountEntity -> {
                     log.info("Retrieved Account: {}", accountEntity.toString());
                     return ResponseEntity.status(HttpStatus.OK)

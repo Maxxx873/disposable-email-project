@@ -3,41 +3,49 @@ package com.disposableemail.dao.entity;
 import com.disposableemail.rest.model.Address;
 import com.disposableemail.rest.model.Attachment;
 import lombok.*;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
 @Builder
+@Document
 @ToString
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@AllArgsConstructor
-@Document(indexName = "mailbox_v1")
 public class MessageEntity {
 
-    private String messageId;
+    @Id
+    @Setter(AccessLevel.NONE)
+    private String id;
+
     private String accountId;
-    private String mimeMessageID;
+    private String msgid;
     private List<Address> from;
     private List<Address> to;
     private List<Address> cc;
     private List<Address> bcc;
     private String subject;
-    private Boolean isUnread;
-    private Boolean isFlagged;
+    private Boolean seen;
+    private Boolean flagged;
     private Boolean isDeleted;
-    private String textBody;
-    private List<String> htmlBody;
-    private Boolean hasAttachment;
+    private String text;
+    private List<String> html;
+    private Boolean hasAttachments;
     private List<Attachment> attachments;
     private Integer size;
     private String downloadUrl;
 
-    @Field(type = FieldType.Date, format = DateFormat.date, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
-    private OffsetDateTime date;
+    @CreatedDate
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private java.time.LocalDateTime createdAt;
+
+    @LastModifiedBy
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private java.time.LocalDateTime updatedAt;
 }

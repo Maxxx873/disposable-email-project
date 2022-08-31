@@ -67,14 +67,20 @@ public class AccountServiceImpl implements AccountService {
                 .cast(Jwt.class)
                 .map(jwt -> {
                     log.info("Retrieved User name {} from JWT", jwt.getClaimAsString(USER_NAME_CLAIM));
-                    return  jwt.getClaimAsString(USER_NAME_CLAIM);
+                    return jwt.getClaimAsString(USER_NAME_CLAIM);
                 }).flatMap(accountRepository::findByAddress);
     }
 
     @Override
-    public Mono<AccountEntity> getAccount(String id) {
-        log.info("Getting an Account {}}", id);
+    public Mono<AccountEntity> getAccountById(String id) {
+        log.info("Getting an Account by id {}}", id);
         return accountRepository.findById(id);
+    }
+
+    @Override
+    public Mono<AccountEntity> getAccountByAddress(String address) {
+        log.info("Getting an Account by address {}}", address);
+        return accountRepository.findByAddress(address);
     }
 
     @Override
