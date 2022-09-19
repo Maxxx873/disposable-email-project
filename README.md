@@ -20,8 +20,8 @@ The specified versions are the tested ones.
 * JDK 17+
 * Git 2.25.1+
 * Apache Maven 3.6.3+
-* Docker 20.10.12+
-* Docker-compose 1.29.2+
+* Docker 20.10.18+
+* Docker compose 2.5.0+
 
 <a href="https://dsp-mail-rest-app-openapi.herokuapp.com/">Demo API</a>
 
@@ -55,7 +55,7 @@ docker run --network james -p 25:25 -p 143:143 -p 8000:8000 -v $(pwd)/apache-jam
 ```
 Running **Distributed Apache James** with docker-compose:
 ```bash
-docker-compose -f apache-james/docker-compose.yml up
+docker compose -f apache-james/docker-compose.yml up
 ```
 
 Running **Mongodb**:
@@ -63,10 +63,22 @@ Running **Mongodb**:
 docker run --name mongodb -d -p 27017:27017 mongo
 ```
 
+### Web administration for James
+
+Get the list of domains:
+```bash
+curl -XGET http://localhost:8000/domains
+```
+
+Create a domain:
+```bash
+curl -XPUT http://localhost:8000/domains/example.com
+```
+
 ### Thunderbird mail configuration locally:
 
 - SMTP server name: localhost
-- SMTP port: 25
+- SMTP port: 465
 - SMTP connection security: SSL/TLS
 - SMTP authentication: Normal password
 - IMAP server name: 127.0.0.1

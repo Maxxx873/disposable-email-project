@@ -11,13 +11,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 
+/**
+ * An Account entity.
+ */
 @Data
 @Builder
-@Document
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
 @AllArgsConstructor
+@Document(collection = "account")
 public class AccountEntity {
 
     @Id

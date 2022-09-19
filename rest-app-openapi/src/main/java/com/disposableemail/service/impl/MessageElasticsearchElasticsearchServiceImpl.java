@@ -2,7 +2,7 @@ package com.disposableemail.service.impl;
 
 import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.dao.entity.MessageElasticsearchEntity;
-import com.disposableemail.dao.repository.MessageElasticsearchRepository;
+import com.disposableemail.dao.repository.search.MessageElasticsearchRepository;
 import com.disposableemail.service.api.AccountService;
 import com.disposableemail.service.api.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;

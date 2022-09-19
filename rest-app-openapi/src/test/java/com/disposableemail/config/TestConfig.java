@@ -1,6 +1,6 @@
 package com.disposableemail.config;
 
-import com.disposableemail.dao.repository.MessageElasticsearchRepository;
+import com.disposableemail.dao.repository.search.MessageElasticsearchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;

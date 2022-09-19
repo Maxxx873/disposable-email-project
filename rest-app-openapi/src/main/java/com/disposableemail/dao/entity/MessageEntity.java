@@ -11,13 +11,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.List;
 
+/**
+ * A Message entity.
+ */
 @Data
 @Builder
-@Document
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@Document(collection = "message")
 public class MessageEntity {
 
     @Id

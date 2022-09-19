@@ -1,4 +1,4 @@
-package com.disposableemail.dao.repository;
+package com.disposableemail.dao.repository.search;
 
 import com.disposableemail.dao.entity.MessageElasticsearchEntity;
 import org.springframework.data.elasticsearch.annotations.Query;
@@ -9,11 +9,33 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface MessageElasticsearchRepository extends ReactiveElasticsearchRepository<MessageElasticsearchEntity, String> {
-    @Query("{\"match\": {\"to.address.raw\": \"?0\"}}")
+    @Query("""
+            {
+                "match": {
+                    "to.address.raw": "?0"
+                }
+            }
+            """)
     Flux<MessageElasticsearchEntity> findByAddressTo(String addressTo);
 
-    @Query("{\"bool\": {\"must\": [{ \"term\":{ \"to.address.raw\": \"?0\"}},{ \"match\": { \"messageId\": \"?1\"}}]}}")
+    @Query("""
+            {
+              "bool": {
+                "must": [
+                  {
+                    "term": {
+                      "to.address.raw": "?0"
+                    }
+                  },
+                  {
+                    "match": {
+                      "messageId": "?1"
+                    }
+                  }
+                ]
+              }
+            }
+            """)
     Mono<MessageElasticsearchEntity> findByAddressToAndMessageId(String addressTo, String messageId);
-
 
 }

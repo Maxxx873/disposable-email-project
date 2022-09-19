@@ -8,13 +8,16 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
+/**
+ * A Domain entity.
+ */
 @Data
 @Builder
-@Document
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
 @AllArgsConstructor
+@Document(collection = "domain")
 public class DomainEntity {
 
     @Id
