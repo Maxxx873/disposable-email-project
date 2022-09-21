@@ -30,6 +30,7 @@
         <testcontainers.version>1.17.3</testcontainers.version>
         <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
         <resilience4j-spring-boot2.version>1.7.1</resilience4j-spring-boot2.version>
+        <reactor-test.version>3.4.23</reactor-test.version>
     </properties>
     <dependencies>
         <dependency>
@@ -163,6 +164,12 @@
             <artifactId>junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+            <version>${reactor-test.version}</version>
         </dependency>
     </dependencies>
 

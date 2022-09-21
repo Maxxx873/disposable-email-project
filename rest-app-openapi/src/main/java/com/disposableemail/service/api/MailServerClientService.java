@@ -11,6 +11,8 @@ public interface MailServerClientService {
 
     Flux<DomainEntity> getDomains();
 
-    Response createUser(Credentials credentials);
+    Mono<Response> createUser(Credentials credentials);
+
+    Mono<String> getMailboxId(String username, String mailboxName);
 
 }

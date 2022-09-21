@@ -1,6 +1,7 @@
 package com.disposableemail.service.impl;
 
 import com.disposableemail.dao.entity.DomainEntity;
+import com.disposableemail.exception.MailboxNotFoundException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.MailServerClientService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,6 +23,7 @@ import javax.annotation.PostConstruct;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -31,15 +33,43 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @Value("${mail-server.name}")
     private String mailServerName;
 
+    private final String MAILBOX_ID_KEY = "mailboxId";
+
     private final ObjectMapper mapper;
 
     private final WebClient mailServerApiClient;
 
     private final RetryRegistry registry;
 
+
     @PostConstruct
     public void postConstruct() {
         registry.retry("retryMailService").getEventPublisher().onRetry(ev -> log.info("Connect to {} API: {}", mailServerName, ev));
+    }
+
+    @Override
+    public Mono<String> getMailboxId(String username, String mailboxName) {
+
+        return mailServerApiClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/users/{username}/mailboxes")
+                        .build(username))
+                .retrieve()
+                .bodyToMono(String.class).map(response -> {
+                    try {
+                        log.info("Getting mailboxes for user {} | {}", username, response);
+                        return mapper.readValue(response, new TypeReference<List<Map<String, String>>>() {
+                        });
+                    } catch (JsonProcessingException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                })
+                .map(mailboxes ->
+                        mailboxes.stream().filter(mailbox ->
+                                        mailbox.containsValue(mailboxName) && mailbox.containsKey(MAILBOX_ID_KEY))
+                                .findFirst())
+                .flatMap(optional -> optional.map(mailbox ->
+                        Mono.just(mailbox.get(MAILBOX_ID_KEY))).orElseGet(Mono::empty))
+                .switchIfEmpty(Mono.error(new MailboxNotFoundException()));
     }
 
     @Override
@@ -54,7 +84,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
             } catch (JsonProcessingException ex) {
                 throw new RuntimeException(ex);
             }
-        }).flatMapIterable(list -> list).map(domainName -> DomainEntity.builder()
+        }).flatMapIterable(domains -> domains).map(domainName -> DomainEntity.builder()
                 .domain(domainName)
                 .isActive(true)
                 .isPrivate(false)
@@ -63,7 +93,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
 
     @Override
     @SneakyThrows
-    public Response createUser(Credentials credentials) {
+    public Mono<Response> createUser(Credentials credentials) {
         log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
 
         var user = mapper.createObjectNode();
@@ -74,8 +104,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(mapper.writeValueAsString(user)), String.class)
                 .retrieve()
-                .bodyToMono(Response.class)
-                .block();
+                .bodyToMono(Response.class);
     }
 
     public Flux<DomainEntity> getMockDomains(Throwable t) {
