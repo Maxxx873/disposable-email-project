@@ -50,9 +50,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @Override
     public Mono<String> getMailboxId(String username, String mailboxName) {
 
-        return mailServerApiClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/users/{username}/mailboxes")
-                        .build(username))
+        return mailServerApiClient.get().uri("/users/{username}/mailboxes", username)
                 .retrieve()
                 .bodyToMono(String.class).map(response -> {
                     try {

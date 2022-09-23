@@ -1,7 +1,6 @@
 package com.disposableemail.service.api;
 
 import com.disposableemail.dao.entity.MessageEntity;
-import com.disposableemail.rest.model.Message;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

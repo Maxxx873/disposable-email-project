@@ -38,4 +38,6 @@ public interface MessageElasticsearchRepository extends ReactiveElasticsearchRep
             """)
     Mono<MessageElasticsearchEntity> findByAddressToAndMessageId(String addressTo, String messageId);
 
+    Flux<MessageElasticsearchEntity> findByMailboxId(String mailboxId);
+
 }
