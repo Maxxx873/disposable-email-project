@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -28,7 +29,10 @@ public class MessageEntity {
     private String id;
 
     private String accountId;
+
+    @Indexed(unique = true)
     private String msgid;
+
     private List<Address> from;
     private List<Address> to;
     private List<Address> cc;

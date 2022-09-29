@@ -1,4 +1,4 @@
-package com.disposableemail.dao.entity;
+package com.disposableemail.dao.entity.search;
 
 import com.disposableemail.rest.model.Address;
 import com.disposableemail.rest.model.Attachment;
@@ -22,6 +22,7 @@ public class MessageElasticsearchEntity {
 
     private String accountId;
     private String messageId;
+    private String mailboxId;
     private String mimeMessageID;
     private List<Address> from;
     private List<Address> to;

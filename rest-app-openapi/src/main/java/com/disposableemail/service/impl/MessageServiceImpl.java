@@ -4,10 +4,9 @@ import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.dao.entity.MessageEntity;
 import com.disposableemail.dao.mapper.MessageElasticsearchMapper;
 import com.disposableemail.dao.repository.MessageRepository;
-import com.disposableemail.rest.model.Address;
 import com.disposableemail.service.api.AccountService;
-import com.disposableemail.service.api.MessageElasticsearchService;
 import com.disposableemail.service.api.MessageService;
+import com.disposableemail.service.api.search.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Collections;
 
 @Slf4j
 @Service
@@ -67,7 +64,7 @@ public class MessageServiceImpl implements MessageService {
     public Flux<MessageEntity> getMessagesFromElasticsearchAndSaveToDb(Integer size, ServerWebExchange exchange) {
         log.info("Getting a Messages collection | Size {}", size);
 
-        return messageElasticsearchService.getMessages(exchange)
+        return messageElasticsearchService.getMessagesFromMailbox(exchange)
                 .flatMap(messageElasticsearchEntity ->
                         messageRepository.findById(messageElasticsearchEntity.getMessageId())
                                 .switchIfEmpty(Mono.defer(() -> {
@@ -76,10 +73,11 @@ public class MessageServiceImpl implements MessageService {
                                             .messageElasticsearchEntityToMessageEntity(messageElasticsearchEntity);
                                     return messageRepository.save(message);
                                 })))
-                .thenMany(accountService.getAccountFromJwt(exchange).map(AccountEntity::getAddress)
-                        .flatMapMany(address ->
-                                messageRepository.findByToAndIsDeletedFalseOrderByCreatedAtDesc(Collections
-                                        .singletonList(Address.builder().address(address).build()), Pageable.ofSize(size))));
+                .thenMany(accountService.getAccountFromJwt(exchange).map(AccountEntity::getId)
+                        .flatMapMany(accountId ->
+                                messageRepository
+                                        .findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountId,
+                                                Pageable.ofSize(size))));
 
     }
 

@@ -1,7 +1,7 @@
 package com.disposableemail.dao.mapper;
 
-import com.disposableemail.dao.entity.MessageElasticsearchEntity;
 import com.disposableemail.dao.entity.MessageEntity;
+import com.disposableemail.dao.entity.search.MessageElasticsearchEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
