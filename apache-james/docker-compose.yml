@@ -23,6 +23,7 @@ services:
       - "8000:8000"
     volumes:
       - ./conf/:/root/conf/
+      - ./extensions-jars/:/root/extensions-jars/
     networks:
       - james
 

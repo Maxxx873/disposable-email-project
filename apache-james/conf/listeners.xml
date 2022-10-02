@@ -29,6 +29,9 @@
   <listener>
     <class>org.apache.james.mailbox.cassandra.MailboxOperationLoggingListener</class>
   </listener>
+  <listener>
+    <class>com.disposableemail.apache.james.listener.DeleteBigMessages</class>
+  </listener>
   <preDeletionHook>
     <class>org.apache.james.vault.DeletedMessageVaultHook</class>
   </preDeletionHook>

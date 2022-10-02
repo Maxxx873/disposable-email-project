@@ -17,6 +17,7 @@
 
     <modules>
         <module>rest-app-openapi</module>
+        <module>apache-james/extensions</module>
     </modules>
 
     <properties>
@@ -26,7 +27,7 @@
         <swagger-annotations.version>2.2.2</swagger-annotations.version>
         <jackson-databind-nullable.version>0.2.3</jackson-databind-nullable.version>
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
-        <keycloak-admin-client.version>19.0.1</keycloak-admin-client.version>
+        <keycloak-admin-client.version>19.0.2</keycloak-admin-client.version>
         <testcontainers.version>1.17.3</testcontainers.version>
         <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
         <resilience4j-spring-boot2.version>1.7.1</resilience4j-spring-boot2.version>
