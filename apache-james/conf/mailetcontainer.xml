@@ -35,11 +35,9 @@
     </spooler>
 
     <processors>
+
         <processor state="root" enableJmx="true">
-            <mailet match="All" class="PostmasterAlias"/>
-            <mailet match="RelayLimit=30" class="Null"/>
-            <mailet match="All" class="ToProcessor">
-                <processor>transport</processor>
+            <mailet match="All" class="com.disposableemail.apache.james.mailet.DumpMimeInToSystemOutMailet">
             </mailet>
         </processor>
 
@@ -158,5 +156,4 @@
     </processors>
 
 </mailetcontainer>
-
 

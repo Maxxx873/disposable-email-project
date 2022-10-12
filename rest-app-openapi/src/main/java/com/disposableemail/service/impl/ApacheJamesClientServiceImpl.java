@@ -34,6 +34,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     private String mailServerName;
 
     private final String MAILBOX_ID_KEY = "mailboxId";
+    private final String PASSWORD_FIELD = "password";
 
     private final ObjectMapper mapper;
 
@@ -94,15 +95,17 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     public Mono<Response> createUser(Credentials credentials) {
         log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
 
-        var user = mapper.createObjectNode();
-        user.put("password", credentials.getPassword());
-
-        return mailServerApiClient.put()
+        var password = mapper.createObjectNode();
+        password.put(PASSWORD_FIELD, credentials.getPassword());
+        var stream = mailServerApiClient.put()
                 .uri("/users/" + credentials.getAddress())
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(mapper.writeValueAsString(user)), String.class)
+                .bodyValue(mapper.writeValueAsString(password))
                 .retrieve()
                 .bodyToMono(Response.class);
+        stream.subscribe();
+
+        return stream;
     }
 
     public Flux<DomainEntity> getMockDomains(Throwable t) {
@@ -119,8 +122,8 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                         .isActive(true)
                         .domain("example.org")
                         .build()
-
         );
+
         return Flux.just(domainList).flatMapIterable(list -> list);
     }
 }

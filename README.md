@@ -77,12 +77,15 @@ curl -XPUT http://localhost:8000/domains/example.com
 
 ### Thunderbird mail configuration locally:
 
-- SMTP server name: localhost
-- SMTP port: 465
-- SMTP connection security: SSL/TLS
-- SMTP authentication: Normal password
+#### Incoming Server:
 - IMAP server name: 127.0.0.1
 - IMAP port: 993
 - IMAP connection security: SSL/TLS
 - IMAP authentication: Normal password
+
+#### Outgoing Server:
+- SMTP server name: localhost
+- SMTP port: 465
+- SMTP connection security: SSL/TLS
+- SMTP authentication: Normal password
 

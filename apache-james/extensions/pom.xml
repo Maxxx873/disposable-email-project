@@ -16,6 +16,11 @@
     <name>Apache James :: Extensions</name>
     <description>Apache James custom components.</description>
 
+    <modules>
+        <module>listeners</module>
+        <module>mailets</module>
+    </modules>
+
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -25,9 +30,5 @@
         <junit-jupiter-api.version>5.9.1</junit-jupiter-api.version>
         <assertj-core.version>3.23.1</assertj-core.version>
     </properties>
-
-    <modules>
-        <module>listeners</module>
-    </modules>
 
 </project>
