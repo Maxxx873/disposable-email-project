@@ -39,6 +39,11 @@
         <processor state="root" enableJmx="true">
             <mailet match="All" class="com.disposableemail.apache.james.mailet.DumpMimeInToSystemOutMailet">
             </mailet>
+            <mailet match="All" class="com.disposableemail.apache.james.mailet.SourceCollectorMailet">
+                <connectionString>mongodb://mongodb:27017</connectionString>
+                <database>disposableemail</database>
+                <collectionName>source</collectionName>
+            </mailet>
         </processor>
 
         <processor state="error" enableJmx="true">

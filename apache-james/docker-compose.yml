@@ -7,6 +7,7 @@ services:
       - elasticsearch
       - cassandra
       - rabbitmq
+      - mongodb
     image: apache/james:distributed-latest
     container_name: james-distributed
     hostname: james.local
@@ -47,6 +48,13 @@ services:
     image: cassandra:3.11.10
     ports:
       - "9042:9042"
+    networks:
+      - james
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
     networks:
       - james
 
