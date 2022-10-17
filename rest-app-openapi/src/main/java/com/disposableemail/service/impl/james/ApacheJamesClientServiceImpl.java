@@ -1,7 +1,6 @@
-package com.disposableemail.service.impl;
+package com.disposableemail.service.impl.james;
 
 import com.disposableemail.dao.entity.DomainEntity;
-import com.disposableemail.exception.MailboxNotFoundException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.MailServerClientService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,7 +20,7 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -49,11 +48,14 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     }
 
     @Override
+    @Retry(name = "retryMailService")
     public Mono<String> getMailboxId(String username, String mailboxName) {
 
         return mailServerApiClient.get().uri("/users/{username}/mailboxes", username)
                 .retrieve()
-                .bodyToMono(String.class).map(response -> {
+                .bodyToMono(String.class)
+                .retryWhen(reactor.util.retry.Retry.fixedDelay(5, Duration.ofSeconds(2)))
+                .map(response -> {
                     try {
                         log.info("Getting mailboxes for user {} | {}", username, response);
                         return mapper.readValue(response, new TypeReference<List<Map<String, String>>>() {
@@ -66,13 +68,15 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                         mailboxes.stream().filter(mailbox ->
                                         mailbox.containsValue(mailboxName) && mailbox.containsKey(MAILBOX_ID_KEY))
                                 .findFirst())
-                .flatMap(optional -> optional.map(mailbox ->
-                        Mono.just(mailbox.get(MAILBOX_ID_KEY))).orElseGet(Mono::empty))
-                .switchIfEmpty(Mono.error(new MailboxNotFoundException()));
+                .map(optional -> {
+                    var mailboxId = optional.stream().iterator().next().get(MAILBOX_ID_KEY);
+                    log.info("Extracted mailboxId | {}", mailboxId);
+                    return mailboxId;
+                });
     }
 
     @Override
-    @Retry(name = "retryMailService", fallbackMethod = "getMockDomains")
+    @Retry(name = "retryMailService")
     public Flux<DomainEntity> getDomains() {
 
         return mailServerApiClient.get().uri("/domains").retrieve().bodyToMono(String.class).map(response -> {
@@ -92,38 +96,39 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
 
     @Override
     @SneakyThrows
+    @Retry(name = "retryMailService")
     public Mono<Response> createUser(Credentials credentials) {
         log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
 
         var password = mapper.createObjectNode();
         password.put(PASSWORD_FIELD, credentials.getPassword());
-        var stream = mailServerApiClient.put()
+        var response = mailServerApiClient.put()
                 .uri("/users/" + credentials.getAddress())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(mapper.writeValueAsString(password))
                 .retrieve()
                 .bodyToMono(Response.class);
-        stream.subscribe();
 
-        return stream;
+        response.subscribe();
+
+        return response;
     }
 
-    public Flux<DomainEntity> getMockDomains(Throwable t) {
-        log.info("Getting mock domains | Not available mail server {}", mailServerName);
+    @Override
+    @SneakyThrows
+    @Retry(name = "retryMailService")
+    public Mono<Response> createMailbox(Credentials credentials, String mailboxName) {
+        log.info("Creating a Mailbox in Mail Server {} | User: {}, Mailbox: {}",
+                mailServerName, credentials.getAddress(), mailboxName);
 
-        var domainList = Arrays.asList(
-                DomainEntity.builder()
-                        .isPrivate(true)
-                        .isActive(true)
-                        .domain("example.com")
-                        .build(),
-                DomainEntity.builder()
-                        .isPrivate(true)
-                        .isActive(true)
-                        .domain("example.org")
-                        .build()
-        );
+        var response = mailServerApiClient.put()
+                .uri("/users/" + credentials.getAddress() + "/mailboxes/" + mailboxName)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
+        response.subscribe();
 
-        return Flux.just(domainList).flatMapIterable(list -> list);
+        return response;
+
     }
 }

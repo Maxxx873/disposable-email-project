@@ -30,6 +30,7 @@ public class AccountEntity {
     @Indexed(unique = true)
     private String address;
 
+    private String mailboxId;
     private Integer quota;
     private Integer used;
     private Boolean isDisabled;

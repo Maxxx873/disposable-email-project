@@ -78,7 +78,6 @@ public class MessageServiceImpl implements MessageService {
                                 messageRepository
                                         .findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountId,
                                                 Pageable.ofSize(size))));
-
     }
 
 }

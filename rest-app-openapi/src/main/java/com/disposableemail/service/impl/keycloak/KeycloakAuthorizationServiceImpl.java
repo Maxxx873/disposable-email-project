@@ -1,4 +1,4 @@
-package com.disposableemail.service.impl;
+package com.disposableemail.service.impl.keycloak;
 
 import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
@@ -48,7 +48,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
 
     @Override
     public Token getToken(Credentials credentials) {
-        log.info("Keycloak | Getting Token string from a Token Manager");
+        log.info("Keycloak | Getting Token string from a Token Manager for {}", credentials.getAddress());
         Keycloak instance = Keycloak.getInstance(serverUrl, realm, credentials.getAddress(),
                 credentials.getPassword(), client);
         var tokenManager = instance.tokenManager();

@@ -41,6 +41,7 @@ keycloak:
 
 mail-server:
   name: ${MAIL_SERVER_NAME:Apache James}
+  mailbox: ${MAILBOX_NAME:INBOX}
   base-url: ${MAIL_SERVER_BASE_URL}
 
 logging:
@@ -54,5 +55,5 @@ resilience4j.retry:
       retryExceptions:
         - org.springframework.web.client.HttpServerErrorException
     retryMailService:
-      maxAttempts: 5
-      waitDuration: 5s
+      maxAttempts: 15
+      waitDuration: 1s

@@ -24,4 +24,7 @@
     <autodetect>false</autodetect>
     <autodetectIP>false</autodetectIP>
     <defaultDomain>localhost</defaultDomain>
+    <domainnames>
+        <domainname>example.com</domainname>
+    </domainnames>
 </domainlist>

@@ -15,4 +15,5 @@ public interface MailServerClientService {
 
     Mono<String> getMailboxId(String username, String mailboxName);
 
+    Mono<Response> createMailbox(Credentials credentials, String mailboxName);
 }

@@ -14,6 +14,7 @@ import com.disposableemail.service.api.AuthorizationService;
 import com.disposableemail.service.api.MailServerClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
+
+    @Value("${mail-server.mailbox}")
+    private String INBOX;
 
     private final AccountRepository accountRepository;
     private final AuthorizationService authorizationService;
@@ -43,60 +47,66 @@ public class AccountServiceImpl implements AccountService {
                     if (domainEntity.getIsActive() && !domainEntity.getIsPrivate()) {
                         authorizationService.createUser(credentials);
                         mailServerClientService.createUser(credentials);
+                        mailServerClientService.createMailbox(credentials, INBOX);
                         var accountEntity = accountMapper
                                 .accountToAccountEntity(credentialsMapper.credentialsToAccount(credentials));
-                        return accountRepository.save(accountEntity);
+
+                      return mailServerClientService.getMailboxId(accountEntity.getAddress(), INBOX)
+                               .map(s -> {
+                                   accountEntity.setMailboxId(s);
+                                   return accountEntity;
+                               }).flatMap(accountRepository::save);
+
                     } else {
                         return Mono.just(new AccountEntity());
                     }
                 }).flatMap(accountEntity -> accountEntity)
                 .switchIfEmpty(Mono.error(new DomainNotAvailableException()));
     }
+        @Override
+        public Mono<Token> getTokenFromAuthorizationService (Credentials credentials){
+            log.info("Getting a Token for an Account | ({})", credentials.getAddress());
+            return Mono.just(authorizationService.getToken(credentials));
+        }
 
-    @Override
-    public Mono<Token> getTokenFromAuthorizationService(Credentials credentials) {
-        log.info("Getting a Token for an Account | ({})", credentials.getAddress());
-        return Mono.just(authorizationService.getToken(credentials));
-    }
+        @Override
+        public Mono<AccountEntity> getAccountFromJwt (ServerWebExchange exchange){
+            log.info("Getting an Account from {}", USER_NAME_CLAIM);
+            return ReactiveSecurityContextHolder.getContext()
+                    .map(context -> context.getAuthentication().getPrincipal())
+                    .cast(Jwt.class)
+                    .map(jwt -> {
+                        log.info("Retrieved User name {} from JWT", jwt.getClaimAsString(USER_NAME_CLAIM));
+                        return jwt.getClaimAsString(USER_NAME_CLAIM);
+                    }).flatMap(accountRepository::findByAddress);
+        }
 
-    @Override
-    public Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange) {
-        log.info("Getting an Account from {}", USER_NAME_CLAIM);
-        return ReactiveSecurityContextHolder.getContext()
-                .map(context -> context.getAuthentication().getPrincipal())
-                .cast(Jwt.class)
-                .map(jwt -> {
-                    log.info("Retrieved User name {} from JWT", jwt.getClaimAsString(USER_NAME_CLAIM));
-                    return jwt.getClaimAsString(USER_NAME_CLAIM);
-                }).flatMap(accountRepository::findByAddress);
-    }
+        @Override
+        public Mono<AccountEntity> getAccountById (String id){
+            log.info("Getting an Account by id {}}", id);
+            return accountRepository.findById(id);
+        }
 
-    @Override
-    public Mono<AccountEntity> getAccountById(String id) {
-        log.info("Getting an Account by id {}}", id);
-        return accountRepository.findById(id);
-    }
+        @Override
+        public Mono<AccountEntity> getAccountByAddress (String address){
+            log.info("Getting an Account by address {}}", address);
+            return accountRepository.findByAddress(address);
+        }
 
-    @Override
-    public Mono<AccountEntity> getAccountByAddress(String address) {
-        log.info("Getting an Account by address {}}", address);
-        return accountRepository.findByAddress(address);
-    }
+        @Override
+        public Mono<AccountEntity> deleteAccount (String id){
+            log.info("Deleting an Account {}}", id);
+            return accountRepository
+                    .findById(id)
+                    .switchIfEmpty(Mono.error(new AccountNotFoundException()))
+                    .flatMap(accountEntity -> {
+                        log.info("Account {} is deleted", id);
+                        return accountRepository.delete(accountEntity).then(Mono.just(accountEntity));
+                    });
+        }
 
-    @Override
-    public Mono<AccountEntity> deleteAccount(String id) {
-        log.info("Deleting an Account {}}", id);
-        return accountRepository
-                .findById(id)
-                .switchIfEmpty(Mono.error(new AccountNotFoundException()))
-                .flatMap(accountEntity -> {
-                    log.info("Account {} is deleted", id);
-                    return accountRepository.delete(accountEntity).then(Mono.just(accountEntity));
-                });
+        @Override
+        public String getDomainFromEmailAddress (String address){
+            return address.substring(address.indexOf("@") + 1);
+        }
     }
-
-    @Override
-    public String getDomainFromEmailAddress(String address) {
-        return address.substring(address.indexOf("@") + 1);
-    }
-}

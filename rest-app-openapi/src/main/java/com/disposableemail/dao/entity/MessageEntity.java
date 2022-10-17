@@ -38,12 +38,12 @@ public class MessageEntity {
     private List<Address> cc;
     private List<Address> bcc;
     private String subject;
-    private Boolean seen;
-    private Boolean flagged;
+    private Boolean isUnread;
+    private Boolean isFlagged;
     private Boolean isDeleted;
     private String text;
     private List<String> html;
-    private Boolean hasAttachments;
+    private Boolean hasAttachment;
     private List<Attachment> attachments;
     private Integer size;
     private String downloadUrl;

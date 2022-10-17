@@ -4,10 +4,12 @@ import com.disposableemail.dao.entity.DomainEntity;
 import com.disposableemail.exception.MailboxNotFoundException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.MailServerClientService;
+import com.disposableemail.service.impl.james.ApacheJamesClientServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.resilience4j.retry.RetryRegistry;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +26,7 @@ import javax.ws.rs.core.Response;
 
 import static org.mockito.Mockito.when;
 
-
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class ApacheJamesClientServiceImplUnitTest {
 
@@ -125,6 +127,23 @@ class ApacheJamesClientServiceImplUnitTest {
         when(response.bodyToMono(Response.class)).thenReturn(Mono.empty());
 
         Mono<Response> response = mailServerClientService.createUser(credentials);
+
+        StepVerifier.create(response).expectComplete().verify();
+
+    }
+
+    @Test
+    void shouldCreateMailbox() throws JsonProcessingException {
+        var mailboxName = "INBOX";
+        var credentials = new Credentials(USERNAME, PASSWORD);
+        var uri = String.format("/users/%s/mailboxes/%s", USERNAME, mailboxName);
+
+        when(webClientMock.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(response);
+        when(response.bodyToMono(Response.class)).thenReturn(Mono.empty());
+
+        Mono<Response> response = mailServerClientService.createMailbox(credentials, mailboxName);
 
         StepVerifier.create(response).expectComplete().verify();
 

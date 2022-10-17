@@ -36,7 +36,8 @@ public class SourceCollectorMailet extends GenericMailet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        var sourceDocument = new Document(Map.of("_id", new ObjectId(),"data", out.toString()));
+        var sourceDocument = new Document(Map.of("_id", new ObjectId(),"msgid", message.getMessageID(),
+                "data", out.toString()));
         sourceCollection.insertOne(sourceDocument);
         System.out.printf("Added new data from message %s", mail.getMessage().getMessageID());
     }
