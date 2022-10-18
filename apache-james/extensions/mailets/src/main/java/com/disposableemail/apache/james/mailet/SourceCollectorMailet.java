@@ -10,7 +10,6 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
@@ -29,7 +28,7 @@ public class SourceCollectorMailet extends GenericMailet {
 
     @Override
     public void service(Mail mail) throws MessagingException {
-        MimeMessage message = mail.getMessage();
+        var message = mail.getMessage();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             message.writeTo(out);
@@ -39,7 +38,7 @@ public class SourceCollectorMailet extends GenericMailet {
         var sourceDocument = new Document(Map.of("_id", new ObjectId(),"msgid", message.getMessageID(),
                 "data", out.toString()));
         sourceCollection.insertOne(sourceDocument);
-        System.out.printf("Added new data from message %s", mail.getMessage().getMessageID());
+        System.out.printf("Added new data from message %s", message.getMessageID());
     }
 
     @Override
@@ -58,9 +57,8 @@ public class SourceCollectorMailet extends GenericMailet {
         var connectionString = getInitParameter("connectionString");
         var databaseName = getInitParameter("database");
         var collectionName = getInitParameter("collectionName");
-        var database = mongoClient.getDatabase(databaseName);
-
         mongoClient = MongoClients.create(connectionString);
+        var database = mongoClient.getDatabase(databaseName);
         System.out.println("Database names:");
         mongoClient.listDatabases().forEach(System.out::println);
         System.out.println("Collection names:");
