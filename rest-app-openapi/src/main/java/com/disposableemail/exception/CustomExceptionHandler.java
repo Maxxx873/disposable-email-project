@@ -57,6 +57,14 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(SourceNotFoundException.class)
+    public final ResponseEntity<ErrorResponse> handleSourceNotFoundException(SourceNotFoundException ex) {
+        log.error("Exception: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(String.valueOf(HttpStatus.NOT_FOUND.value()), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+
     @ExceptionHandler(DomainNotAvailableException.class)
     public final ResponseEntity<ErrorResponse> handleDomainNotFoundException(DomainNotAvailableException ex) {
         log.error("Exception: {}", ex.getMessage());

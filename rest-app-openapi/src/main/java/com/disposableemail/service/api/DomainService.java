@@ -13,6 +13,4 @@ public interface DomainService {
     Flux<DomainEntity> getDomainsFromEmailServerAndSaveToDb(@Min(1) Integer size);
 
     Mono<DomainEntity> getDomain(String id);
-
-
 }

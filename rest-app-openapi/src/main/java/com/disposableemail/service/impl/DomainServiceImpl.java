@@ -26,6 +26,7 @@ public class DomainServiceImpl implements DomainService {
     @Override
     public Flux<DomainEntity> getDomainsFromEmailServerAndSaveToDb(Integer size) {
         log.info("Getting a Domains collection | Size {}", size);
+
         return mailServerClientService.getDomains()
                 .flatMap(domainEntity -> domainRepository.findByDomain(domainEntity.getDomain()).switchIfEmpty(Mono.defer(() -> {
                     log.info("Added a new Domain from {} | {} ", mailServerName, domainEntity.getDomain());
@@ -37,6 +38,7 @@ public class DomainServiceImpl implements DomainService {
     @Override
     public Mono<DomainEntity> getDomain(String id) {
         log.info("Getting a Domain {}", id);
+
         return domainRepository.findById(id);
     }
 }

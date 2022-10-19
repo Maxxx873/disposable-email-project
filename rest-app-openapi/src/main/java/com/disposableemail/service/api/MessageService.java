@@ -13,5 +13,4 @@ public interface MessageService {
     Mono<MessageEntity> updateMessage(String messageId, MessageEntity messageEntity,  ServerWebExchange exchange);
 
     Flux<MessageEntity> getMessagesFromElasticsearchAndSaveToDb(Integer size, ServerWebExchange exchange);
-
 }

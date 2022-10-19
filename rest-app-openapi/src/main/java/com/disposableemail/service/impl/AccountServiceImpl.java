@@ -40,6 +40,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Mono<AccountEntity> createAccountInAuthorizationServiceAndSaveToDb(Credentials credentials) {
         log.info("Creating an Account | ({})", credentials.getAddress());
+
         return domainRepository.findByDomain(getDomainFromEmailAddress(credentials.getAddress()))
                 .doOnError(throwable -> log.error("Trying to find a Domain", throwable))
                 .map(domainEntity -> {
@@ -66,12 +67,14 @@ public class AccountServiceImpl implements AccountService {
         @Override
         public Mono<Token> getTokenFromAuthorizationService (Credentials credentials){
             log.info("Getting a Token for an Account | ({})", credentials.getAddress());
+
             return Mono.just(authorizationService.getToken(credentials));
         }
 
         @Override
         public Mono<AccountEntity> getAccountFromJwt (ServerWebExchange exchange){
             log.info("Getting an Account from {}", USER_NAME_CLAIM);
+
             return ReactiveSecurityContextHolder.getContext()
                     .map(context -> context.getAuthentication().getPrincipal())
                     .cast(Jwt.class)
@@ -83,19 +86,22 @@ public class AccountServiceImpl implements AccountService {
 
         @Override
         public Mono<AccountEntity> getAccountById (String id){
-            log.info("Getting an Account by id {}}", id);
+            log.info("Getting an Account by id {}", id);
+
             return accountRepository.findById(id);
         }
 
         @Override
         public Mono<AccountEntity> getAccountByAddress (String address){
             log.info("Getting an Account by address {}}", address);
+
             return accountRepository.findByAddress(address);
         }
 
         @Override
         public Mono<AccountEntity> deleteAccount (String id){
             log.info("Deleting an Account {}}", id);
+
             return accountRepository
                     .findById(id)
                     .switchIfEmpty(Mono.error(new AccountNotFoundException()))

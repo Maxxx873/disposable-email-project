@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 public class AccountEntity {
 
     @Id
+    @Setter(AccessLevel.NONE)
     private String id;
 
     @Email
