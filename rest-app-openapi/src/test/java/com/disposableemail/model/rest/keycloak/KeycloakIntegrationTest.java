@@ -3,7 +3,7 @@ package com.disposableemail.model.rest.keycloak;
 import com.disposableemail.config.TestConfig;
 import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
-import com.disposableemail.service.api.AuthorizationService;
+import com.disposableemail.service.api.auth.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

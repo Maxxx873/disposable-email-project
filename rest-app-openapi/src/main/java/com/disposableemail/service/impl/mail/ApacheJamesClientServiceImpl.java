@@ -1,8 +1,8 @@
-package com.disposableemail.service.impl.james;
+package com.disposableemail.service.impl.mail;
 
 import com.disposableemail.dao.entity.DomainEntity;
 import com.disposableemail.rest.model.Credentials;
-import com.disposableemail.service.api.MailServerClientService;
+import com.disposableemail.service.api.mail.MailServerClientService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

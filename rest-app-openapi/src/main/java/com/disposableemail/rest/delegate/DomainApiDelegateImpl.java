@@ -1,4 +1,4 @@
-package com.disposableemail.rest;
+package com.disposableemail.rest.delegate;
 
 import com.disposableemail.dao.mapper.DomainMapper;
 import com.disposableemail.exception.DomainNotAvailableException;

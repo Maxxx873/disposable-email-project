@@ -46,7 +46,6 @@ public class MessageEntity {
     private Boolean hasAttachment;
     private List<Attachment> attachments;
     private Integer size;
-    private String downloadUrl;
 
     @CreatedDate
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

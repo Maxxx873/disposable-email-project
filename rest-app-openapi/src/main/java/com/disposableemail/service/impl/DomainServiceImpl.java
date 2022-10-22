@@ -3,7 +3,7 @@ package com.disposableemail.service.impl;
 import com.disposableemail.dao.entity.DomainEntity;
 import com.disposableemail.dao.repository.DomainRepository;
 import com.disposableemail.service.api.DomainService;
-import com.disposableemail.service.api.MailServerClientService;
+import com.disposableemail.service.api.mail.MailServerClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

@@ -4,6 +4,7 @@ import com.disposableemail.dao.entity.MessageEntity;
 import com.disposableemail.rest.model.Message;
 import com.disposableemail.rest.model.Messages;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import reactor.core.publisher.Mono;
 
@@ -11,6 +12,8 @@ import reactor.core.publisher.Mono;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MessageMapper {
 
+    @Mapping(target = "downloadUrl",
+            expression = "java(String.valueOf(\"/messages/\" + messageEntity.getId() + \"/download\"))")
     Message messageEntityToMessage(MessageEntity messageEntity);
 
     MessageEntity messageToMessageEntity(Message message);
@@ -19,6 +22,8 @@ public interface MessageMapper {
         return mono.map(this::messageToMessageEntity);
     }
 
+    @Mapping(target = "downloadUrl",
+            expression = "java(String.valueOf(\"/messages/\" + messageEntity.getId() + \"/download\"))")
     Messages messageEntityToMessages(MessageEntity messageEntity);
 
     MessageEntity messagesToMessageEntity(Messages messages);

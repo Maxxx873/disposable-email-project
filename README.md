@@ -12,6 +12,12 @@
 
 </div>
 
+## Project information
+
+:e-mail: The `Disposable Email Project` contains an API for creating temporary email accounts and getting a list of messages.
+Processing emails is based on [Apache James](https://james.apache.org/) - Java Apache Mail Enterprise Server.
+Incoming messages are processed and added to the MongoDB database.
+
 ## Requirements
 
 The following software is required for the complete workflow (from git clone to the running Docker Container).

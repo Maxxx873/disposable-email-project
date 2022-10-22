@@ -1,4 +1,4 @@
-package com.disposableemail.rest;
+package com.disposableemail.rest.delegate;
 
 import com.disposableemail.rest.api.TokenApiDelegate;
 import com.disposableemail.rest.model.Credentials;

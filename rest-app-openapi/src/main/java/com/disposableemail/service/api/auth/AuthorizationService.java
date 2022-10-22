@@ -1,4 +1,4 @@
-package com.disposableemail.service.api;
+package com.disposableemail.service.api.auth;
 
 
 import com.disposableemail.rest.model.Credentials;

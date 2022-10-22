@@ -1,4 +1,4 @@
-package com.disposableemail.service.api;
+package com.disposableemail.service.api.mail;
 
 import com.disposableemail.dao.entity.DomainEntity;
 import com.disposableemail.rest.model.Credentials;

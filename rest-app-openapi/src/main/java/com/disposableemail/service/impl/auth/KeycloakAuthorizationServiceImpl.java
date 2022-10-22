@@ -1,9 +1,9 @@
-package com.disposableemail.service.impl.keycloak;
+package com.disposableemail.service.impl.auth;
 
 import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.rest.model.Token;
-import com.disposableemail.service.api.AuthorizationService;
+import com.disposableemail.service.api.auth.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;

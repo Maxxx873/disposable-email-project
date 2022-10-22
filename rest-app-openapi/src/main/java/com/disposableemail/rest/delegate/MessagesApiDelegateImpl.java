@@ -1,4 +1,4 @@
-package com.disposableemail.rest;
+package com.disposableemail.rest.delegate;
 
 import com.disposableemail.dao.mapper.MessageMapper;
 import com.disposableemail.exception.MessageNotFoundException;
@@ -51,7 +51,7 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
     public Mono<ResponseEntity<Message>> patchMessageItem(String id, Mono<Message> message, ServerWebExchange exchange) {
 
         return messageMapper.messageToMessageEntity(message).flatMap(messageEntity ->
-                messageService.updateMessage(id, messageEntity, exchange))
+                        messageService.updateMessage(id, messageEntity, exchange))
                 .switchIfEmpty(Mono.error(new MessageNotFoundException()))
                 .map(messageEntity -> ResponseEntity.status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -71,4 +71,5 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
                 })
                 .switchIfEmpty(Mono.error(new MessageNotFoundException()));
     }
+
 }
