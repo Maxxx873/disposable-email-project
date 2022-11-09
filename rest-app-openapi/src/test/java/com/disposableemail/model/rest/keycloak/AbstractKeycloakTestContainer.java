@@ -14,13 +14,13 @@ import java.time.Duration;
 public abstract class AbstractKeycloakTestContainer {
 
     @Container
-    private static final GenericContainer<?> keycloakContainer = new GenericContainer<>(DockerImageName.parse("quay.io/keycloak/keycloak:18.0.1"))
+    private static final GenericContainer<?> keycloakContainer = new GenericContainer<>(DockerImageName.parse("quay.io/keycloak/keycloak:20.0.1"))
             .withExposedPorts(8080)
             .withEnv("KEYCLOAK_ADMIN", "admin")
             .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin")
             .withEnv("KC_DB", "dev-mem")
             .withCommand("start-dev")
-            .waitingFor(Wait.forHttp("/admin").forPort(8080).withStartupTimeout(Duration.ofMinutes(2)));
+            .waitingFor(Wait.forHttp("/admin").forPort(8080).withStartupTimeout(Duration.ofMinutes(1)));
 
     @DynamicPropertySource
     private static void dynamicProperties(DynamicPropertyRegistry registry) {
@@ -33,6 +33,5 @@ public abstract class AbstractKeycloakTestContainer {
         registry.add("keycloak.server.url", () -> keycloakServerUrl);
         registry.add("keycloak.server.password", () -> keycloakAdminPassword);
     }
-
 
 }

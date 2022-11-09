@@ -4,6 +4,7 @@ import com.disposableemail.dao.entity.SourceEntity;
 import com.disposableemail.service.api.MessageService;
 import com.disposableemail.service.api.SourceService;
 import io.netty.buffer.ByteBufAllocator;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -22,6 +23,7 @@ import reactor.core.publisher.Mono;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 @Slf4j
+@Hidden
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${openapi.disposableEmailProject.base-path:/api/v1}")

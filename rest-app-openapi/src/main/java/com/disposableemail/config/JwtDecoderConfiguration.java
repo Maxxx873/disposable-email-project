@@ -26,7 +26,8 @@ public class JwtDecoderConfiguration {
 
     @PostConstruct
     public void postConstruct() {
-        registry.retry("retryAuthorizationService").getEventPublisher().onRetry(ev -> log.info("Connect to Authorization Service: {}", ev));
+        registry.retry("retryAuthorizationService")
+                .getEventPublisher().onRetry(ev -> log.info("Connect to Authorization Service: {}", ev));
     }
 
     @Retry(name = "retryAuthorizationService", fallbackMethod = "exitApplication")

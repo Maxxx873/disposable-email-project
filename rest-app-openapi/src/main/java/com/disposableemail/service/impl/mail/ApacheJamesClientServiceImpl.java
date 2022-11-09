@@ -34,11 +34,8 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
 
     private final String MAILBOX_ID_KEY = "mailboxId";
     private final String PASSWORD_FIELD = "password";
-
     private final ObjectMapper mapper;
-
     private final WebClient mailServerApiClient;
-
     private final RetryRegistry registry;
 
 
@@ -129,6 +126,35 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
         response.subscribe();
 
         return response;
+    }
 
+    @Override
+    public Mono<Response> getQuotaSize(Credentials credentials) {
+        log.info("Getting the quota size for a user | User: {}", credentials.getAddress());
+
+        var response = mailServerApiClient.get()
+                .uri("/qouta/users/" + credentials.getAddress() + "/size/")
+                .retrieve()
+                .bodyToMono(Response.class)
+                .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
+        response.subscribe();
+
+        return response;
+    }
+
+    @Override
+    public Mono<Response> updateQuotaSize(Credentials credentials) {
+        log.info("Updating the quota size for a user | User: {}", credentials.getAddress());
+
+
+        var response = mailServerApiClient.put()
+                .uri("/qouta/users/" + credentials.getAddress() + "/size/")
+                .bodyValue(40000)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
+        response.subscribe();
+
+        return response;
     }
 }
