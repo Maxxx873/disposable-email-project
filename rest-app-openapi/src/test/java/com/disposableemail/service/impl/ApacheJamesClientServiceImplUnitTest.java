@@ -44,8 +44,6 @@ class ApacheJamesClientServiceImplUnitTest {
                         ]
             """;
 
-    private final int DOMAINS_COUNT = 2;
-
     private static final String USERNAME = "username@test.com";
     private static final String PASSWORD = "password";
 
@@ -134,6 +132,7 @@ class ApacheJamesClientServiceImplUnitTest {
 
     @Test
     void shouldCreateMailbox() throws JsonProcessingException {
+
         var mailboxName = "INBOX";
         var credentials = new Credentials(USERNAME, PASSWORD);
         var uri = String.format("/users/%s/mailboxes/%s", USERNAME, mailboxName);
@@ -152,6 +151,8 @@ class ApacheJamesClientServiceImplUnitTest {
     @Test
     void shouldReturnListOfDomains() {
 
+        var domainsCount = 2;
+
         when(webClientMock.get()).thenReturn(requestHeadersUri);
         when(requestHeadersUri.uri("/domains")).thenReturn(requestHeaders);
         when(requestHeaders.retrieve()).thenReturn(response);
@@ -159,8 +160,46 @@ class ApacheJamesClientServiceImplUnitTest {
 
         Flux<DomainEntity> resultDomainsList = mailServerClientService.getDomains();
 
-        StepVerifier.create(resultDomainsList).expectNextCount(DOMAINS_COUNT).expectComplete().verify();
+        StepVerifier.create(resultDomainsList).expectNextCount(domainsCount).expectComplete().verify();
 
     }
+
+    @Test
+    void shouldUpdateQuoteSizeForUSer() {
+
+        var quotaSize = 40000;
+        var credentials = new Credentials(USERNAME, PASSWORD);
+        var uri = String.format("/quota/users/%s/size", USERNAME);
+
+        when(webClientMock.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
+        when(requestBodySpec.bodyValue(quotaSize)).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(response);
+        when(response.bodyToMono(Response.class)).thenReturn(Mono.empty());
+
+        Mono<Response> response = mailServerClientService.updateQuotaSize(credentials, quotaSize);
+
+        StepVerifier.create(response).expectComplete().verify();
+
+    }
+
+    @Test
+    void shouldGetQuoteSizeForUSer() {
+
+        var quotaSize = 40000;
+        var credentials = new Credentials(USERNAME, PASSWORD);
+        var uri = String.format("/quota/users/%s/size", USERNAME);
+
+        when(webClientMock.get()).thenReturn(requestHeadersUri);
+        when(requestHeadersUri.uri(uri)).thenReturn(requestHeaders);
+        when(requestHeaders.retrieve()).thenReturn(response);
+        when(response.bodyToMono(Integer.class)).thenReturn(Mono.just(quotaSize));
+
+        Mono<Integer> response = mailServerClientService.getQuotaSize(credentials);
+
+        StepVerifier.create(response).expectNext(quotaSize).expectComplete().verify();
+    }
+
+
 
 }

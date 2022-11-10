@@ -29,6 +29,9 @@ public class AccountServiceImpl implements AccountService {
     @Value("${mail-server.mailbox}")
     private String INBOX;
 
+    @Value("${mail-server.defaultUserSizeQuota}")
+    private String quotaSize;
+
     private final AccountRepository accountRepository;
     private final AuthorizationService authorizationService;
     private final CredentialsMapper credentialsMapper;
@@ -49,12 +52,17 @@ public class AccountServiceImpl implements AccountService {
                         authorizationService.createUser(credentials);
                         mailServerClientService.createUser(credentials);
                         mailServerClientService.createMailbox(credentials, INBOX);
+                        mailServerClientService.updateQuotaSize(credentials, Integer.parseInt(quotaSize));
                         var accountEntity = accountMapper
                                 .accountToAccountEntity(credentialsMapper.credentialsToAccount(credentials));
 
                       return mailServerClientService.getMailboxId(accountEntity.getAddress(), INBOX)
                                .map(s -> {
                                    accountEntity.setMailboxId(s);
+                                   accountEntity.setQuota(Integer.parseInt(quotaSize));
+                                   accountEntity.setIsDisabled(false);
+                                   accountEntity.setIsDeleted(false);
+                                   accountEntity.setUsed(0);
                                    return accountEntity;
                                }).flatMap(accountRepository::save);
 

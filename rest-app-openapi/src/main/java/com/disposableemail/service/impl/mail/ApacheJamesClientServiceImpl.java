@@ -41,7 +41,8 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
 
     @PostConstruct
     public void postConstruct() {
-        registry.retry("retryMailService").getEventPublisher().onRetry(ev -> log.info("Connect to {} API: {}", mailServerName, ev));
+        registry.retry("retryMailService").getEventPublisher().onRetry(ev ->
+                log.info("Connect to {} API: {}", mailServerName, ev));
     }
 
     @Override
@@ -129,13 +130,13 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     }
 
     @Override
-    public Mono<Response> getQuotaSize(Credentials credentials) {
+    public Mono<Integer> getQuotaSize(Credentials credentials) {
         log.info("Getting the quota size for a user | User: {}", credentials.getAddress());
 
         var response = mailServerApiClient.get()
-                .uri("/qouta/users/" + credentials.getAddress() + "/size/")
+                .uri("/quota/users/" + credentials.getAddress() + "/size")
                 .retrieve()
-                .bodyToMono(Response.class)
+                .bodyToMono(Integer.class)
                 .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
         response.subscribe();
 
@@ -143,13 +144,13 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     }
 
     @Override
-    public Mono<Response> updateQuotaSize(Credentials credentials) {
+    public Mono<Response> updateQuotaSize(Credentials credentials, int quotaSize) {
         log.info("Updating the quota size for a user | User: {}", credentials.getAddress());
 
 
         var response = mailServerApiClient.put()
-                .uri("/qouta/users/" + credentials.getAddress() + "/size/")
-                .bodyValue(40000)
+                .uri("/quota/users/" + credentials.getAddress() + "/size")
+                .bodyValue(quotaSize)
                 .retrieve()
                 .bodyToMono(Response.class)
                 .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));

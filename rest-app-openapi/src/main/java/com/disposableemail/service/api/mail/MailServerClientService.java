@@ -17,8 +17,8 @@ public interface MailServerClientService {
 
     Mono<Response> createMailbox(Credentials credentials, String mailboxName);
 
-    Mono<Response> getQuotaSize(Credentials credentials);
+    Mono<Integer> getQuotaSize(Credentials credentials);
 
-    Mono<Response> updateQuotaSize(Credentials credentials);
+    Mono<Response> updateQuotaSize(Credentials credentials, int quotaSize);
 
 }
