@@ -43,7 +43,7 @@ mail-server:
   name: ${MAIL_SERVER_NAME:Apache James}
   mailbox: ${MAILBOX_NAME:INBOX}
   base-url: ${MAIL_SERVER_BASE_URL}
-  defaultUserSizeQuota: ${DEFAULT_USER_SIZE_QUOTA:40000000}
+  defaultUserSizeQuota: ${DEFAULT_USER_SIZE_QUOTA}
 
 logging:
   level.root: info

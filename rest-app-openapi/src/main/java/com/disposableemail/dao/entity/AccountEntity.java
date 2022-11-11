@@ -32,8 +32,6 @@ public class AccountEntity {
     private String address;
 
     private String mailboxId;
-    private Integer quota;
-    private Integer used;
     private Boolean isDisabled;
     private Boolean isDeleted;
 

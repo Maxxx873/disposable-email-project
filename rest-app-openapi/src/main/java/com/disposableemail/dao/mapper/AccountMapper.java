@@ -2,19 +2,23 @@ package com.disposableemail.dao.mapper;
 
 import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.rest.model.Account;
+import com.disposableemail.service.api.mail.MailServerClientService;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface AccountMapper {
+public abstract class AccountMapper {
 
-    Account accountEntityToAccount(AccountEntity accountEntity);
+    @Autowired
+    protected MailServerClientService mailService;
 
-    AccountEntity accountToAccountEntity(Account account);
+    @Mapping(target = "quota", expression = "java(mailService.getQuotaSize(accountEntity.getAddress()).block())")
+    @Mapping(target = "used", expression = "java(mailService.getUsedSize(accountEntity.getAddress()).block())")
+    public abstract Account accountEntityToAccount(AccountEntity accountEntity);
+    public abstract AccountEntity accountToAccountEntity(Account account);
 
-    default Mono<AccountEntity> accountToAccountEntity(Mono<Account> mono) {
-        return mono.map(this::accountToAccountEntity);
-    }
 }

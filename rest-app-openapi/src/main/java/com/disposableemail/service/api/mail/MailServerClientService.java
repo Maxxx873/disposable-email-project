@@ -13,12 +13,14 @@ public interface MailServerClientService {
 
     Mono<Response> createUser(Credentials credentials);
 
-    Mono<String> getMailboxId(String username, String mailboxName);
+    Mono<String> getMailboxId(Credentials credentials, String mailboxName);
 
     Mono<Response> createMailbox(Credentials credentials, String mailboxName);
 
-    Mono<Integer> getQuotaSize(Credentials credentials);
+    Mono<Integer> getQuotaSize(String username);
 
     Mono<Response> updateQuotaSize(Credentials credentials, int quotaSize);
+
+    Mono<Integer> getUsedSize(String username);
 
 }

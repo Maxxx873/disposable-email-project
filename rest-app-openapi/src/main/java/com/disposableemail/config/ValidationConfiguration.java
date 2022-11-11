@@ -20,8 +20,4 @@ public class ValidationConfiguration {
         return new LocalValidatorFactoryBean();
     }
 
-/*    @Bean
-    public ReactiveAuditorAware<AuditableUser> myAuditorProvider() {
-        return new AuditorAwareImpl();
-    }*/
 }

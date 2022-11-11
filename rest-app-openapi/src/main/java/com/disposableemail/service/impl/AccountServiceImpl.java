@@ -56,13 +56,11 @@ public class AccountServiceImpl implements AccountService {
                         var accountEntity = accountMapper
                                 .accountToAccountEntity(credentialsMapper.credentialsToAccount(credentials));
 
-                      return mailServerClientService.getMailboxId(accountEntity.getAddress(), INBOX)
-                               .map(s -> {
-                                   accountEntity.setMailboxId(s);
-                                   accountEntity.setQuota(Integer.parseInt(quotaSize));
+                      return mailServerClientService.getMailboxId(credentials, INBOX)
+                               .map(id -> {
+                                   accountEntity.setMailboxId(id);
                                    accountEntity.setIsDisabled(false);
                                    accountEntity.setIsDeleted(false);
-                                   accountEntity.setUsed(0);
                                    return accountEntity;
                                }).flatMap(accountRepository::save);
 

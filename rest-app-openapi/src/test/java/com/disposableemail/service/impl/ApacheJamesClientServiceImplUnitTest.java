@@ -44,6 +44,31 @@ class ApacheJamesClientServiceImplUnitTest {
                         ]
             """;
 
+    private static final String QUOTA_JSON = """
+                        {
+                            "global": null,
+                            "domain": null,
+                            "user": {
+                                "count": null,
+                                "size": 40001
+                            },
+                            "computed": {
+                                "count": null,
+                                "size": 40001
+                            },
+                            "occupation": {
+                                "size": 33640,
+                                "count": 8,
+                                "ratio": {
+                                    "size": 0.8409789755256118,
+                                    "count": 0.0,
+                                    "max": 0.8409789755256118
+                                }
+                            }
+                        }
+            """;
+
+
     private static final String USERNAME = "username@test.com";
     private static final String PASSWORD = "password";
 
@@ -80,13 +105,14 @@ class ApacheJamesClientServiceImplUnitTest {
 
         var mailboxName = "INBOX";
         var expectedMailBoxId = "031f2760-3753-11ed-b0b7-b9c0a2f33564";
+        var credentials = new Credentials(USERNAME, PASSWORD);
 
         when(webClientMock.get()).thenReturn(requestHeadersUri);
-        when(requestHeadersUri.uri("/users/{username}/mailboxes", USERNAME)).thenReturn(requestHeaders);
+        when(requestHeadersUri.uri("/users/{username}/mailboxes", credentials.getAddress())).thenReturn(requestHeaders);
         when(requestHeaders.retrieve()).thenReturn(response);
         when(response.bodyToMono(String.class)).thenReturn(Mono.just(MAILBOXES_JSON));
 
-        Mono<String> resultMailboxId = mailServerClientService.getMailboxId(USERNAME, mailboxName);
+        Mono<String> resultMailboxId = mailServerClientService.getMailboxId(credentials, mailboxName);
 
         StepVerifier.create(resultMailboxId).expectNext(expectedMailBoxId).expectComplete().verify();
 
@@ -96,13 +122,14 @@ class ApacheJamesClientServiceImplUnitTest {
     void shouldThrowMailBoxNotFoundExceptionIfMailBoxNameNotExist() {
 
         var mailboxName = "INBOX1";
+        var credentials = new Credentials(USERNAME, PASSWORD);
 
         when(webClientMock.get()).thenReturn((requestHeadersUri));
-        when(requestHeadersUri.uri("/users/{username}/mailboxes", USERNAME)).thenReturn(requestHeaders);
+        when(requestHeadersUri.uri("/users/{username}/mailboxes", credentials.getAddress())).thenReturn(requestHeaders);
         when(requestHeaders.retrieve()).thenReturn(response);
         when(response.bodyToMono(String.class)).thenReturn(Mono.just(MAILBOXES_JSON));
 
-        Mono<String> resultMailboxId = mailServerClientService.getMailboxId(USERNAME, mailboxName);
+        Mono<String> resultMailboxId = mailServerClientService.getMailboxId(credentials, mailboxName);
 
         StepVerifier.create(resultMailboxId).expectErrorMatches(throwable ->
                 throwable instanceof MailboxNotFoundException && throwable.getMessage().equals("Mailbox not found"));
@@ -187,7 +214,6 @@ class ApacheJamesClientServiceImplUnitTest {
     void shouldGetQuoteSizeForUSer() {
 
         var quotaSize = 40000;
-        var credentials = new Credentials(USERNAME, PASSWORD);
         var uri = String.format("/quota/users/%s/size", USERNAME);
 
         when(webClientMock.get()).thenReturn(requestHeadersUri);
@@ -195,11 +221,26 @@ class ApacheJamesClientServiceImplUnitTest {
         when(requestHeaders.retrieve()).thenReturn(response);
         when(response.bodyToMono(Integer.class)).thenReturn(Mono.just(quotaSize));
 
-        Mono<Integer> response = mailServerClientService.getQuotaSize(credentials);
+        Mono<Integer> response = mailServerClientService.getQuotaSize(USERNAME);
 
         StepVerifier.create(response).expectNext(quotaSize).expectComplete().verify();
     }
 
+    @Test
+    void shouldGetUsedSizeForUSer() {
+
+        var expectedUsedSize = 33640;
+        var uri = String.format("/quota/users/%s", USERNAME);
+
+        when(webClientMock.get()).thenReturn(requestHeadersUri);
+        when(requestHeadersUri.uri(uri)).thenReturn(requestHeaders);
+        when(requestHeaders.retrieve()).thenReturn(response);
+        when(response.bodyToMono(String.class)).thenReturn(Mono.just(QUOTA_JSON));
+
+        Mono<Integer> usedSize = mailServerClientService.getUsedSize(USERNAME);
+
+        StepVerifier.create(usedSize).expectNext(expectedUsedSize).expectComplete().verify();
+    }
 
 
 }

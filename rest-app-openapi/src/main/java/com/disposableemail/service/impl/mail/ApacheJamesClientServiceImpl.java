@@ -47,15 +47,15 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
 
     @Override
     @Retry(name = "retryMailService")
-    public Mono<String> getMailboxId(String username, String mailboxName) {
+    public Mono<String> getMailboxId(Credentials credentials, String mailboxName) {
 
-        return mailServerApiClient.get().uri("/users/{username}/mailboxes", username)
+        return mailServerApiClient.get().uri("/users/{username}/mailboxes", credentials.getAddress())
                 .retrieve()
                 .bodyToMono(String.class)
                 .retryWhen(reactor.util.retry.Retry.fixedDelay(5, Duration.ofSeconds(2)))
                 .map(response -> {
                     try {
-                        log.info("Getting mailboxes for user {} | {}", username, response);
+                        log.info("Getting mailboxes for user {} | {}", credentials.getAddress(), response);
                         return mapper.readValue(response, new TypeReference<List<Map<String, String>>>() {
                         });
                     } catch (JsonProcessingException ex) {
@@ -130,11 +130,11 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     }
 
     @Override
-    public Mono<Integer> getQuotaSize(Credentials credentials) {
-        log.info("Getting the quota size for a user | User: {}", credentials.getAddress());
+    public Mono<Integer> getQuotaSize(String username) {
+        log.info("Getting the quota size for a user | User: {}", username);
 
         var response = mailServerApiClient.get()
-                .uri("/quota/users/" + credentials.getAddress() + "/size")
+                .uri("/quota/users/" + username + "/size")
                 .retrieve()
                 .bodyToMono(Integer.class)
                 .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
@@ -147,7 +147,6 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     public Mono<Response> updateQuotaSize(Credentials credentials, int quotaSize) {
         log.info("Updating the quota size for a user | User: {}", credentials.getAddress());
 
-
         var response = mailServerApiClient.put()
                 .uri("/quota/users/" + credentials.getAddress() + "/size")
                 .bodyValue(quotaSize)
@@ -158,4 +157,28 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
 
         return response;
     }
+
+    @Override
+    public Mono<Integer> getUsedSize(String username) {
+        log.info("Getting used size for a user | User: {}", username);
+
+        var response = mailServerApiClient.get()
+                .uri("/quota/users/" + username)
+                .retrieve()
+                .bodyToMono(String.class)
+                .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)))
+                .map(jsonString -> {
+                    try {
+                        var quota = mapper.readTree(jsonString);
+                        var occupation = quota.get("occupation");
+                        return occupation.get("size").asInt();
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        response.subscribe();
+
+        return response;
+    }
+
 }
