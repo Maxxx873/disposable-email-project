@@ -1,14 +1,14 @@
-package com.disposableemail.dao.mapper;
+package com.disposableemail.dao.mapper.search;
 
 import com.disposableemail.dao.entity.MessageEntity;
 import com.disposableemail.dao.entity.search.MessageElasticsearchEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import reactor.core.publisher.Mono;
 
 @Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = AttachmentMapper.class)
 public interface MessageElasticsearchMapper {
 
     @Mapping(source = "messageId", target = "id")
@@ -18,11 +18,5 @@ public interface MessageElasticsearchMapper {
     @Mapping(target = "createdAt", expression = "java(messageElasticsearchEntity.getDate().toLocalDateTime())")
     @Mapping(target = "updatedAt", expression = "java(messageElasticsearchEntity.getDate().toLocalDateTime())")
     MessageEntity messageElasticsearchEntityToMessageEntity(MessageElasticsearchEntity messageElasticsearchEntity);
-
-    MessageElasticsearchEntity messageEntityToMessageElasticsearchEntity(MessageEntity messageEntity);
-
-    default Mono<MessageElasticsearchEntity> messageEntityToMessageElasticsearchEntity(Mono<MessageEntity> mono) {
-        return mono.map(this::messageEntityToMessageElasticsearchEntity);
-    }
 
 }

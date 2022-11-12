@@ -1,7 +1,6 @@
 package com.disposableemail.dao.entity.search;
 
 import com.disposableemail.rest.model.Address;
-import com.disposableemail.rest.model.Attachment;
 import lombok.*;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -35,7 +34,7 @@ public class MessageElasticsearchEntity {
     private String textBody;
     private List<String> htmlBody;
     private Boolean hasAttachment;
-    private List<Attachment> attachments;
+    private List<AttachmentElasticsearchEntity> attachments;
     private Integer size;
     private String downloadUrl;
 

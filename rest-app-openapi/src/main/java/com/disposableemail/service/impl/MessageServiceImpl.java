@@ -2,7 +2,7 @@ package com.disposableemail.service.impl;
 
 import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.dao.entity.MessageEntity;
-import com.disposableemail.dao.mapper.MessageElasticsearchMapper;
+import com.disposableemail.dao.mapper.search.MessageElasticsearchMapper;
 import com.disposableemail.dao.repository.MessageRepository;
 import com.disposableemail.service.api.AccountService;
 import com.disposableemail.service.api.MessageService;
