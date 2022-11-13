@@ -537,22 +537,20 @@ components:
           items:
             $ref: '#/components/schemas/Attachment'
           example:
-            - id: ATTACH000001
+            - id: 63713e318473775ab3014b56
               filename: happy.png
               contentType: image/png
               disposition: attachment
               transferEncoding: base64
-              related: false
               size: 20
-              downloadUrl: /messages/id/attachment/ATTACH000001
-            - id: ATTACH000002
+              downloadUrl: /messages/id/attachment/63713e318473775ab3014b56
+            - id: 63713e318473775ab3014b85
               filename: happy.png
               contentType: image/png
               disposition: attachment
               transferEncoding: base64
-              related: false
               size: 240
-              downloadUrl: /messages/id/attachment/ATTACH000002
+              downloadUrl: /messages/id/attachment/63713e318473775ab3014b85
         size:
           readOnly: true
           type: integer
@@ -672,8 +670,6 @@ components:
           type: string
         transferEncoding:
           type: string
-        related:
-          type: boolean
         size:
           type: integer
         downloadUrl:

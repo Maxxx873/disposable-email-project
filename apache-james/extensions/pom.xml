@@ -19,6 +19,7 @@
     <modules>
         <module>listeners</module>
         <module>mailets</module>
+        <module>matchers</module>
     </modules>
 
     <properties>

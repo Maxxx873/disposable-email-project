@@ -1,9 +1,12 @@
 package com.disposableemail.dao.entity;
 
+import com.disposableemail.rest.model.Attachment;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 /**
  * A Source entity.
@@ -25,5 +28,6 @@ public class SourceEntity {
     private String msgid;
 
     private String data;
+    private List<Attachment> attachments;
 
 }
