@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class SourceCollectorMailet extends GenericMailet {
 
@@ -37,21 +38,23 @@ public class SourceCollectorMailet extends GenericMailet {
     @Override
     public void service(Mail mail) throws MessagingException {
         if (mail.getMessageSize() < PAYLOAD_DOCUMENT_MAX_SIZE) {
-            var message = mail.getMessage();
-            var out = new ByteArrayOutputStream();
-            try {
-                message.writeTo(out);
-                var sourceDocument = new Document(Map.of(
-                        "_id", new ObjectId(),
-                        "msgid", message.getMessageID(),
-                        "data", out.toString(),
-                        "attachments", getAttachments(message)
-                ));
-                sourceCollection.insertOne(sourceDocument);
-                System.out.printf("Added new data from message %s", message.getMessageID());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            var optionalMimeMessage = Optional.ofNullable(mail.getMessage());
+            optionalMimeMessage.ifPresent(mimeMessage -> {
+                var out = new ByteArrayOutputStream();
+                try {
+                    mimeMessage.writeTo(out);
+                    var sourceDocument = new Document(Map.of(
+                            "_id", new ObjectId(),
+                            "msgid", mimeMessage.getMessageID(),
+                            "data", out.toString(),
+                            "attachments", getAttachments(mimeMessage)
+                    ));
+                    sourceCollection.insertOne(sourceDocument);
+                    System.out.printf("Added new data from message %s", mimeMessage.getMessageID());
+                } catch (IOException | MessagingException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
     }
 
@@ -85,19 +88,22 @@ public class SourceCollectorMailet extends GenericMailet {
      */
     private List<Document> getAttachments(Message message) throws IOException, MessagingException {
         var attachments = new ArrayList<Document>();
-        var multiPart = (Multipart) message.getContent();
-        for (int partCount = 0; partCount < multiPart.getCount(); partCount++) {
-            MimeBodyPart part = (MimeBodyPart) multiPart.getBodyPart(partCount);
-            if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
-                var attachmentDocument = new Document(Map.of(
-                        "_id", new ObjectId(),
-                        "filename", part.getFileName(),
-                        "contentType", getShortContentType(part.getContentType()),
-                        "disposition", part.getDisposition(),
-                        "transferEncoding", part.getEncoding(),
-                        "size", part.getSize()
-                ));
-                attachments.add(attachmentDocument);
+        var content = message.getContent();
+        if (content instanceof Multipart) {
+            var multiPart = (Multipart) content;
+            for (int partCount = 0; partCount < multiPart.getCount(); partCount++) {
+                MimeBodyPart part = (MimeBodyPart) multiPart.getBodyPart(partCount);
+                if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
+                    var attachmentDocument = new Document(Map.of(
+                            "_id", new ObjectId(),
+                            "filename", part.getFileName(),
+                            "contentType", getShortContentType(part.getContentType()),
+                            "disposition", part.getDisposition(),
+                            "transferEncoding", part.getEncoding(),
+                            "size", part.getSize()
+                    ));
+                    attachments.add(attachmentDocument);
+                }
             }
         }
         return attachments;
@@ -107,4 +113,5 @@ public class SourceCollectorMailet extends GenericMailet {
         var items = contentType.split(";");
         return items[0];
     }
+
 }

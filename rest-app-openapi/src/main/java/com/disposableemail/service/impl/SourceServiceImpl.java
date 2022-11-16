@@ -39,4 +39,11 @@ public class SourceServiceImpl implements SourceService {
             }
         });
     }
+
+    @Override
+    public Mono<byte[]> downloadAttachment(String msgid, String attachmentId) {
+        log.info("Getting an Attachment as ByteArrayInputStream by msgid {}, attachmentId {}", msgid, attachmentId);
+
+        return null;
+    }
 }

@@ -27,18 +27,18 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${openapi.disposableEmailProject.base-path:/api/v1}")
-public class SourceDownloadController {
+public class AttachmentDownloadController {
 
     private final SourceService sourceService;
     private final MessageService messageService;
     private final DataBufferFactory dataBufferFactory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping(value = "/messages/{id}/download", produces = APPLICATION_OCTET_STREAM_VALUE)
-    public Mono<ResponseEntity<Mono<DataBuffer>>> downloadSource(@PathVariable String id, ServerWebExchange exchange) {
+    @GetMapping(value = "/messages/{messageId}/attachment/{attachmentId}", produces = APPLICATION_OCTET_STREAM_VALUE)
+    public Mono<ResponseEntity<Mono<DataBuffer>>> downloadAttachment(@PathVariable String messageId, String attachmentId, ServerWebExchange exchange) {
 
         return Mono.fromCallable(() -> {
-            var body = messageService.getMessage(id, exchange)
+            var body = messageService.getMessage(messageId, exchange)
                     .flatMap(messageEntity -> {
                         log.info("Retrieved Message: {}", messageEntity.toString());
                         return sourceService.getSourceByMsgId(messageEntity.getMsgid());
@@ -48,9 +48,8 @@ public class SourceDownloadController {
                     .map(dataBufferFactory::wrap);
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + id + ".eml\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachmentId + ".eml\"")
                     .body(body);
         });
     }
-
 }

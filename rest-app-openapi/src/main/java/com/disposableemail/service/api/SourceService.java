@@ -8,4 +8,7 @@ public interface SourceService {
     Mono<SourceEntity> getSourceByMsgId(String msgid);
 
     Mono<byte[]> downloadSource(String msgid);
+
+    Mono<byte[]> downloadAttachment(String msgid, String attachmentId);
+
 }
