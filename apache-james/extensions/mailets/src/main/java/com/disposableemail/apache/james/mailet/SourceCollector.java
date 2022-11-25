@@ -8,20 +8,26 @@ import org.apache.mailet.Mail;
 import org.apache.mailet.base.GenericMailet;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
-public class SourceCollectorMailet extends GenericMailet {
+public class SourceCollector extends GenericMailet {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceCollector.class);
 
     private MongoClient mongoClient;
     private MongoCollection<Document> sourceCollection;
@@ -30,8 +36,8 @@ public class SourceCollectorMailet extends GenericMailet {
 
     @Override
     public void init() {
-        System.out.println("---[Source Collector to MonngoDB Mailet]---");
-        System.out.println("Initializing...");
+        LOGGER.info("---[Source Collector to MonngoDB Mailet]---");
+        LOGGER.info("Initializing...");
         setupDatabase();
     }
 
@@ -39,29 +45,34 @@ public class SourceCollectorMailet extends GenericMailet {
     public void service(Mail mail) throws MessagingException {
         if (mail.getMessageSize() < PAYLOAD_DOCUMENT_MAX_SIZE) {
             var optionalMimeMessage = Optional.ofNullable(mail.getMessage());
-            optionalMimeMessage.ifPresent(mimeMessage -> {
-                var out = new ByteArrayOutputStream();
-                try {
-                    mimeMessage.writeTo(out);
-                    var sourceDocument = new Document(Map.of(
-                            "_id", new ObjectId(),
-                            "msgid", mimeMessage.getMessageID(),
-                            "data", out.toString(),
-                            "attachments", getAttachments(mimeMessage)
-                    ));
-                    sourceCollection.insertOne(sourceDocument);
-                    System.out.printf("Added new data from message %s", mimeMessage.getMessageID());
-                } catch (IOException | MessagingException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            optionalMimeMessage.ifPresent(getMimeMessageConsumer());
         }
+    }
+
+    private Consumer<MimeMessage> getMimeMessageConsumer() {
+        return mimeMessage -> {
+            var out = new ByteArrayOutputStream();
+            try {
+                mimeMessage.writeTo(out);
+                var sourceDocument = new Document(Map.of(
+                        "_id", new ObjectId(),
+                        "msgid", mimeMessage.getMessageID(),
+                        "data", out.toString(),
+                        "attachments", getAttachments(mimeMessage),
+                        "createdAt", LocalDateTime.now()
+                ));
+                sourceCollection.insertOne(sourceDocument);
+                System.out.printf("Added new data from message %s", mimeMessage.getMessageID());
+            } catch (IOException | MessagingException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     @Override
     public void destroy() {
         if (null != mongoClient) {
-            System.out.println("Closing MongoDb connection...");
+            System.out.println("Closing MongoDB connection...");
             mongoClient.close();
         }
         super.destroy();
@@ -100,7 +111,8 @@ public class SourceCollectorMailet extends GenericMailet {
                             "contentType", getShortContentType(part.getContentType()),
                             "disposition", part.getDisposition(),
                             "transferEncoding", part.getEncoding(),
-                            "size", part.getSize()
+                            "size", part.getSize(),
+                            "partId", partCount
                     ));
                     attachments.add(attachmentDocument);
                 }
@@ -113,5 +125,11 @@ public class SourceCollectorMailet extends GenericMailet {
         var items = contentType.split(";");
         return items[0];
     }
+
+    @Override
+    public String getMailetInfo() {
+        return SourceCollector.class.getName() + " Mailet";
+    }
+
 
 }

@@ -35,21 +35,24 @@ public class AttachmentDownloadController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/messages/{messageId}/attachment/{attachmentId}", produces = APPLICATION_OCTET_STREAM_VALUE)
-    public Mono<ResponseEntity<Mono<DataBuffer>>> downloadAttachment(@PathVariable String messageId, String attachmentId, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Mono<DataBuffer>>> downloadAttachment(@PathVariable String messageId,
+                                                                     @PathVariable String attachmentId,
+                                                                     ServerWebExchange exchange) {
 
-        return Mono.fromCallable(() -> {
-            var body = messageService.getMessage(messageId, exchange)
-                    .flatMap(messageEntity -> {
-                        log.info("Retrieved Message: {}", messageEntity.toString());
-                        return sourceService.getSourceByMsgId(messageEntity.getMsgid());
-                    })
-                    .map(SourceEntity::getMsgid)
-                    .flatMap(sourceService::downloadSource)
-                    .map(dataBufferFactory::wrap);
+        log.info("Attachment from message download start | MessageId {} | AttachmentId: {}", messageId, attachmentId);
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachmentId + ".eml\"")
-                    .body(body);
-        });
+        return sourceService.getAttachmentName(attachmentId)
+                .map(filename ->
+                        ResponseEntity.ok()
+                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename))
+                .map(bodyBuilder ->
+                        bodyBuilder.body(messageService.getMessage(messageId, exchange)
+                                .flatMap(messageEntity -> {
+                                    log.info("Retrieved Message | {}", messageEntity.toString());
+                                    return sourceService.getSourceByMsgId(messageEntity.getMsgid());
+                                })
+                                .map(SourceEntity::getMsgid)
+                                .flatMap(msgid -> sourceService.downloadAttachment(msgid, attachmentId))
+                                .map(dataBufferFactory::wrap)));
     }
 }
