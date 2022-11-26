@@ -5,15 +5,19 @@ import com.disposableemail.rest.model.Message;
 import com.disposableemail.rest.model.Messages;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import reactor.core.publisher.Mono;
 
 @Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_DEFAULT)
 public interface MessageMapper {
 
     @Mapping(target = "downloadUrl",
             expression = "java(String.valueOf(\"/messages/\" + messageEntity.getId() + \"/download\"))")
+    @Mapping(target = "text", defaultValue = "")
+    @Mapping(target = "html", defaultExpression = "java(new ArrayList<>())")
     Message messageEntityToMessage(MessageEntity messageEntity);
 
     MessageEntity messageToMessageEntity(Message message);
@@ -31,4 +35,5 @@ public interface MessageMapper {
     default Mono<MessageEntity> messagesToMessageEntity(Mono<Messages> mono) {
         return mono.map(this::messagesToMessageEntity);
     }
+
 }

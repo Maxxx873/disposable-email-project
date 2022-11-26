@@ -1,7 +1,10 @@
 package com.disposableemail.service.api;
 
+import com.disposableemail.dao.entity.AttachmentEntity;
 import com.disposableemail.dao.entity.SourceEntity;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public interface SourceService {
 
@@ -12,5 +15,7 @@ public interface SourceService {
     Mono<byte[]> downloadAttachment(String id, String attachmentId);
 
     Mono<String> getAttachmentName(String attachmentId);
+
+    Mono<List<AttachmentEntity>> getAttachments(String msgid);
 
 }

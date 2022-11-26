@@ -26,5 +26,5 @@ public class AttachmentEntity {
     private String transferEncoding;
     private Integer size;
     private Integer partId;
-
+    private String downloadUrl;
 }

@@ -1,7 +1,6 @@
 package com.disposableemail.dao.entity;
 
 import com.disposableemail.rest.model.Address;
-import com.disposableemail.rest.model.Attachment;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -44,7 +43,7 @@ public class MessageEntity {
     private String text;
     private List<String> html;
     private Boolean hasAttachment;
-    private List<Attachment> attachments;
+    private List<AttachmentEntity> attachments;
     private Integer size;
 
     @CreatedDate

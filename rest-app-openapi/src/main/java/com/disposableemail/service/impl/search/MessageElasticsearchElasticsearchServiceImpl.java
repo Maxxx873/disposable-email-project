@@ -27,7 +27,7 @@ public class MessageElasticsearchElasticsearchServiceImpl implements MessageElas
         return accountService.getAccountFromJwt(exchange)
                 .flatMapMany(accountEntity ->
                         messageElasticsearchRepository.findByAddressTo(accountEntity.getAddress()).map(message -> {
-                            log.info("Getting a Messages collection from Elasticsearch by recipient {}", accountEntity.getAddress());
+                            log.info("Getting a Messages collection from Elasticsearch | recipient: {}", accountEntity.getAddress());
                             message.setAccountId(accountEntity.getId());
                             return message;
                         }));
@@ -40,14 +40,14 @@ public class MessageElasticsearchElasticsearchServiceImpl implements MessageElas
                 .flatMapMany(accountEntity ->
                         messageElasticsearchRepository.findByMailboxId(accountEntity.getMailboxId()).map(message -> {
                             message.setAccountId(accountEntity.getId());
-                            log.info("Getting a Messages collection from Elasticsearch by mailboxId={}", message.getMailboxId());
+                            log.info("Getting a Messages collection from Elasticsearch | mailboxId: {}", message.getMailboxId());
                             return message;
                         }));
     }
 
     @Override
     public Mono<MessageElasticsearchEntity> getMessage(String id, ServerWebExchange exchange) {
-        log.info("Getting a Message {} from Elasticsearch", id);
+        log.info("Getting a Message from Elasticsearch | id: {}", id);
 
         return accountService.getAccountFromJwt(exchange)
                 .map(AccountEntity::getAddress)

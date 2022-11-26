@@ -3,6 +3,8 @@ package com.disposableemail.service.impl;
 import com.disposableemail.dao.entity.AttachmentEntity;
 import com.disposableemail.dao.entity.SourceEntity;
 import com.disposableemail.dao.repository.SourceRepository;
+import com.disposableemail.exception.AttachmentNotFoundException;
+import com.disposableemail.exception.MessageNotFoundException;
 import com.disposableemail.service.api.SourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,8 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -52,10 +56,22 @@ public class SourceServiceImpl implements SourceService {
 
         return sourceRepository.findByAttachmentId(attachmentId).map(sourceEntity ->
                         sourceEntity.getAttachments().stream().filter(attachmentEntity ->
-                                Objects.equals(attachmentEntity.getId(), attachmentId)).findFirst().orElseThrow())
+                                        Objects.equals(attachmentEntity.getId(), attachmentId)).findFirst()
+                                .orElseThrow(AttachmentNotFoundException::new))
                 .map(AttachmentEntity::getFilename)
                 .doOnSuccess(filename -> log.info("Received attachment | filename: {}", filename))
                 .doOnError(e -> log.error("Attachment name not found | attachmentId: {}", attachmentId));
+    }
+
+    @Override
+    public Mono<List<AttachmentEntity>> getAttachments(String msgid) {
+        log.info("Getting Attachments for message | msgid: {}", msgid);
+
+        return sourceRepository.findByMsgid(msgid).map(SourceEntity::getAttachments)
+                .doOnSuccess(attachments -> log.info("Received attachments | msgid: {} attachmentsCount: {}",
+                        msgid, attachments.size()))
+                .defaultIfEmpty(new ArrayList<>())
+                .doOnError(e -> log.error("Error getting Attachments | msgid: {}", msgid));
     }
 
     @Override
@@ -70,7 +86,9 @@ public class SourceServiceImpl implements SourceService {
                 var mimeMessage = new MimeMessage(null, new ByteArrayInputStream(sourceEntity.getData().getBytes()));
                 var content = mimeMessage.getContent();
                 if (content instanceof Multipart multiPart) {
-                    var part = (MimeBodyPart) multiPart.getBodyPart(attachment.orElseThrow().getPartId());
+                    var part = (MimeBodyPart) multiPart
+                            .getBodyPart(attachment.orElseThrow(MessageNotFoundException::new)
+                            .getPartId());
                     return IOUtils.toByteArray(new ByteArrayInputStream(part.getInputStream().readAllBytes()));
                 }
                 return IOUtils.toByteArray(new ByteArrayInputStream(sourceEntity.getData().getBytes()));
@@ -78,7 +96,5 @@ public class SourceServiceImpl implements SourceService {
                 throw new RuntimeException(e);
             }
         });
-
-
     }
 }
