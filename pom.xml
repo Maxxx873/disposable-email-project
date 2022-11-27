@@ -25,13 +25,14 @@
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <swagger-annotations.version>2.2.2</swagger-annotations.version>
-        <jackson-databind-nullable.version>0.2.3</jackson-databind-nullable.version>
+        <jackson-databind-nullable.version>0.2.4</jackson-databind-nullable.version>
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
         <keycloak-admin-client.version>20.0.1</keycloak-admin-client.version>
-        <testcontainers.version>1.17.5</testcontainers.version>
-        <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
+        <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
         <resilience4j-spring-boot2.version>1.7.1</resilience4j-spring-boot2.version>
-        <reactor-test.version>3.4.23</reactor-test.version>
+        <reactor-test.version>3.5.0</reactor-test.version>
+        <versions-maven-plugin.version>2.13.0</versions-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -195,5 +196,20 @@
             </dependencies>
         </profile>
     </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>org.apache.commons:commons-collections4</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
