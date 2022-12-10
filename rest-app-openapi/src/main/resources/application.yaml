@@ -19,19 +19,19 @@ spring:
 
   data:
     mongodb:
-      host: ${MONGODB_HOST:localhost}
-      port: ${MONGODB_PORT:27017}
+      host: ${MONGODB_HOST}
+      port: ${MONGODB_PORT}
       database: disposableemail
       auto-index-creation: true
 
-  elasticsearch:
-    rest:
-      uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
-    client:
-      reactive:
-      endpoints: ${ELASTICSEARCH_ENDPOINTS:localhost:9200}
-    webclient:
-      max-in-memory-size: 512MB
+    elasticsearch:
+      rest:
+        uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+      client:
+        reactive:
+          endpoints: ${ELASTICSEARCH_ENDPOINTS:localhost:9200}
+      webclient:
+        max-in-memory-size: 512MB
 
 keycloak:
   server:

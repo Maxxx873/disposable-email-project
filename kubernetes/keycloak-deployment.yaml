@@ -1,0 +1,57 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: keycloak-deployment
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:20.0.1
+          args: ["start-dev"]
+          env:
+            - name: KC_DB
+              value: dev-file
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: "admin"
+            - name: KC_FEATURES
+              value: scripts
+            - name: KC_HTTP_PORT
+              value: "9080"
+            - name: KC_HTTPS_PORT
+              value: "9443"
+          ports:
+            - containerPort: 9080
+              name: http-port
+            - containerPort: 9443
+              name: https-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-service
+spec:
+  selector:
+    app: keycloak
+  type: NodePort
+  ports:
+    - name: http-port
+      protocol: TCP
+      port: 9080
+      targetPort: 9080
+      nodePort: 30038
+    - name: https-port
+      protocol: TCP
+      port: 9443
+      targetPort: 9443

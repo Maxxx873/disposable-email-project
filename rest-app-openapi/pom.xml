@@ -40,6 +40,10 @@
                 <version>${spring-boot-maven-plugin.version}</version>
                 <configuration>
                     <mainClass>${spring.boot.mainclass}</mainClass>
+                    <layers>
+                        <enabled>true</enabled>
+                        <includeLayerTools>true</includeLayerTools>
+                    </layers>
                 </configuration>
                 <executions>
                     <execution>

@@ -5,8 +5,6 @@ authorization:
   service: ${AUTHORIZATION_SERVICE:keycloak}
 
 spring:
-  config:
-    import: optional:.env[.properties]
   main:
     allow-bean-definition-overriding: true
 
@@ -14,8 +12,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${KEYCLOAK_JWT_SET_URI:http://localhost:8484/auth/realms/master/protocol/openid-connect/certs}
-          issuer-uri: ${KEYCLOAK_REALM_ISSUER_URL:http://localhost:8484/auth/realms/master}
+          jwk-set-uri: ${KEYCLOAK_JWT_SET_URI:http://localhost:9080/realms/master/protocol/openid-connect/certs}
+          issuer-uri: ${KEYCLOAK_REALM_ISSUER_URL:http://localhost:9080/realms/master}
 
   data:
     mongodb:
@@ -24,27 +22,27 @@ spring:
       database: disposableemail
       auto-index-creation: true
 
-  elasticsearch:
-    rest:
-      uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
-    client:
-      reactive:
-      endpoints: ${ELASTICSEARCH_ENDPOINTS:localhost:9200}
-    webclient:
-      max-in-memory-size: 512MB
+    elasticsearch:
+      rest:
+        uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+      client:
+        reactive:
+          endpoints: ${ELASTICSEARCH_ENDPOINTS:localhost:9200}
+      webclient:
+        max-in-memory-size: 512MB
 
 keycloak:
   server:
-    url: ${KEYCLOAK_SERVER_URL:http://localhost:8484/auth}
+    url: ${KEYCLOAK_SERVER_URL:http://localhost:9080}
     realm: ${KEYCLOAK_SERVER_REALM:master}
     username: ${KEYCLOAK_SERVER_USERNAME:admin}
-    password: ${KEYCLOAK_SERVER_PASSWORD:setlistorganizeradmin}
+    password: ${KEYCLOAK_SERVER_PASSWORD:admin}
     client: ${KEYCLOAK_SERVER_CLIENT:admin-cli}
 
 mail-server:
   name: ${MAIL_SERVER_NAME:Apache James}
   mailbox: ${MAILBOX_NAME:INBOX}
-  base-url: ${MAIL_SERVER_BASE_URL}
+  base-url: ${MAIL_SERVER_BASE_URL:http://localhost:8000}
   defaultUserSizeQuota: ${DEFAULT_USER_SIZE_QUOTA:40000000}
 
 logging:

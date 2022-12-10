@@ -1,0 +1,61 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dsp-eml-prj-rest-app-deployment
+  labels:
+    app: dsp-eml-prj-rest-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dsp-eml-prj-rest-app
+  template:
+    metadata:
+      labels:
+        app: dsp-eml-prj-rest-app
+    spec:
+      containers:
+        - name: dsp-eml-prj-rest-app
+          image: maxxx873/dsp-eml-prj-rest-app.jar
+          env:
+            - name: PORT
+              value: "8088"
+            - name: KEYCLOAK_JWT_SET_URI
+              value: "http://keycloak-service:9080/realms/master/protocol/openid-connect/certs"
+            - name: KEYCLOAK_REALM_ISSUER_URL
+              value: "http://keycloak-service:9080/realms/master"
+            - name: KEYCLOAK_SERVER_URL
+              value: "http://keycloak-service:9080"
+            - name: KEYCLOAK_SERVER_REALM
+              value: "master"
+            - name: KEYCLOAK_SERVER_USERNAME
+              value: "admin"
+            - name: KEYCLOAK_SERVER_PASSWORD
+              value: "admin"
+            - name: MAIL_SERVER_BASE_URL
+              value: "http://localhost:8000"
+            - name: MONGODB_HOST
+              value: "mongodb-service"
+            - name: MONGODB_PORT
+              value: "27017"
+            - name: ELASTICSEARCH_URIS
+              value: "http://elasticsearch-service:9200"
+            - name: ELASTICSEARCH_ENDPOINTS
+              value: "elasticsearch-service:9200"
+          ports:
+            - containerPort: 8088
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dsp-eml-prj-rest-app-service
+spec:
+  selector:
+    app: dsp-eml-prj-rest-app
+  type: NodePort
+  ports:
+    - name: http-port
+      protocol: TCP
+      port: 8088
+      targetPort: 8088
+      nodePort: 30039

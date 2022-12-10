@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MessageElasticsearchElasticsearchServiceImpl implements MessageElasticsearchService {
+public class MessageElasticsearchServiceImpl implements MessageElasticsearchService {
 
     private final MessageElasticsearchRepository messageElasticsearchRepository;
     private final AccountService accountService;
