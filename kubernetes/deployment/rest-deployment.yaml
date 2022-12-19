@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: dsp-eml-prj-rest-app
-          image: maxxx873/dsp-eml-prj-rest-app.jar
+          image: maxxx873/dsp-eml-prj-rest
           env:
             - name: PORT
               value: "8088"
@@ -33,15 +33,15 @@ spec:
             - name: KEYCLOAK_SERVER_PASSWORD
               value: "admin"
             - name: MAIL_SERVER_BASE_URL
-              value: "http://localhost:8000"
+              value: "http://james-service:8000"
             - name: MONGODB_HOST
-              value: "mongodb-service"
+              value: "mongodb"
             - name: MONGODB_PORT
               value: "27017"
             - name: ELASTICSEARCH_URIS
-              value: "http://elasticsearch-service:9200"
+              value: "http://elasticsearch:9200"
             - name: ELASTICSEARCH_ENDPOINTS
-              value: "elasticsearch-service:9200"
+              value: "elasticsearch:9200"
           ports:
             - containerPort: 8088
 ---

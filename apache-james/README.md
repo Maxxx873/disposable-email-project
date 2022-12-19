@@ -31,6 +31,17 @@ Running **Distributed Apache James** with docker-compose:
 docker compose -f apache-james/docker-compose.yml up
 ```
 
+#### Pushing to dockerhub:
+```bash
+docker login
+```
+```bash
+docker build -t maxxx873/dsp-eml-prj-james:latest -f Dockerfile .
+```
+```bash
+docker push maxxx873/dsp-eml-prj-james:latest
+```
+
 Running **Mongodb**:
 ```bash
 docker run --name mongodb -d -p 27017:27017 mongo

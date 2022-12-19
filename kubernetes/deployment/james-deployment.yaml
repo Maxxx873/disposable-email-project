@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: james-deployment
+  labels:
+    app: james
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: james
+  template:
+    metadata:
+      labels:
+        app: james
+    spec:
+      containers:
+        - image: maxxx873/dsp-eml-prj-james
+          name: james-distributed
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+            - containerPort: 25
+            - containerPort: 110
+            - containerPort: 143
+            - containerPort: 465
+            - containerPort: 587
+            - containerPort: 993
+            - containerPort: 8000
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: james-service
+spec:
+  type: NodePort
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+    - name: "25"
+      port: 25
+      targetPort: 25
+    - name: "110"
+      port: 110
+      targetPort: 110
+    - name: "143"
+      port: 143
+      targetPort: 143
+    - name: "465"
+      port: 465
+      targetPort: 465
+    - name: "587"
+      port: 587
+      targetPort: 587
+    - name: "993"
+      port: 993
+      targetPort: 993
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: james

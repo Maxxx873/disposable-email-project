@@ -5,9 +5,9 @@
 docker login
 ```
 ```bash
-docker build -t maxxx873/dsp-eml-prj-rest-app.jar:latest -f Dockerfile .
+docker build -t maxxx873/dsp-eml-prj-rest:latest -f Dockerfile .
 ```
 ```bash
-docker push maxxx873/dsp-eml-prj-rest-app.jar:latest
+docker push maxxx873/dsp-eml-prj-rest:latest
 ```
 
