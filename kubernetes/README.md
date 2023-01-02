@@ -1,6 +1,11 @@
-# Run REST application with Kubernetes
+# Run project with Kubernetes
 
 #### Deployment:
+
+When using a `microk8s` cluster, the following add-on must be enabled:
+```bash
+microk8s enable dns
+```
 
 After setting up `kubectl` and connecting to a running kubernetes cluster, run the following commands in the 
 correct order:
@@ -44,12 +49,15 @@ kubectl rollout restart deployment mongo-deployment
 kubectl rollout restart deployment keycloak-deployment
 ```
 ```bash
-kubectl rollout restart deployment rest-deployment
+kubectl rollout restart deployment dsp-eml-prj-rest-app-deployment
 ```
 ```bash
 kubectl rollout restart deployment james-deployment
 ```
-
+To delete:
+```bash
+kubectl delete pods <pod> --grace-period=0 --force
+```
 
 
 

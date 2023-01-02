@@ -1,0 +1,30 @@
+apiVersion: v2
+name: dsp-eml-prj
+description: A Helm chart for Kubernetes
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+
+dependencies:
+ # - name: keycloak
+  #  repository: https://charts.bitnami.com/bitnami
+  #  condition: keycloak.enabled
+  #  version: 13.0.0
+  - name: rest-chart
+    condition: rest-chart.enabled
+    version: "*"
+  # - name: cassandra-chart
+  #   condition: cassandra-chart.enabled
+  #   version: "*"
+  # - name: elasticsearch-chart
+  #   condition: elasticsearch-chart.enabled
+  #   version: "*"
+  #- name: james-chart
+  #   condition: james-chart.enabled
+  #  version: "*"
+  # - name: mongo-chart
+  #   condition: mongo-chart.enabled
+  #   version: "*"
+  # - name: rabbitmq-chart
+  #  condition: rabbitmq-chart.enabled
+  #  version: "*"
