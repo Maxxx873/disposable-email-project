@@ -28,8 +28,7 @@ spring:
       client:
         reactive:
           endpoints: ${ELASTICSEARCH_ENDPOINTS:localhost:9200}
-      webclient:
-        max-in-memory-size: 512MB
+          max-in-memory-size: 512MB
 
 keycloak:
   server:

@@ -1,0 +1,61 @@
+server:
+  port: ${PORT:8088}
+
+authorization:
+  service: ${AUTHORIZATION_SERVICE:keycloak}
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_JWT_SET_URI}
+          issuer-uri: ${KEYCLOAK_REALM_ISSUER_URL}
+
+  data:
+    mongodb:
+      host: ${MONGODB_HOST}
+      port: ${MONGODB_PORT}
+      database: disposableemail
+      auto-index-creation: true
+
+    elasticsearch:
+      rest:
+        uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+        password: ${ELASTICSEARCH_PASSWORD:secret}
+        username: ${ELASTICSEARCH_USERNAME:elastic}
+      client:
+        reactive:
+          endpoints: ${ELASTICSEARCH_ENDPOINTS:localhost:9200}
+          max-in-memory-size: 512MB
+
+keycloak:
+  server:
+    url: ${KEYCLOAK_SERVER_URL}
+    realm: ${KEYCLOAK_SERVER_REALM}
+    username: ${KEYCLOAK_SERVER_USERNAME}
+    password: ${KEYCLOAK_SERVER_PASSWORD}
+    client: ${KEYCLOAK_SERVER_CLIENT:admin-cli}
+
+mail-server:
+  name: ${MAIL_SERVER_NAME:Apache James}
+  mailbox: ${MAILBOX_NAME:INBOX}
+  base-url: ${MAIL_SERVER_BASE_URL}
+  defaultUserSizeQuota: ${DEFAULT_USER_SIZE_QUOTA}
+
+logging:
+  level.root: info
+
+resilience4j.retry:
+  instances:
+    retryAuthorizationService:
+      maxAttempts: 15
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+    retryMailService:
+      maxAttempts: 15
+      waitDuration: 1s

@@ -225,7 +225,6 @@ paths:
           allowEmptyValue: true
           schema:
             type: integer
-            default: 1
           style: form
           explode: false
           allowReserved: false

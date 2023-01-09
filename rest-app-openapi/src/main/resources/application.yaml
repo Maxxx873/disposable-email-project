@@ -4,11 +4,20 @@ server:
 authorization:
   service: ${AUTHORIZATION_SERVICE:keycloak}
 
+
 spring:
+
   config:
     import: optional:.env[.properties]
   main:
     allow-bean-definition-overriding: true
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
 
   security:
     oauth2:
@@ -30,8 +39,7 @@ spring:
       client:
         reactive:
           endpoints: ${ELASTICSEARCH_ENDPOINTS:localhost:9200}
-      webclient:
-        max-in-memory-size: 512MB
+          max-in-memory-size: 512MB
 
 keycloak:
   server:

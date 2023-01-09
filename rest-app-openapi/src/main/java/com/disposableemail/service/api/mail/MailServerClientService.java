@@ -15,11 +15,11 @@ public interface MailServerClientService {
 
     Mono<String> getMailboxId(Credentials credentials, String mailboxName);
 
-    Mono<Response> createMailbox(Credentials credentials, String mailboxName);
+    Mono<Response> createMailbox(Credentials credentials);
 
     Mono<Integer> getQuotaSize(String username);
 
-    Mono<Response> updateQuotaSize(Credentials credentials, int quotaSize);
+    Mono<Response> updateQuotaSize(Credentials credentials);
 
     Mono<Integer> getUsedSize(String username);
 

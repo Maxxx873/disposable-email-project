@@ -1,5 +1,6 @@
 package com.disposableemail.service.impl.auth;
 
+import com.disposableemail.event.EventProducer;
 import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.rest.model.Token;
@@ -9,7 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
@@ -29,8 +36,15 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     private final Keycloak keycloak;
     private final UserRepresentation userRepresentation;
     private final CredentialRepresentation credentialRepresentation;
+    private final EventProducer eventProducer;
 
+    @Async
     @Override
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(name = "account-start-creating", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "account-start-creating"),
+            key = "start-creating-account"
+    ))
     public Response createUser(Credentials credentials) {
         userRepresentation.setUsername(credentials.getAddress());
         credentialRepresentation.setValue(credentials.getPassword());
@@ -43,13 +57,14 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         }
         log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
                 response.getStatus(), response.getStatusInfo());
+        eventProducer.sendKeycloakConfirmation(credentials);
         return response;
     }
 
     @Override
     public Token getToken(Credentials credentials) {
         log.info("Keycloak | Getting Token string from a Token Manager for {}", credentials.getAddress());
-        Keycloak instance = Keycloak.getInstance(serverUrl, realm, credentials.getAddress(),
+        var instance = Keycloak.getInstance(serverUrl, realm, credentials.getAddress(),
                 credentials.getPassword(), client);
         var tokenManager = instance.tokenManager();
         return new Token(tokenManager.getAccessTokenString());

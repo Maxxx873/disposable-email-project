@@ -34,6 +34,8 @@ public class AccountEntity {
     private String mailboxId;
     private Boolean isDisabled;
     private Boolean isDeleted;
+    private Integer quota;
+    private Integer used;
 
     @CreatedDate
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

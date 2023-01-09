@@ -21,7 +21,7 @@ services:
       - "993:993"
       - "8000:8000"
     volumes:
-      - ./conf/:/root/conf/
+      - ./conf-dev/:/root/conf/
       - ./extensions-jars/:/root/extensions-jars/
     networks:
       - james

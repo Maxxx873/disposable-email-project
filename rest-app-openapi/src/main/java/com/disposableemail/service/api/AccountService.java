@@ -18,6 +18,8 @@ public interface AccountService {
 
     Mono<AccountEntity> getAccountById(String id);
 
+    Mono<AccountEntity> setMailboxId(Credentials credentials);
+
     Mono<AccountEntity> getAccountByAddress(String address);
 
     Mono<AccountEntity> deleteAccount(String id);

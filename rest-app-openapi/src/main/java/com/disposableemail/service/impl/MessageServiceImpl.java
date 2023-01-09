@@ -2,12 +2,9 @@ package com.disposableemail.service.impl;
 
 import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.dao.entity.MessageEntity;
-import com.disposableemail.dao.mapper.search.MessageElasticsearchMapper;
 import com.disposableemail.dao.repository.MessageRepository;
 import com.disposableemail.service.api.AccountService;
 import com.disposableemail.service.api.MessageService;
-import com.disposableemail.service.api.SourceService;
-import com.disposableemail.service.api.search.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +18,22 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
-    private final MessageElasticsearchService messageElasticsearchService;
-    private final MessageElasticsearchMapper messageElasticsearchMapper;
     private final MessageRepository messageRepository;
     private final AccountService accountService;
-    private final SourceService sourceService;
+
+    @Override
+    public Mono<MessageEntity> saveMessage(MessageEntity messageEntity) {
+        log.info("Saving a Message | Text: {}", messageEntity.getText());
+
+        return messageRepository.save(messageEntity);
+    }
+
+    @Override
+    public Mono<MessageEntity> getMessageById(String messageId) {
+        log.info("Getting a Message | Id {}", messageId);
+
+        return messageRepository.findById(messageId);
+    }
 
     @Override
     public Mono<MessageEntity> getMessage(String messageId, ServerWebExchange exchange) {
@@ -63,31 +71,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Flux<MessageEntity> getMessagesFromElasticsearchAndSaveToDb(Integer size, ServerWebExchange exchange) {
+    public Flux<MessageEntity> getMessages(Integer size, ServerWebExchange exchange) {
         log.info("Getting a Messages collection | Size: {}", size);
 
-        return messageElasticsearchService.getMessagesFromMailbox(exchange)
-                .flatMap(messageElasticsearchEntity ->
-                        messageRepository.findById(messageElasticsearchEntity.getMessageId())
-                                .switchIfEmpty(Mono.defer(() -> {
-                                    log.info("Added a new Message | Id: {} ", messageElasticsearchEntity.getMessageId());
-                                    var message = messageElasticsearchMapper
-                                            .messageElasticsearchEntityToMessageEntity(messageElasticsearchEntity);
-
-                                    return sourceService.getAttachments(message.getMsgid())
-                                            .map(attachmentEntities -> {
-                                                attachmentEntities.forEach(attachmentEntity ->
-                                                        attachmentEntity.setDownloadUrl("/messages/" + message.getId() + "/attachment/" + attachmentEntity.getId()));
-                                                return attachmentEntities;
-                                            }).flatMap(attachmentEntities -> {
-                                                message.setAttachments(attachmentEntities);
-                                                return messageRepository.save(message);
-                                            });
-                                })))
-                .thenMany(accountService.getAccountFromJwt(exchange).map(AccountEntity::getId)
-                        .flatMapMany(accountId ->
-                                messageRepository.findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountId,
-                                        Pageable.ofSize(size))));
+        return accountService.getAccountFromJwt(exchange).map(AccountEntity::getId)
+                .flatMapMany(accountId ->
+                        messageRepository.findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountId,
+                                Pageable.ofSize(size)));
     }
 
 }

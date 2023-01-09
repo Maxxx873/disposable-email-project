@@ -1,12 +1,14 @@
 package com.disposableemail.rest.delegate;
 
 import com.disposableemail.dao.mapper.MessageMapper;
+import com.disposableemail.dao.mapper.search.MessageElasticsearchMapper;
 import com.disposableemail.exception.MessageNotFoundException;
 import com.disposableemail.exception.MessagesNotFoundException;
 import com.disposableemail.rest.api.MessagesApiDelegate;
 import com.disposableemail.rest.model.Message;
 import com.disposableemail.rest.model.Messages;
 import com.disposableemail.service.api.MessageService;
+import com.disposableemail.service.api.search.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -25,15 +29,19 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
 
     private final MessageMapper messageMapper;
     private final MessageService messageService;
+    private final MessageElasticsearchService messageElasticsearchService;
+    private final MessageElasticsearchMapper messageElasticsearchMapper;
 
     @Override
     @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Flux<Messages>>> getMessageCollection(Integer size, ServerWebExchange exchange) {
 
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(messageService.getMessagesFromElasticsearchAndSaveToDb(size, exchange)
-                                .map(messageMapper::messageEntityToMessages)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body((Objects.equals(size, null) ?
+                        messageElasticsearchService.getMessagesFromMailbox(exchange) :
+                        messageElasticsearchService.getMessagesFromMailbox(size, exchange))
+                .map(messageElasticsearchMapper::messageElasticsearchEntityToMessages)))
                 .switchIfEmpty(Mono.error(new MessagesNotFoundException()));
     }
 
@@ -64,7 +72,7 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
 
         return messageService.getMessage(id, exchange)
                 .map(messageEntity -> {
-                    log.info("Retrieved Message: {}", messageEntity.toString());
+                    log.info("Retrieved Message | message: {}", messageEntity.toString());
                     return ResponseEntity.status(HttpStatus.OK)
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(messageMapper.messageEntityToMessage(messageEntity));

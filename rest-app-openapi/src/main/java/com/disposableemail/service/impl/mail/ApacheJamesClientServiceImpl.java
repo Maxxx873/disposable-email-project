@@ -1,6 +1,7 @@
 package com.disposableemail.service.impl.mail;
 
 import com.disposableemail.dao.entity.DomainEntity;
+import com.disposableemail.event.EventProducer;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.mail.MailServerClientService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,8 +12,15 @@ import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -31,12 +39,18 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
 
     @Value("${mail-server.name}")
     private String mailServerName;
+    @Value("${mail-server.mailbox}")
+    private String INBOX;
+
+    @Value("${mail-server.defaultUserSizeQuota}")
+    private String quotaSize;
 
     private final String MAILBOX_ID_KEY = "mailboxId";
     private final String PASSWORD_FIELD = "password";
     private final ObjectMapper mapper;
     private final WebClient mailServerApiClient;
     private final RetryRegistry registry;
+    private final EventProducer eventProducer;
 
 
     @PostConstruct
@@ -49,7 +63,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @Retry(name = "retryMailService")
     public Mono<String> getMailboxId(Credentials credentials, String mailboxName) {
 
-        return mailServerApiClient.get().uri("/users/{username}/mailboxes", credentials.getAddress())
+        var result = mailServerApiClient.get().uri("/users/{username}/mailboxes", credentials.getAddress())
                 .retrieve()
                 .bodyToMono(String.class)
                 .retryWhen(reactor.util.retry.Retry.fixedDelay(5, Duration.ofSeconds(2)))
@@ -71,6 +85,8 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                     log.info("Extracted mailboxId | {}", mailboxId);
                     return mailboxId;
                 });
+        result.subscribe();
+        return result;
     }
 
     @Override
@@ -92,77 +108,110 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                 .build());
     }
 
+    @Async
     @Override
     @SneakyThrows
     @Retry(name = "retryMailService")
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(name = "account-keycloak-confirmation", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "account-keycloak-confirmation"),
+            key = "keycloak-confirmation-account"
+    ))
     public Mono<Response> createUser(Credentials credentials) {
         log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
 
         var password = mapper.createObjectNode();
         password.put(PASSWORD_FIELD, credentials.getPassword());
-        var response = mailServerApiClient.put()
+        var result = mailServerApiClient.put()
                 .uri("/users/" + credentials.getAddress())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(mapper.writeValueAsString(password))
-                .retrieve()
-                .bodyToMono(Response.class);
-
-        response.subscribe();
-
-        return response;
+                .exchangeToMono(response -> {
+                    if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
+                        log.info("User created in Mail Service | Status code: {} | Address: {}",
+                                response.statusCode(), credentials.getAddress());
+                        eventProducer.sendAccountCreatedInMailService(credentials);
+                        return response.bodyToMono(Response.class);
+                    }
+                    return Mono.empty();
+                }).retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
+        result.subscribe();
+        return result;
     }
 
+    @Async
     @Override
     @SneakyThrows
     @Retry(name = "retryMailService")
-    public Mono<Response> createMailbox(Credentials credentials, String mailboxName) {
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(name = "account-created-in-mail-service", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "account-created-in-mail-service"),
+            key = "account-created-in-mail-service"
+    ))
+    public Mono<Response> createMailbox(Credentials credentials) {
         log.info("Creating a Mailbox in Mail Server {} | User: {}, Mailbox: {}",
-                mailServerName, credentials.getAddress(), mailboxName);
+                mailServerName, credentials.getAddress(), INBOX);
 
-        var response = mailServerApiClient.put()
-                .uri("/users/" + credentials.getAddress() + "/mailboxes/" + mailboxName)
-                .retrieve()
-                .bodyToMono(Response.class)
-                .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
-        response.subscribe();
+        var result = mailServerApiClient.put()
+                .uri("/users/" + credentials.getAddress() + "/mailboxes/" + INBOX)
+                .exchangeToMono(response -> {
+                    if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
+                        log.info("Mailbox created in Mail Service | Status code: {} | Address: {}",
+                                response.statusCode(), credentials.getAddress());
+                        eventProducer.sendMailboxCreatedInMailService(credentials);
+                        return response.bodyToMono(Response.class);
+                    }
+                    return Mono.empty();
+                }).retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
 
-        return response;
+        result.subscribe();
+        return result;
     }
 
     @Override
     public Mono<Integer> getQuotaSize(String username) {
         log.info("Getting the quota size for a user | User: {}", username);
 
-        var response = mailServerApiClient.get()
+        var result = mailServerApiClient.get()
                 .uri("/quota/users/" + username + "/size")
                 .retrieve()
                 .bodyToMono(Integer.class)
                 .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
-        response.subscribe();
-
-        return response;
+        result.subscribe();
+        return result;
     }
 
+    @Async
     @Override
-    public Mono<Response> updateQuotaSize(Credentials credentials, int quotaSize) {
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(name = "account-mailbox-created", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "account-mailbox-created"),
+            key = "mailbox-created-in-mail-service"
+    ))
+    public Mono<Response> updateQuotaSize(Credentials credentials) {
         log.info("Updating the quota size for a user | User: {}", credentials.getAddress());
 
-        var response = mailServerApiClient.put()
+        var result = mailServerApiClient.put()
                 .uri("/quota/users/" + credentials.getAddress() + "/size")
-                .bodyValue(quotaSize)
-                .retrieve()
-                .bodyToMono(Response.class)
-                .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
-        response.subscribe();
-
-        return response;
+                .bodyValue(Integer.parseInt(quotaSize))
+                .exchangeToMono(response -> {
+                    if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
+                        log.info("Quota size updated in Mail Service | Status code: {} | Address: {}",
+                                response.statusCode(), credentials.getAddress());
+                        eventProducer.sendQuotaSizeUpdatedInMailService(credentials);
+                        return response.bodyToMono(Response.class);
+                    }
+                    return Mono.empty();
+                }).retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
+        result.subscribe();
+        return result;
     }
 
     @Override
     public Mono<Integer> getUsedSize(String username) {
         log.info("Getting used size for a user | User: {}", username);
 
-        var response = mailServerApiClient.get()
+        var result = mailServerApiClient.get()
                 .uri("/quota/users/" + username)
                 .retrieve()
                 .bodyToMono(String.class)
@@ -176,9 +225,8 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                         throw new RuntimeException(e);
                     }
                 });
-        response.subscribe();
-
-        return response;
+        result.subscribe();
+        return result;
     }
 
 }

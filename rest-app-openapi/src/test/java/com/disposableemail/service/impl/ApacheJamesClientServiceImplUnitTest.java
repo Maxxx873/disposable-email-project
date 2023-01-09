@@ -1,6 +1,7 @@
 package com.disposableemail.service.impl;
 
 import com.disposableemail.dao.entity.DomainEntity;
+import com.disposableemail.event.EventProducer;
 import com.disposableemail.exception.MailboxNotFoundException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.mail.MailServerClientService;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -75,6 +77,8 @@ class ApacheJamesClientServiceImplUnitTest {
     @MockBean
     private RetryRegistry registry;
     @Mock
+    private EventProducer eventProducer;
+    @Mock
     private ObjectMapper mapper;
     @Mock
     private ObjectNode node;
@@ -97,7 +101,9 @@ class ApacheJamesClientServiceImplUnitTest {
 
     @BeforeEach
     void setUp() {
-        mailServerClientService = new ApacheJamesClientServiceImpl(new ObjectMapper(), webClientMock, registry);
+        mailServerClientService = new ApacheJamesClientServiceImpl(new ObjectMapper(), webClientMock, registry, eventProducer);
+        ReflectionTestUtils.setField(mailServerClientService, "INBOX", "INBOX");
+        ReflectionTestUtils.setField(mailServerClientService, "quotaSize", "40000");
     }
 
     @Test
@@ -169,7 +175,7 @@ class ApacheJamesClientServiceImplUnitTest {
         when(requestBodySpec.retrieve()).thenReturn(response);
         when(response.bodyToMono(Response.class)).thenReturn(Mono.empty());
 
-        Mono<Response> response = mailServerClientService.createMailbox(credentials, mailboxName);
+        Mono<Response> response = mailServerClientService.createMailbox(credentials);
 
         StepVerifier.create(response).expectComplete().verify();
 
@@ -204,7 +210,7 @@ class ApacheJamesClientServiceImplUnitTest {
         when(requestHeadersSpec.retrieve()).thenReturn(response);
         when(response.bodyToMono(Response.class)).thenReturn(Mono.empty());
 
-        Mono<Response> response = mailServerClientService.updateQuotaSize(credentials, quotaSize);
+        Mono<Response> response = mailServerClientService.updateQuotaSize(credentials);
 
         StepVerifier.create(response).expectComplete().verify();
 
