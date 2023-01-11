@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 public interface AccountService {
 
-    Mono<AccountEntity> createAccountInAuthorizationServiceAndSaveToDb(Credentials credentials);
+    Mono<AccountEntity> createAccount(Credentials credentials);
 
     Mono<Token> getTokenFromAuthorizationService(Credentials credentials);
 

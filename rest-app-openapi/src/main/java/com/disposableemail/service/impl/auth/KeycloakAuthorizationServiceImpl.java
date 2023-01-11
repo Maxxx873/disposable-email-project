@@ -17,6 +17,7 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
@@ -37,6 +38,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     private final UserRepresentation userRepresentation;
     private final CredentialRepresentation credentialRepresentation;
     private final EventProducer eventProducer;
+    private final TextEncryptor encryptor;
 
     @Async
     @Override
@@ -47,7 +49,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     ))
     public Response createUser(Credentials credentials) {
         userRepresentation.setUsername(credentials.getAddress());
-        credentialRepresentation.setValue(credentials.getPassword());
+        credentialRepresentation.setValue(encryptor.decrypt(credentials.getPassword()));
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
         var response = keycloak.realm(realm).users().create(userRepresentation);
         if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {

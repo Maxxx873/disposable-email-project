@@ -14,11 +14,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,6 +29,9 @@ import reactor.test.StepVerifier;
 
 import javax.ws.rs.core.Response;
 
+import java.util.function.Function;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -79,6 +85,8 @@ class ApacheJamesClientServiceImplUnitTest {
     @Mock
     private EventProducer eventProducer;
     @Mock
+    private TextEncryptor encryptor;
+    @Mock
     private ObjectMapper mapper;
     @Mock
     private ObjectNode node;
@@ -101,7 +109,7 @@ class ApacheJamesClientServiceImplUnitTest {
 
     @BeforeEach
     void setUp() {
-        mailServerClientService = new ApacheJamesClientServiceImpl(new ObjectMapper(), webClientMock, registry, eventProducer);
+        mailServerClientService = new ApacheJamesClientServiceImpl(new ObjectMapper(), webClientMock, registry, eventProducer, encryptor);
         ReflectionTestUtils.setField(mailServerClientService, "INBOX", "INBOX");
         ReflectionTestUtils.setField(mailServerClientService, "quotaSize", "40000");
     }
@@ -149,13 +157,14 @@ class ApacheJamesClientServiceImplUnitTest {
         var requestBody = String.format("{\"password\":\"%s\"}", PASSWORD);
         var uri = String.format("/users/%s", USERNAME);
 
+        when(encryptor.decrypt(credentials.getPassword())).thenReturn(PASSWORD);
         when(webClientMock.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
         when(mapper.writeValueAsString(node)).thenReturn(requestBody);
         when(requestBodySpec.bodyValue(mapper.writeValueAsString(node))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(response);
-        when(response.bodyToMono(Response.class)).thenReturn(Mono.empty());
+        when(requestHeadersSpec.exchangeToMono(ArgumentMatchers.<Function<ClientResponse, ? extends Mono<String>>>notNull()))
+                .thenReturn(Mono.empty());
 
         Mono<Response> response = mailServerClientService.createUser(credentials);
 
@@ -172,8 +181,8 @@ class ApacheJamesClientServiceImplUnitTest {
 
         when(webClientMock.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(response);
-        when(response.bodyToMono(Response.class)).thenReturn(Mono.empty());
+        when(requestBodySpec.exchangeToMono(ArgumentMatchers.<Function<ClientResponse, ? extends Mono<String>>>notNull()))
+                .thenReturn(Mono.empty());
 
         Mono<Response> response = mailServerClientService.createMailbox(credentials);
 
@@ -207,8 +216,8 @@ class ApacheJamesClientServiceImplUnitTest {
         when(webClientMock.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
         when(requestBodySpec.bodyValue(quotaSize)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(response);
-        when(response.bodyToMono(Response.class)).thenReturn(Mono.empty());
+        when(requestHeadersSpec.exchangeToMono(ArgumentMatchers.<Function<ClientResponse, ? extends Mono<String>>>notNull()))
+                .thenReturn(Mono.empty());
 
         Mono<Response> response = mailServerClientService.updateQuotaSize(credentials);
 

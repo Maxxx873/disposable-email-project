@@ -6,11 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.crypto.encrypt.Encryptors;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
-@RequiredArgsConstructor
 @EnableWebFluxSecurity
+@RequiredArgsConstructor
 @EnableReactiveMethodSecurity
 public class SecurityConfiguration {
 
@@ -18,6 +20,13 @@ public class SecurityConfiguration {
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuerUri;
+
+    @Value("${spring.security.password}")
+    private String password;
+
+    @Value("${spring.security.salt}")
+    private String salt;
+
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -36,4 +45,8 @@ public class SecurityConfiguration {
         return decoderConfiguration.getReactiveJwtDecoder(issuerUri);
     }
 
+    @Bean
+    public TextEncryptor textEncryptor() {
+        return Encryptors.text(password, salt);
+    }
 }

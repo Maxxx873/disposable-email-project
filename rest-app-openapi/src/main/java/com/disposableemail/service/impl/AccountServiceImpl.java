@@ -1,8 +1,6 @@
 package com.disposableemail.service.impl;
 
 import com.disposableemail.dao.entity.AccountEntity;
-import com.disposableemail.dao.mapper.AccountMapper;
-import com.disposableemail.dao.mapper.CredentialsMapper;
 import com.disposableemail.dao.repository.AccountRepository;
 import com.disposableemail.dao.repository.DomainRepository;
 import com.disposableemail.event.EventProducer;
@@ -23,6 +21,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
@@ -42,14 +41,13 @@ public class AccountServiceImpl implements AccountService {
     private final EventProducer domainEventProducer;
     private final AccountRepository accountRepository;
     private final AuthorizationService authorizationService;
-    private final CredentialsMapper credentialsMapper;
-    private final AccountMapper accountMapper;
     private final DomainRepository domainRepository;
     private final MailServerClientService mailServerClientService;
     private final String USER_NAME_CLAIM = "preferred_username";
+    private final TextEncryptor encryptor;
 
     @Override
-    public Mono<AccountEntity> createAccountInAuthorizationServiceAndSaveToDb(Credentials credentials) {
+    public Mono<AccountEntity> createAccount(Credentials credentials) {
         log.info("Creating an Account | ({})", credentials.getAddress());
 
         return domainRepository.findByDomain(getDomainFromEmailAddress(credentials.getAddress()))
@@ -57,15 +55,8 @@ public class AccountServiceImpl implements AccountService {
                 .map(domainEntity -> {
                     log.info("Using a Domain: {}", domainEntity.toString());
                     if (domainEntity.getIsActive() && !domainEntity.getIsPrivate()) {
-                        domainEventProducer.sendStartCreatingAccount(credentials);
-                        var accountEntity = accountMapper
-                                .accountToAccountEntity(credentialsMapper.credentialsToAccount(credentials));
-                        accountEntity.setIsDisabled(false);
-                        accountEntity.setIsDeleted(false);
-                        accountEntity.setQuota(Integer.parseInt(quotaSize));
-                        accountEntity.setUsed(0);
-                        return accountRepository.save(accountEntity);
-
+                        domainEventProducer.sendStartCreatingAccount(getEncryptCredentials(credentials));
+                        return accountRepository.save(getNewAccountEntity(credentials));
                     } else {
                         return Mono.just(new AccountEntity());
                     }
@@ -144,5 +135,22 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public String getDomainFromEmailAddress(String address) {
         return address.substring(address.indexOf("@") + 1);
+    }
+
+    private AccountEntity getNewAccountEntity(Credentials credentials) {
+        return AccountEntity.builder()
+                .address(credentials.getAddress())
+                .isDeleted(false)
+                .isDeleted(false)
+                .used(0)
+                .quota(Integer.parseInt(quotaSize))
+                .build();
+    }
+
+    private Credentials getEncryptCredentials(Credentials credentials) {
+        return Credentials.builder()
+                .address(credentials.getAddress())
+                .password(encryptor.encrypt(credentials.getPassword()))
+                .build();
     }
 }

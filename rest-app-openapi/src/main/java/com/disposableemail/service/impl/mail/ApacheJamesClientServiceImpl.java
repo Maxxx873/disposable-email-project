@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -51,6 +52,8 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     private final WebClient mailServerApiClient;
     private final RetryRegistry registry;
     private final EventProducer eventProducer;
+
+    private final TextEncryptor encryptor;
 
 
     @PostConstruct
@@ -121,7 +124,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
         log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
 
         var password = mapper.createObjectNode();
-        password.put(PASSWORD_FIELD, credentials.getPassword());
+        password.put(PASSWORD_FIELD, encryptor.decrypt(credentials.getPassword()));
         var result = mailServerApiClient.put()
                 .uri("/users/" + credentials.getAddress())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -163,7 +166,6 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                     }
                     return Mono.empty();
                 }).retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
-
         result.subscribe();
         return result;
     }

@@ -12,8 +12,10 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${KEYCLOAK_JWT_SET_URI:http://localhost:9080/realms/master/protocol/openid-connect/certs}
-          issuer-uri: ${KEYCLOAK_REALM_ISSUER_URL:http://localhost:9080/realms/master}
+          jwk-set-uri: ${KEYCLOAK_JWT_SET_URI}
+          issuer-uri: ${KEYCLOAK_REALM_ISSUER_URL}
+    password: ${CRYPTO_PASSWORD:pass}
+    salt: ${CRYPTO_SALT:e707efd5cf9f191d}
 
   data:
     mongodb:

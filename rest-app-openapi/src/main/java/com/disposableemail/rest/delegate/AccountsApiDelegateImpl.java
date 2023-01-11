@@ -53,9 +53,9 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     @Override
     public Mono<ResponseEntity<Account>> createAccountItem(Mono<Credentials> credentials, ServerWebExchange exchange) {
 
-        return credentials.flatMap(accountService::createAccountInAuthorizationServiceAndSaveToDb).map(accountEntity -> {
+        return credentials.flatMap(accountService::createAccount).map(accountEntity -> {
             log.info("Saved Account: {}", accountEntity.toString());
-            return ResponseEntity.status(HttpStatus.CREATED)
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(accountMapper.accountEntityToAccount(accountEntity));
         });

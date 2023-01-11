@@ -25,6 +25,8 @@ spring:
         jwt:
           jwk-set-uri: ${KEYCLOAK_JWT_SET_URI}
           issuer-uri: ${KEYCLOAK_REALM_ISSUER_URL}
+    password: ${CRYPTO_PASSWORD:pass}
+    salt: ${CRYPTO_SALT:e707efd5cf9f191d}
 
   data:
     mongodb:
