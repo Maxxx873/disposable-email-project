@@ -42,6 +42,18 @@ spec:
               value: "http://elasticsearch:9200"
             - name: ELASTICSEARCH_ENDPOINTS
               value: "elasticsearch:9200"
+            - name: RABBITMQ_HOST
+              value: "rabbitmq"
+            - name: RABBITMQ_PORT
+              value: "5672"
+            - name: RABBITMQ_USERNAME
+              value: "guest"
+            - name: RABBITMQ_PASSWORD
+              value: "guest"
+            - name: CRYPTO_PASSWORD
+              value: "pass"
+            - name: CRYPTO_SALT
+              value: "e707efd5cf9f191d"
           ports:
             - containerPort: 8088
 ---
