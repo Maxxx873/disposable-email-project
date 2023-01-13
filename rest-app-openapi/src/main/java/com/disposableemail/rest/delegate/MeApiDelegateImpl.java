@@ -5,6 +5,7 @@ import com.disposableemail.exception.AccountNotFoundException;
 import com.disposableemail.rest.api.MeApiDelegate;
 import com.disposableemail.rest.model.Account;
 import com.disposableemail.service.api.AccountService;
+import com.disposableemail.service.api.mail.MailServerClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,17 +23,29 @@ public class MeApiDelegateImpl implements MeApiDelegate {
 
     private final AccountService accountService;
     private final AccountMapper accountMapper;
+    private final MailServerClientService mailServerClientService;
 
     @Override
     @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Account>> getMeAccountItem(ServerWebExchange exchange) {
 
-        return accountService.getAccountFromJwt(exchange)
-                .map(accountEntity -> {
-                    log.info("Extracting authenticated Account: {}", accountEntity.toString());
+        var accountEntity = accountService.getAccountFromJwt(exchange);
+        var usedSize = accountEntity.flatMap(account -> mailServerClientService.getUsedSize(account.getAddress()));
+        return accountEntity
+                .map(accountMapper::accountEntityToAccount)
+                .zipWith(usedSize)
+                .map(tuple2 -> {
+                    log.info("Get used size for Account | address: {}, used size: {}",
+                            tuple2.getT1().getAddress(), tuple2.getT2());
+                    var account = tuple2.getT1();
+                    account.setUsed(tuple2.getT2());
+                    return account;
+                })
+                .map(account -> {
+                    log.info("Extracting authenticated Account: {}", account.toString());
                     return ResponseEntity.status(HttpStatus.OK)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .body(accountMapper.accountEntityToAccount(accountEntity));
+                            .body(account);
                 })
                 .switchIfEmpty(Mono.error(new AccountNotFoundException()));
     }

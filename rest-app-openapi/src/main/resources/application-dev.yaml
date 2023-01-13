@@ -5,6 +5,9 @@ authorization:
   service: ${AUTHORIZATION_SERVICE:keycloak}
 
 spring:
+  output:
+    ansi:
+      enabled: always
   main:
     allow-bean-definition-overriding: true
 

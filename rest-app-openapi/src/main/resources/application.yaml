@@ -6,6 +6,9 @@ authorization:
 
 
 spring:
+  output:
+    ansi:
+      enabled: always
 
   config:
     import: optional:.env[.properties]

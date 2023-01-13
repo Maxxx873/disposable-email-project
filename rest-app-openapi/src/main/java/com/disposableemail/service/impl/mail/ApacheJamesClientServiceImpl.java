@@ -52,7 +52,6 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     private final WebClient mailServerApiClient;
     private final RetryRegistry registry;
     private final EventProducer eventProducer;
-
     private final TextEncryptor encryptor;
 
 

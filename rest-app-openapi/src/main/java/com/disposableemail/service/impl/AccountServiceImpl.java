@@ -141,7 +141,7 @@ public class AccountServiceImpl implements AccountService {
         return AccountEntity.builder()
                 .address(credentials.getAddress())
                 .isDeleted(false)
-                .isDeleted(false)
+                .isDisabled(false)
                 .used(0)
                 .quota(Integer.parseInt(quotaSize))
                 .build();

@@ -39,7 +39,7 @@ public class ElasticMongoIntegrationServiceImpl implements ElasticMongoIntegrati
         log.info("Saving a Message collection from Elasticsearch to Mongo | Account: {}, Mailbox: {}",
                 accountEntity.getAddress(), accountEntity.getMailboxId());
 
-        messageElasticsearchService.getMessagesFromMailbox(accountEntity)
+        var result = messageElasticsearchService.getMessagesFromMailbox(accountEntity)
                 .flatMap(messageElasticsearchEntity ->
                         messageService.getMessageById(messageElasticsearchEntity.getMessageId())
                                 .switchIfEmpty(Mono.defer(() -> {
@@ -59,5 +59,6 @@ public class ElasticMongoIntegrationServiceImpl implements ElasticMongoIntegrati
                                                 return messageService.saveMessage(message);
                                             });
                                 })));
+        result.subscribe();
     }
 }
