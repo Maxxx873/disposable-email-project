@@ -1,7 +1,10 @@
 package com.disposableemail.service.impl.mail;
 
 import com.disposableemail.dao.entity.DomainEntity;
+import com.disposableemail.event.Event;
 import com.disposableemail.event.EventProducer;
+import com.disposableemail.exception.DomainNotAvailableException;
+import com.disposableemail.exception.MailboxNotFoundException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.mail.MailServerClientService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,6 +36,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+import static com.disposableemail.event.Event.Type.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,13 +46,15 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @Value("${mail-server.name}")
     private String mailServerName;
     @Value("${mail-server.mailbox}")
-    private String INBOX;
-
+    private String inbox;
     @Value("${mail-server.defaultUserSizeQuota}")
     private String quotaSize;
 
-    private final String MAILBOX_ID_KEY = "mailboxId";
-    private final String PASSWORD_FIELD = "password";
+    @Value("${mail-server.quotaPath}")
+    private String quotaPath;
+
+    private static final String MAILBOX_ID_KEY = "mailboxId";
+    private static final String PASSWORD_FIELD = "password";
     private final ObjectMapper mapper;
     private final WebClient mailServerApiClient;
     private final RetryRegistry registry;
@@ -75,7 +82,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                         return mapper.readValue(response, new TypeReference<List<Map<String, String>>>() {
                         });
                     } catch (JsonProcessingException ex) {
-                        throw new RuntimeException(ex);
+                        throw new MailboxNotFoundException();
                     }
                 })
                 .map(mailboxes ->
@@ -101,7 +108,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                 return mapper.readValue(response, new TypeReference<List<String>>() {
                 });
             } catch (JsonProcessingException ex) {
-                throw new RuntimeException(ex);
+                throw new DomainNotAvailableException();
             }
         }).flatMapIterable(domains -> domains).map(domainName -> DomainEntity.builder()
                 .domain(domainName)
@@ -115,9 +122,9 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @SneakyThrows
     @Retry(name = "retryMailService")
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "account-keycloak-confirmation", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "account-keycloak-confirmation"),
-            key = "keycloak-confirmation-account"
+            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "${queues.account-auth-confirmation}"),
+            key = "${routing-keys.account-auth-confirmation}"
     ))
     public Mono<Response> createUser(Credentials credentials) {
         log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
@@ -132,7 +139,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                     if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
                         log.info("User created in Mail Service | Status code: {} | Address: {}",
                                 response.statusCode(), credentials.getAddress());
-                        eventProducer.sendAccountCreatedInMailService(credentials);
+                        eventProducer.send(new Event<>(ACCOUNT_CREATED_IN_MAIL_SERVICE, credentials));
                         return response.bodyToMono(Response.class);
                     }
                     return Mono.empty();
@@ -146,21 +153,21 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @SneakyThrows
     @Retry(name = "retryMailService")
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "account-created-in-mail-service", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "account-created-in-mail-service"),
-            key = "account-created-in-mail-service"
+            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "${queues.account-in-mail-service-creating}"),
+            key = "${routing-keys.account-in-mail-service-creating}"
     ))
     public Mono<Response> createMailbox(Credentials credentials) {
         log.info("Creating a Mailbox in Mail Server {} | User: {}, Mailbox: {}",
-                mailServerName, credentials.getAddress(), INBOX);
+                mailServerName, credentials.getAddress(), inbox);
 
         var result = mailServerApiClient.put()
-                .uri("/users/" + credentials.getAddress() + "/mailboxes/" + INBOX)
+                .uri("/users/" + credentials.getAddress() + "/mailboxes/" + inbox)
                 .exchangeToMono(response -> {
                     if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
                         log.info("Mailbox created in Mail Service | Status code: {} | Address: {}",
                                 response.statusCode(), credentials.getAddress());
-                        eventProducer.sendMailboxCreatedInMailService(credentials);
+                        eventProducer.send(new Event<>(MAILBOX_CREATED_IN_MAIL_SERVICE, credentials));
                         return response.bodyToMono(Response.class);
                     }
                     return Mono.empty();
@@ -174,7 +181,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
         log.info("Getting the quota size for a user | User: {}", username);
 
         var result = mailServerApiClient.get()
-                .uri("/quota/users/" + username + "/size")
+                .uri(quotaPath + username + "/size")
                 .retrieve()
                 .bodyToMono(Integer.class)
                 .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
@@ -185,21 +192,21 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @Async
     @Override
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "account-mailbox-created", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "account-mailbox-created"),
-            key = "mailbox-created-in-mail-service"
+            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "${queues.account-mailbox-in-mail-service-creating}"),
+            key = "${routing-keys.account-mailbox-in-mail-service-creating}"
     ))
     public Mono<Response> updateQuotaSize(Credentials credentials) {
         log.info("Updating the quota size for a user | User: {}", credentials.getAddress());
 
         var result = mailServerApiClient.put()
-                .uri("/quota/users/" + credentials.getAddress() + "/size")
+                .uri(quotaPath + credentials.getAddress() + "/size")
                 .bodyValue(Integer.parseInt(quotaSize))
                 .exchangeToMono(response -> {
                     if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
                         log.info("Quota size updated in Mail Service | Status code: {} | Address: {}",
                                 response.statusCode(), credentials.getAddress());
-                        eventProducer.sendQuotaSizeUpdatedInMailService(credentials);
+                        eventProducer.send(new Event<>(QUOTA_SIZE_UPDATED_IN_MAIL_SERVICE, credentials));
                         return response.bodyToMono(Response.class);
                     }
                     return Mono.empty();
@@ -213,7 +220,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
         log.info("Getting used size for a user | User: {}", username);
 
         var result = mailServerApiClient.get()
-                .uri("/quota/users/" + username)
+                .uri(quotaPath + username)
                 .retrieve()
                 .bodyToMono(String.class)
                 .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)))
@@ -222,8 +229,8 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                         var quota = mapper.readTree(jsonString);
                         var occupation = quota.get("occupation");
                         return occupation.get("size").asInt();
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
+                    } catch (JsonProcessingException ex) {
+                        throw new MailboxNotFoundException();
                     }
                 });
         result.subscribe();

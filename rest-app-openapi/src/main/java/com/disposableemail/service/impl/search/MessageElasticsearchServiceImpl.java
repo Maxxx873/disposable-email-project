@@ -3,6 +3,7 @@ package com.disposableemail.service.impl.search;
 import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.dao.entity.search.MessageElasticsearchEntity;
 import com.disposableemail.dao.repository.search.MessageElasticsearchRepository;
+import com.disposableemail.event.Event;
 import com.disposableemail.event.EventProducer;
 import com.disposableemail.service.api.AccountService;
 import com.disposableemail.service.api.search.MessageElasticsearchService;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import static com.disposableemail.event.Event.Type.GETTING_MESSAGES;
 
 
 @Slf4j
@@ -44,7 +47,7 @@ public class MessageElasticsearchServiceImpl implements MessageElasticsearchServ
         return accountService.getAccountFromJwt(exchange)
                 .flatMapMany(accountEntity -> {
                     log.info("Getting a Messages collection from Elasticsearch | mailboxId: {}", accountEntity.getMailboxId());
-                    eventProducer.sendGettingMessages(accountEntity);
+                    eventProducer.send(new Event<>(GETTING_MESSAGES, accountEntity));
                     return messageElasticsearchRepository.findByMailboxId(accountEntity.getMailboxId())
                             .map(message -> {
                                 message.setAccountId(accountEntity.getId());
@@ -70,7 +73,7 @@ public class MessageElasticsearchServiceImpl implements MessageElasticsearchServ
         return accountService.getAccountFromJwt(exchange)
                 .flatMapMany(accountEntity -> {
                     log.info("Getting a Messages collection from Elasticsearch | mailboxId: {}", accountEntity.getMailboxId());
-                    eventProducer.sendGettingMessages(accountEntity);
+                    eventProducer.send(new Event<>(GETTING_MESSAGES, accountEntity));
                     return messageElasticsearchRepository.findByMailboxId(accountEntity.getMailboxId())
                             .map(message -> {
                                 message.setAccountId(accountEntity.getId());

@@ -51,6 +51,26 @@ mail-server:
   base-url: ${MAIL_SERVER_BASE_URL}
   defaultUserSizeQuota: ${DEFAULT_USER_SIZE_QUOTA}
 
+exchanges:
+  messages: DisposableEmail-exchange-messages
+  accounts: DisposableEmail-exchange-accounts
+
+routing-keys:
+  messages-getting: getting-messages-key
+  account-start-creating: account-start-creating-key
+  account-auth-confirmation: account-auth-confirmation-key
+  account-in-mail-service-creating: account-in-mail-service-creating-key
+  account-mailbox-in-mail-service-creating: account-mailbox-creating-key
+  account-quota-in-mail-service-updating: account-quota-in-mail-service-updating-key
+
+queues:
+  messages-getting: DisposableEmail-queue-messages
+  account-start-creating: DisposableEmail-queue-account-start-creating
+  account-auth-confirmation: DisposableEmail-queue-account-auth-confirmation
+  account-in-mail-service-creating: DisposableEmail-queue-account-in-mail-service-creating
+  account-mailbox-in-mail-service-creating: DisposableEmail-queue-account-mailbox-creating
+  account-quota-in-mail-service-updating: account-quota-in-mail-service-updating
+
 logging:
   level.root: info
 

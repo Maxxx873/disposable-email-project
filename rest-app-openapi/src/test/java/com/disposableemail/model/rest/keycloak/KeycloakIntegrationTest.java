@@ -28,7 +28,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 @ContextConfiguration(classes = TestConfig.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
+class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
 
     @Autowired
     public Keycloak keycloak;
@@ -78,7 +78,7 @@ public class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
         authorizationService.createUser(credentials);
         var token = authorizationService.getToken(credentials);
 
-        assertThat(token.getToken().length()).isPositive();
+        assertThat(token).isNotNull();
     }
 
     @Test

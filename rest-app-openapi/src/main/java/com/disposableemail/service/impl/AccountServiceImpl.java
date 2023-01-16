@@ -3,6 +3,7 @@ package com.disposableemail.service.impl;
 import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.dao.repository.AccountRepository;
 import com.disposableemail.dao.repository.DomainRepository;
+import com.disposableemail.event.Event;
 import com.disposableemail.event.EventProducer;
 import com.disposableemail.exception.AccountNotFoundException;
 import com.disposableemail.exception.DomainNotAvailableException;
@@ -27,23 +28,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import static com.disposableemail.event.Event.Type.START_CREATING_ACCOUNT;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
     @Value("${mail-server.mailbox}")
-    private String INBOX;
+    private String inbox;
 
     @Value("${mail-server.defaultUserSizeQuota}")
     private String quotaSize;
 
-    private final EventProducer domainEventProducer;
+    private final EventProducer eventProducer;
     private final AccountRepository accountRepository;
     private final AuthorizationService authorizationService;
     private final DomainRepository domainRepository;
     private final MailServerClientService mailServerClientService;
-    private final String USER_NAME_CLAIM = "preferred_username";
+    private static final String PREFERRED_USERNAME = "preferred_username";
     private final TextEncryptor encryptor;
 
     @Override
@@ -55,7 +58,7 @@ public class AccountServiceImpl implements AccountService {
                 .map(domainEntity -> {
                     log.info("Using a Domain: {}", domainEntity.toString());
                     if (domainEntity.getIsActive() && !domainEntity.getIsPrivate()) {
-                        domainEventProducer.sendStartCreatingAccount(getEncryptCredentials(credentials));
+                        eventProducer.send(new Event<>(START_CREATING_ACCOUNT, getEncryptCredentials(credentials)));
                         return accountRepository.save(getNewAccountEntity(credentials));
                     } else {
                         return Mono.just(new AccountEntity());
@@ -73,14 +76,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange) {
-        log.info("Getting an Account from {}", USER_NAME_CLAIM);
+        log.info("Getting an Account from {}", PREFERRED_USERNAME);
 
         return ReactiveSecurityContextHolder.getContext()
                 .map(context -> context.getAuthentication().getPrincipal())
                 .cast(Jwt.class)
                 .map(jwt -> {
-                    log.info("Retrieved User name {} from JWT", jwt.getClaimAsString(USER_NAME_CLAIM));
-                    return jwt.getClaimAsString(USER_NAME_CLAIM);
+                    log.info("Retrieved User name {} from JWT", jwt.getClaimAsString(PREFERRED_USERNAME));
+                    return jwt.getClaimAsString(PREFERRED_USERNAME);
                 }).flatMap(accountRepository::findByAddress);
     }
 
@@ -94,12 +97,12 @@ public class AccountServiceImpl implements AccountService {
     @Async
     @Override
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "account-quota-size-updated", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "account-quota-size-updated"),
-            key = "quota-size-updated-in-mail-service"
+            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "${queues.account-quota-in-mail-service-updating}"),
+            key = "${routing-keys.account-quota-in-mail-service-updating}"
     ))
     public Mono<AccountEntity> setMailboxId(Credentials credentials) {
-        var result = mailServerClientService.getMailboxId(credentials, INBOX)
+        var result = mailServerClientService.getMailboxId(credentials, inbox)
                 .zipWith(accountRepository.findByAddress(credentials.getAddress()))
                 .flatMap(tuple2 -> {
                     log.info("Set Mailbox id for Account | address: {}, mailbox: {}",

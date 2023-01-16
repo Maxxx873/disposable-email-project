@@ -30,7 +30,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<MessageEntity> getMessageById(String messageId) {
-        log.info("Getting a Message | Id {}", messageId);
+        log.info("Getting a Message | Id: {}", messageId);
 
         return messageRepository.findById(messageId);
     }

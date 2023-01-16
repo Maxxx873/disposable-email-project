@@ -14,6 +14,10 @@ To install chart for james server with 'james' name:
 ```bash
 helm install james charts/james-chart
 ```
+To upgrade chart for james server with 'james' name:
+```bash
+helm upgrade --install james charts/james-chart
+```
 
 Add repo:
 ```bash
@@ -116,6 +120,8 @@ $ helm install -f values.yaml keycloak bitnami/keycloak \
     --set postgresql.containerSecurityContext.enabled=false \
     --set postgresql.containerSecurityContext.runAsNonRoot=false \
     --set volumeClaimTemplate.resources.requests.storage=1Gi \
+    --set auth.adminPassword=admin \
+    --set auth.adminUser=admin \
     --set nameOverride=service \
     --set service.type=NodePort \
     --set service.ports.http=9080

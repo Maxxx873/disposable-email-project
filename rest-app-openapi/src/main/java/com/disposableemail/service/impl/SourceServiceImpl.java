@@ -5,6 +5,7 @@ import com.disposableemail.dao.entity.SourceEntity;
 import com.disposableemail.dao.repository.SourceRepository;
 import com.disposableemail.exception.AttachmentNotFoundException;
 import com.disposableemail.exception.MessageNotFoundException;
+import com.disposableemail.exception.SourceNotFoundException;
 import com.disposableemail.service.api.SourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class SourceServiceImpl implements SourceService {
             try {
                 return IOUtils.toByteArray(new ByteArrayInputStream(sourceEntity.getData().getBytes()));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new SourceNotFoundException();
             }
         });
     }

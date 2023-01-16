@@ -23,7 +23,7 @@
 <pop3servers>
     <pop3server enabled="false">
         <jmxName>pop3server</jmxName>
-        <bind>0.0.0.0:110</bind>
+        <bind>0.0.0.0:10110</bind>
         <connectionBacklog>200</connectionBacklog>
         <tls socketTLS="false" startTLS="false">
             <!-- To create a new keystore execute:

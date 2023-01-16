@@ -26,7 +26,7 @@ env:
   - name: KEYCLOAK_SERVER_PASSWORD
     value: "admin"
   - name: MAIL_SERVER_BASE_URL
-    value: "http://james-service:8000"
+    value: "http://james-admin:8000"
   - name: MONGODB_HOST
     value: "mongodb"
   - name: MONGODB_PORT

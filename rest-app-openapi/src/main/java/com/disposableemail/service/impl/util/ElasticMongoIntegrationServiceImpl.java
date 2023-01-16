@@ -31,9 +31,9 @@ public class ElasticMongoIntegrationServiceImpl implements ElasticMongoIntegrati
     @Async
     @Override
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "messages", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "messages"),
-            key = "getting-messages"
+            exchange = @Exchange(name = "${exchanges.messages}", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "${queues.messages-getting}"),
+            key = "${routing-keys.messages-getting}"
     ))
     public void saveMessagesFromElasticsearchMailboxToMongo(AccountEntity accountEntity) {
         log.info("Saving a Message collection from Elasticsearch to Mongo | Account: {}, Mailbox: {}",

@@ -1,5 +1,6 @@
 package com.disposableemail.service.impl.auth;
 
+import com.disposableemail.event.Event;
 import com.disposableemail.event.EventProducer;
 import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 
+import static com.disposableemail.event.Event.Type.KEYCLOAK_REGISTER_CONFIRMATION;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -43,9 +46,9 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     @Async
     @Override
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "account-start-creating", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "account-start-creating"),
-            key = "start-creating-account"
+            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
+            value = @Queue(name = "${queues.account-start-creating}"),
+            key = "${routing-keys.account-start-creating}"
     ))
     public Response createUser(Credentials credentials) {
         userRepresentation.setUsername(credentials.getAddress());
@@ -59,7 +62,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         }
         log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
                 response.getStatus(), response.getStatusInfo());
-        eventProducer.sendKeycloakConfirmation(credentials);
+        eventProducer.send(new Event<>(KEYCLOAK_REGISTER_CONFIRMATION, credentials));
         return response;
     }
 
