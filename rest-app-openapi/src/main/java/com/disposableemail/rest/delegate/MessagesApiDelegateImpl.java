@@ -11,6 +11,8 @@ import com.disposableemail.service.api.MessageService;
 import com.disposableemail.service.api.search.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,14 +36,13 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
 
     @Override
     @PreAuthorize("isAuthenticated()")
-    public Mono<ResponseEntity<Flux<Messages>>> getMessageCollection(Integer size, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<Messages>>> getMessageCollection(Integer page, Integer size, ServerWebExchange exchange) {
 
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body((Objects.equals(size, null) ?
-                        messageElasticsearchService.getMessagesFromMailbox(exchange) :
-                        messageElasticsearchService.getMessagesFromMailbox(size, exchange))
-                .map(messageElasticsearchMapper::messageElasticsearchEntityToMessages)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(messageElasticsearchService.getMessagesFromMailbox(
+                                        PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date")), exchange)
+                                .map(messageElasticsearchMapper::messageElasticsearchEntityToMessages)))
                 .switchIfEmpty(Mono.error(new MessagesNotFoundException()));
     }
 

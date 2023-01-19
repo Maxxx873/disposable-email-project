@@ -37,6 +37,7 @@
     <processors>
 
         <processor state="root" enableJmx="true">
+            <mailet match="All" class="com.test.MyMailet"/>
             <mailet match="com.disposableemail.apache.james.matcher.NotBigMessage" class="com.disposableemail.apache.james.mailet.DumpMimeInToSystemOutMailet">
             </mailet>
             <mailet match="All" class="com.disposableemail.apache.james.mailet.SourceCollector">

@@ -1,27 +1,27 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: james-client
+  name: james-smtp-ssl
 spec:
   selector:
-    instance: james-imap-smtp
-  type: NodePort
+    app.kubernetes.io/instance: james
+    app.kubernetes.io/name: james-chart
   ports:
     - protocol: TCP
-      port: 465
+      port: 10465
       name: "smtp-ssl"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: james-imap
+  name: james-imap-ssl
 spec:
-  type: NodePort
   selector:
-    instance: james-imap-smtp
+    app.kubernetes.io/instance: james
+    app.kubernetes.io/name: james-chart
   ports:
     - protocol: TCP
-      port: 993
+      port: 10993
       name : "imap-ssl"
 ---
 kind: Service
@@ -64,3 +64,48 @@ spec:
       port: 25
       targetPort: 25
       name: "smtp-open"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: james-smtp
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/instance: james
+    app.kubernetes.io/name: james-chart
+  ports:
+    - protocol: TCP
+      port: 1025
+      targetPort: 1025
+      name: "james-smtp"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: imap
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/instance: james
+    app.kubernetes.io/name: james-chart
+  ports:
+    - protocol: TCP
+      port: 10143
+      targetPort: 10143
+      name: "james-imap"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: james-smtp-auth
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/instance: james
+    app.kubernetes.io/name: james-chart
+  ports:
+    - protocol: TCP
+      port: 10587
+      targetPort: 10587
+      name: "james-smtp-auth"

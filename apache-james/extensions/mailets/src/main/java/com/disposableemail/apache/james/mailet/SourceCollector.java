@@ -32,8 +32,6 @@ public class SourceCollector extends GenericMailet {
     private MongoClient mongoClient;
     private MongoCollection<Document> sourceCollection;
 
-    private final long PAYLOAD_DOCUMENT_MAX_SIZE = 16777216;
-
     @Override
     public void init() {
         LOGGER.info("---[Source Collector to MonngoDB Mailet]---");
@@ -43,7 +41,8 @@ public class SourceCollector extends GenericMailet {
 
     @Override
     public void service(Mail mail) throws MessagingException {
-        if (mail.getMessageSize() < PAYLOAD_DOCUMENT_MAX_SIZE) {
+        long payloadDocumentMaxSize = 16777216;
+        if (mail.getMessageSize() < payloadDocumentMaxSize) {
             var optionalMimeMessage = Optional.ofNullable(mail.getMessage());
             optionalMimeMessage.ifPresent(getMimeMessageConsumer());
         }
@@ -87,9 +86,9 @@ public class SourceCollector extends GenericMailet {
         var collectionName = getInitParameter("collectionName");
         mongoClient = MongoClients.create(connectionString);
         var database = mongoClient.getDatabase(databaseName);
-        System.out.println("Database names:");
+        LOGGER.debug("Database names:");
         mongoClient.listDatabases().forEach(System.out::println);
-        System.out.println("Collection names:");
+        LOGGER.debug("Collection names:");
         database.listCollectionNames().forEach(System.out::println);
         sourceCollection = database.getCollection(collectionName);
     }
@@ -130,6 +129,5 @@ public class SourceCollector extends GenericMailet {
     public String getMailetInfo() {
         return SourceCollector.class.getName() + " Mailet";
     }
-
 
 }

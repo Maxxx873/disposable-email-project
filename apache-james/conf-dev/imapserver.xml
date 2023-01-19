@@ -31,7 +31,7 @@ under the License.
               keytool -genkey -alias james -keyalg RSA -storetype PKCS12 -keystore /path/to/james/conf/keystore
              -->
             <keystore>file://conf/keystore</keystore>
-<!--            <keystoreType>PKCS12</keystoreType>-->
+            <!--            <keystoreType>PKCS12</keystoreType>-->
             <secret>apachejames</secret>
             <provider>org.bouncycastle.jce.provider.BouncyCastleProvider</provider>
 
@@ -60,7 +60,7 @@ under the License.
               keytool -genkey -alias james -keyalg RSA -storetype PKCS12 -keystore /path/to/james/conf/keystore
              -->
             <keystore>file://conf/keystore</keystore>
-         <!--   <keystoreType>PKCS12</keystoreType>-->
+            <!--   <keystoreType>PKCS12</keystoreType>-->
             <secret>apachejames</secret>
             <provider>org.bouncycastle.jce.provider.BouncyCastleProvider</provider>
 

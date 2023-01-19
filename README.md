@@ -22,9 +22,15 @@ Processing emails is based on distributed [Apache James](https://james.apache.or
 (`Cassandra` for meta-data storage + `ElasticSearch` for search + `RabbitMQ` for messaging).
 Incoming messages are processed and added to the `MongoDB` database.
 
+<p align="center">
+  <img src="img/topology.png" width="1000" title="hover text">
+</p>
+
+
 ## Requirements
 
-The following software is required for the complete workflow (from git clone to the running Docker Container).
+The following software is required for the complete workflow (from git clone to running Docker containers and 
+deploying apps to a k8s cluster).
 The specified versions are the tested ones.
 
 * JDK 17+
@@ -32,6 +38,7 @@ The specified versions are the tested ones.
 * Apache Maven 3.6.3+
 * Docker 20.10.18+
 * Docker compose 2.5.0+
+* Helm 3.10.2+
 
 ## Using Docker
 

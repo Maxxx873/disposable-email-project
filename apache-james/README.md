@@ -59,7 +59,9 @@ Create a domain:
 curl -XPUT http://localhost:8000/domains/example.com
 ```
 
-### Thunderbird mail configuration locally:
+## Thunderbird mail configuration locally:
+
+### SSL
 
 #### Incoming Server:
 - IMAP server name: 127.0.0.1
@@ -71,4 +73,17 @@ curl -XPUT http://localhost:8000/domains/example.com
 - SMTP server name: localhost
 - SMTP port: 465
 - SMTP connection security: SSL/TLS
+- SMTP authentication: Normal password
+
+### No SSL
+#### Incoming Server:
+- IMAP server name: 127.0.0.1
+- IMAP port: 143
+- IMAP connection security: None
+- IMAP authentication: Normal password
+
+#### Outgoing Server:
+- SMTP server name: 127.0.0.1
+- SMTP port: 25
+- SMTP connection security: None
 - SMTP authentication: Normal password

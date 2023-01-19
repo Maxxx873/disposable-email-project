@@ -1,5 +1,8 @@
 # # Using Helm 3 with Openshift
 
+```bash
+oc get svc -n maxxx873-dev
+
 #### Install chart
 
 To install chart for REST application with 'rest' name:

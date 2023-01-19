@@ -23,6 +23,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,10 +33,7 @@ class SourceCollectorMailetTest {
     private static final String CONNECTION_STRING = "mongodb://%s:%d";
     private static final String DATABASE_NAME = "test";
     private static final String COLLECTION_NAME = "source";
-
     private MongodExecutable mongodExecutable;
-    private MongoClient mongoClient;
-
     private MongoDatabase mongoDatabase;
 
     @BeforeEach
@@ -51,7 +49,7 @@ class SourceCollectorMailetTest {
         var starter = MongodStarter.getDefaultInstance();
         mongodExecutable = starter.prepare(mongodConfig);
         mongodExecutable.start();
-        mongoClient = MongoClients.create(String.format(CONNECTION_STRING, ip, port));
+        var mongoClient = MongoClients.create(String.format(CONNECTION_STRING, ip, port));
 
         mailet = new SourceCollector();
         mailet.init(FakeMailetConfig.builder()
@@ -76,7 +74,7 @@ class SourceCollectorMailetTest {
 
         mailet.service(mail);
 
-        assertThat(mongoDatabase.getCollection(COLLECTION_NAME).countDocuments()).isEqualTo(0);
+        assertThat(mongoDatabase.getCollection(COLLECTION_NAME).countDocuments()).isZero();
     }
 
     @Test
@@ -89,10 +87,10 @@ class SourceCollectorMailetTest {
 
         var doc = collection.find().first();
 
-        assertThat(doc.containsKey("msgid")).isTrue();
-        assertThat(doc.containsKey("data")).isTrue();
-        assertThat(doc.containsKey("attachments")).isTrue();
-        assertThat(doc.getList("attachments", Object.class).size()).isEqualTo(0);
+        assertThat(doc).containsKey("msgid");
+        assertThat(doc).containsKey("data");
+        assertThat(doc).containsKey("attachments");
+        assertThat(Objects.requireNonNull(doc).getList("attachments", Object.class)).isEmpty();
     }
 
     @Test
@@ -107,10 +105,10 @@ class SourceCollectorMailetTest {
 
         var doc = collection.find().first();
 
-        assertThat(doc.containsKey("msgid")).isTrue();
-        assertThat(doc.containsKey("data")).isTrue();
-        assertThat(doc.containsKey("attachments")).isTrue();
-        assertThat(doc.getList("attachments", Object.class).size()).isEqualTo(getExpectedPartCount(multiPart));
+        assertThat(doc).containsKey("msgid");
+        assertThat(doc).containsKey("data");
+        assertThat(doc).containsKey("attachments");
+        assertThat(Objects.requireNonNull(doc).getList("attachments", Object.class)).hasSize(getExpectedPartCount(multiPart));
     }
 
     private static int getExpectedPartCount(Multipart multiPart) throws MessagingException {
