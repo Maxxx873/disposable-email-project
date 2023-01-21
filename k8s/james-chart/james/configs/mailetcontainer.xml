@@ -39,7 +39,7 @@
         <processor state="root" enableJmx="true">
             <mailet match="com.disposableemail.apache.james.matcher.NotBigMessage" class="com.disposableemail.apache.james.mailet.DumpMimeInToSystemOutMailet">
             </mailet>
-            <mailet match="All" class="com.disposableemail.apache.james.mailet.SourceCollector">
+            <mailet match="All" class="com.disposableemail.apache.james.mailet.collector.SyncSourceCollector">
                 <connectionString>mongodb://mongodb:27017</connectionString>
                 <database>disposableemail</database>
                 <collectionName>source</collectionName>

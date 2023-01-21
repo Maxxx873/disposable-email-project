@@ -1,6 +1,6 @@
 package com.disposableemail.apache.james.mailet;
 
-import com.mongodb.client.MongoClient;
+import com.disposableemail.apache.james.mailet.collector.SyncSourceCollector;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -27,9 +27,9 @@ import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SourceCollectorMailetTest {
+class SyncSourceCollectorMailetTest {
 
-    private SourceCollector mailet;
+    private SyncSourceCollector mailet;
     private static final String CONNECTION_STRING = "mongodb://%s:%d";
     private static final String DATABASE_NAME = "test";
     private static final String COLLECTION_NAME = "source";
@@ -51,7 +51,7 @@ class SourceCollectorMailetTest {
         mongodExecutable.start();
         var mongoClient = MongoClients.create(String.format(CONNECTION_STRING, ip, port));
 
-        mailet = new SourceCollector();
+        mailet = new SyncSourceCollector();
         mailet.init(FakeMailetConfig.builder()
                 .mailetName("SourceCollector")
                 .setProperty("connectionString", String.format(CONNECTION_STRING, ip, port))
