@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.function.Consumer;
 
@@ -41,10 +40,7 @@ public class SyncSourceCollector extends BasicSourceCollector {
     public Consumer<MimeMessage> processMimeMessage() {
         return mimeMessage -> {
             try {
-                var out = new ByteArrayOutputStream();
-                mimeMessage.writeTo(out);
-                var mailSource = getMailSource(mimeMessage, out);
-                sourceCollection.insertOne(mailSource);
+                sourceCollection.insertOne(getMailSource(mimeMessage));
                 LOGGER.info("Added new data from message {}", mimeMessage.getMessageID());
             } catch (IOException | MessagingException e) {
                 throw new UnsupportedOperationException();

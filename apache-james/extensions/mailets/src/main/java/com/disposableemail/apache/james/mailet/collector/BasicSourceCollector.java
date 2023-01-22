@@ -83,8 +83,10 @@ public class BasicSourceCollector extends GenericMailet {
         return attachments;
     }
 
-    protected MailSource getMailSource(MimeMessage mimeMessage, ByteArrayOutputStream out) throws MessagingException,
+    protected MailSource getMailSource(MimeMessage mimeMessage) throws MessagingException,
             IOException {
+        var out = new ByteArrayOutputStream();
+        mimeMessage.writeTo(out);
         return MailSource.builder()
                 .id(new ObjectId())
                 .msgid(mimeMessage.getMessageID())
