@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 
 import static com.disposableemail.event.Event.Type.KEYCLOAK_REGISTER_CONFIRMATION;
 
@@ -50,7 +51,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
             value = @Queue(name = "${queues.account-start-creating}"),
             key = "${routing-keys.account-start-creating}"
     ))
-    public Response createUser(Credentials credentials) {
+    public CompletableFuture<Response> createUser(Credentials credentials) {
         userRepresentation.setUsername(credentials.getAddress());
         credentialRepresentation.setValue(encryptor.decrypt(credentials.getPassword()));
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
@@ -63,7 +64,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
                 response.getStatus(), response.getStatusInfo());
         eventProducer.send(new Event<>(KEYCLOAK_REGISTER_CONFIRMATION, credentials));
-        return response;
+        return CompletableFuture.supplyAsync(() -> response);
     }
 
     @Override

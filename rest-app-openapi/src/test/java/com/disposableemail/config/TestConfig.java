@@ -1,6 +1,7 @@
 package com.disposableemail.config;
 
 import com.disposableemail.dao.repository.search.MessageElasticsearchRepository;
+import com.disposableemail.event.EventProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -9,12 +10,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Properties;
 
 @TestConfiguration
-@MockBeans({@MockBean(MessageElasticsearchRepository.class), @MockBean(ReactiveJwtDecoder.class)})
+@ActiveProfiles("test")
+@MockBeans({@MockBean(MessageElasticsearchRepository.class), @MockBean(ReactiveJwtDecoder.class),
+        @MockBean(EventProducer.class)})
 public class TestConfig {
+
     @Autowired
     private MessageElasticsearchRepository messageElasticsearchRepository;
     @Autowired

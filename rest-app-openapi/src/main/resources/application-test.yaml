@@ -14,7 +14,7 @@ spring:
 
   mongodb:
     embedded:
-      version: 3.4.6
+      version: 4.4.0
 
 logging:
   level.root: info

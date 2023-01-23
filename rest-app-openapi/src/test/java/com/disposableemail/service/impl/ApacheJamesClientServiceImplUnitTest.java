@@ -108,8 +108,9 @@ class ApacheJamesClientServiceImplUnitTest {
     @BeforeEach
     void setUp() {
         mailServerClientService = new ApacheJamesClientServiceImpl(new ObjectMapper(), webClientMock, registry, eventProducer, encryptor);
-        ReflectionTestUtils.setField(mailServerClientService, "INBOX", "INBOX");
+        ReflectionTestUtils.setField(mailServerClientService, "quotaPath", "/quota/users/");
         ReflectionTestUtils.setField(mailServerClientService, "quotaSize", "40000");
+        ReflectionTestUtils.setField(mailServerClientService, "inbox", "INBOX");
     }
 
     @Test

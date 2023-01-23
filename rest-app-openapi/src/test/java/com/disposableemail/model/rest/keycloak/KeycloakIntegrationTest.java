@@ -5,6 +5,8 @@ import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.auth.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
+import org.awaitility.Durations;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.Keycloak;
@@ -12,19 +14,20 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 
 @Slf4j
-@ActiveProfiles("test")
 @ContextConfiguration(classes = TestConfig.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -35,6 +38,9 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
 
     @Autowired
     public AuthorizationService authorizationService;
+
+    @Autowired
+    public TextEncryptor encryptor;
 
     private static final Credentials credentials = new Credentials("test@test.org", "password");
 
@@ -53,29 +59,41 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
     }
 
     @Test
-    void shouldSuccessfullyAddUser() {
+    void shouldSuccessfullyAddUser() throws ExecutionException, InterruptedException {
         log.debug("shouldSuccessfullyAddUserTest()");
 
-        var response = authorizationService.createUser(credentials);
+        var future = authorizationService.createUser(getCredentialsEncrypted());
 
-        assertThat(response.getStatusInfo()).isEqualTo(Response.Status.CREATED);
+        assertThat(future.get().getStatusInfo()).isEqualTo(Response.Status.CREATED);
+
     }
 
     @Test
-    void shouldConflictAddUserIfUserAlreadyExisting() {
+    void shouldConflictAddUserIfUserAlreadyExisting() throws ExecutionException, InterruptedException {
         log.debug("shouldConflictAddUserIfUserAlreadyExisting()");
 
-        authorizationService.createUser(credentials);
+        var future1 = authorizationService.createUser(getCredentialsEncrypted());
+        await().pollDelay(Durations.TWO_SECONDS).until(() -> true);
 
-        assertThatThrownBy(() -> authorizationService.createUser(credentials))
-                .isInstanceOf(AccountAlreadyRegisteredException.class);
+
+        assertThat(future1.get().getStatusInfo()).isEqualTo(Response.Status.CREATED);
+
+        var future2 = authorizationService.createUser(getCredentialsEncrypted());
+        await().pollDelay(Durations.TWO_SECONDS).until(() -> true);
+
+        assertThat(future2.isCompletedExceptionally()).isTrue();
+        assertThatThrownBy(future2::get).hasCauseInstanceOf(AccountAlreadyRegisteredException.class);
     }
 
     @Test
-    void shouldSuccessfullyGetToken() {
+    void shouldSuccessfullyGetToken() throws ExecutionException, InterruptedException {
         log.debug("shouldSuccessfullyGetToken()");
 
-        authorizationService.createUser(credentials);
+        var future = authorizationService.createUser(getCredentialsEncrypted());
+        await().pollDelay(Durations.TWO_SECONDS).until(() -> true);
+
+        assertThat(future.get().getStatusInfo()).isEqualTo(Response.Status.CREATED);
+
         var token = authorizationService.getToken(credentials);
 
         assertThat(token).isNotNull();
@@ -87,6 +105,13 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
 
         assertThatThrownBy(() -> authorizationService.getToken(credentials))
                 .isInstanceOf(NotAuthorizedException.class);
+    }
+
+    @NotNull
+    private Credentials getCredentialsEncrypted() {
+        return new Credentials()
+                .address(credentials.getAddress())
+                .password(encryptor.encrypt(credentials.getPassword()));
     }
 
 }
