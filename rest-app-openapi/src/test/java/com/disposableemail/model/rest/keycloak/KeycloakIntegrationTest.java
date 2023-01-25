@@ -5,7 +5,6 @@ import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.auth.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
-import org.awaitility.Durations;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,6 @@ import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.awaitility.Awaitility.await;
 
 @Slf4j
 @ContextConfiguration(classes = TestConfig.class)
@@ -62,39 +60,27 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
     void shouldSuccessfullyAddUser() throws ExecutionException, InterruptedException {
         log.debug("shouldSuccessfullyAddUserTest()");
 
-        var future = authorizationService.createUser(getCredentialsEncrypted());
+        var futureKeycloakResponse = authorizationService.createUser(getCredentialsEncrypted());
 
-        assertThat(future.get().getStatusInfo()).isEqualTo(Response.Status.CREATED);
-
+        assertThat(futureKeycloakResponse.get().getStatusInfo()).isEqualTo(Response.Status.CREATED);
     }
 
     @Test
     void shouldConflictAddUserIfUserAlreadyExisting() throws ExecutionException, InterruptedException {
         log.debug("shouldConflictAddUserIfUserAlreadyExisting()");
 
-        var future1 = authorizationService.createUser(getCredentialsEncrypted());
-        await().pollDelay(Durations.TWO_SECONDS).until(() -> true);
+        var futureKeycloakResponse = authorizationService.createUser(getCredentialsEncrypted())
+                .thenApply(response -> authorizationService.createUser(getCredentialsEncrypted())).get();
 
-
-        assertThat(future1.get().getStatusInfo()).isEqualTo(Response.Status.CREATED);
-
-        var future2 = authorizationService.createUser(getCredentialsEncrypted());
-        await().pollDelay(Durations.TWO_SECONDS).until(() -> true);
-
-        assertThat(future2.isCompletedExceptionally()).isTrue();
-        assertThatThrownBy(future2::get).hasCauseInstanceOf(AccountAlreadyRegisteredException.class);
+        assertThatThrownBy(futureKeycloakResponse::get).hasCauseInstanceOf(AccountAlreadyRegisteredException.class);
     }
 
     @Test
     void shouldSuccessfullyGetToken() throws ExecutionException, InterruptedException {
         log.debug("shouldSuccessfullyGetToken()");
 
-        var future = authorizationService.createUser(getCredentialsEncrypted());
-        await().pollDelay(Durations.TWO_SECONDS).until(() -> true);
-
-        assertThat(future.get().getStatusInfo()).isEqualTo(Response.Status.CREATED);
-
-        var token = authorizationService.getToken(credentials);
+        var token = authorizationService.createUser(getCredentialsEncrypted())
+                .thenApply(response -> authorizationService.getToken(credentials)).get();
 
         assertThat(token).isNotNull();
     }

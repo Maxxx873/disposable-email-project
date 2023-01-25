@@ -55,16 +55,11 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         userRepresentation.setUsername(credentials.getAddress());
         credentialRepresentation.setValue(encryptor.decrypt(credentials.getPassword()));
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
-        var response = keycloak.realm(realm).users().create(userRepresentation);
-        if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {
-            log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
-                    response.getStatus(), response.getStatusInfo());
-            throw new AccountAlreadyRegisteredException();
-        }
-        log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
-                response.getStatus(), response.getStatusInfo());
-        eventProducer.send(new Event<>(KEYCLOAK_REGISTER_CONFIRMATION, credentials));
-        return CompletableFuture.supplyAsync(() -> response);
+        return CompletableFuture.supplyAsync(() -> {
+            var response = getKeycloakResponse();
+            eventProducer.send(new Event<>(KEYCLOAK_REGISTER_CONFIRMATION, credentials));
+            return response;
+        });
     }
 
     @Override
@@ -75,5 +70,18 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         var tokenManager = instance.tokenManager();
         return new Token(tokenManager.getAccessTokenString());
     }
+
+    private Response getKeycloakResponse() {
+        var response = keycloak.realm(realm).users().create(userRepresentation);
+        if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {
+            log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
+                    response.getStatus(), response.getStatusInfo());
+            throw new AccountAlreadyRegisteredException();
+        }
+        log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
+                response.getStatus(), response.getStatusInfo());
+        return response;
+    }
+
 
 }
