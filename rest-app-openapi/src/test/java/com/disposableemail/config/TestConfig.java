@@ -2,6 +2,7 @@ package com.disposableemail.config;
 
 import com.disposableemail.dao.repository.search.MessageElasticsearchRepository;
 import com.disposableemail.event.EventProducer;
+import com.rabbitmq.client.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -16,8 +17,10 @@ import java.util.Properties;
 
 @TestConfiguration
 @ActiveProfiles("test")
-@MockBeans({@MockBean(MessageElasticsearchRepository.class), @MockBean(ReactiveJwtDecoder.class),
-        @MockBean(EventProducer.class)})
+@MockBeans({@MockBean(MessageElasticsearchRepository.class),
+        @MockBean(ReactiveJwtDecoder.class),
+        @MockBean(EventProducer.class),
+        @MockBean(Channel.class)})
 public class TestConfig {
 
     @Autowired

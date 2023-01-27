@@ -6,6 +6,7 @@ import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.rest.model.Token;
 import com.disposableemail.service.api.auth.AuthorizationService;
+import com.rabbitmq.client.Channel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
@@ -16,12 +17,15 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
@@ -51,15 +55,12 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
             value = @Queue(name = "${queues.account-start-creating}"),
             key = "${routing-keys.account-start-creating}"
     ))
-    public CompletableFuture<Response> createUser(Credentials credentials) {
+    public CompletableFuture<Response> createUser(Credentials credentials, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         userRepresentation.setUsername(credentials.getAddress());
         credentialRepresentation.setValue(encryptor.decrypt(credentials.getPassword()));
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
-        return CompletableFuture.supplyAsync(() -> {
-            var response = getKeycloakResponse();
-            eventProducer.send(new Event<>(KEYCLOAK_REGISTER_CONFIRMATION, credentials));
-            return response;
-        });
+        channel.basicAck(tag, false);
+        return CompletableFuture.completedFuture(getKeycloakResponse(credentials));
     }
 
     @Override
@@ -71,17 +72,18 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         return new Token(tokenManager.getAccessTokenString());
     }
 
-    private Response getKeycloakResponse() {
+    private Response getKeycloakResponse(Credentials credentials) {
         var response = keycloak.realm(realm).users().create(userRepresentation);
         if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {
             log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
                     response.getStatus(), response.getStatusInfo());
             throw new AccountAlreadyRegisteredException();
         }
+        if (response.getStatusInfo().equals(Response.Status.CREATED)) {
+            eventProducer.send(new Event<>(KEYCLOAK_REGISTER_CONFIRMATION, credentials));
+        }
         log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
                 response.getStatus(), response.getStatusInfo());
         return response;
     }
-
-
 }

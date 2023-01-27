@@ -3,7 +3,6 @@ package com.disposableemail.service.impl.search;
 import com.disposableemail.dao.entity.AccountEntity;
 import com.disposableemail.dao.entity.search.MessageElasticsearchEntity;
 import com.disposableemail.dao.repository.search.MessageElasticsearchRepository;
-import com.disposableemail.event.EventProducer;
 import com.disposableemail.service.api.AccountService;
 import com.disposableemail.service.api.search.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +21,6 @@ public class MessageElasticsearchServiceImpl implements MessageElasticsearchServ
 
     private final MessageElasticsearchRepository messageElasticsearchRepository;
     private final AccountService accountService;
-    private final EventProducer eventProducer;
-
 
     @Override
     public Flux<MessageElasticsearchEntity> getMessagesFromMailbox(AccountEntity accountEntity) {

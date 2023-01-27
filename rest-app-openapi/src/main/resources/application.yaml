@@ -78,7 +78,7 @@ queues:
   account-auth-confirmation: DisposableEmail-queue-account-auth-confirmation
   account-in-mail-service-creating: DisposableEmail-queue-account-in-mail-service-creating
   account-mailbox-in-mail-service-creating: DisposableEmail-queue-account-mailbox-creating
-  account-quota-in-mail-service-updating: account-quota-in-mail-service-updating
+  account-quota-in-mail-service-updating: DisposableEmail-queue-account-quota-in-mail-service-updating
 
 logging:
   level.root: info

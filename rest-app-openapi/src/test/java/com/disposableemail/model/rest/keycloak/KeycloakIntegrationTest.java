@@ -4,6 +4,7 @@ import com.disposableemail.config.TestConfig;
 import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.auth.AuthorizationService;
+import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -19,8 +20,10 @@ import org.springframework.test.context.ContextConfiguration;
 
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -40,7 +43,12 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
     @Autowired
     public TextEncryptor encryptor;
 
+    @Autowired
+    public Channel channel;
+
+
     private static final Credentials credentials = new Credentials("test@test.org", "password");
+    private static final long amqpDeliveryTag = 1;
 
     @AfterEach
     void clearUsers() {
@@ -57,29 +65,35 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
     }
 
     @Test
-    void shouldSuccessfullyAddUser() throws ExecutionException, InterruptedException {
+    void shouldSuccessfullyAddUser() throws ExecutionException, InterruptedException, IOException {
         log.debug("shouldSuccessfullyAddUserTest()");
 
-        var futureKeycloakResponse = authorizationService.createUser(getCredentialsEncrypted());
+        var futureKeycloakResponse = authorizationService.createUser(getCredentialsEncrypted(), channel, amqpDeliveryTag);
 
         assertThat(futureKeycloakResponse.get().getStatusInfo()).isEqualTo(Response.Status.CREATED);
     }
 
     @Test
-    void shouldConflictAddUserIfUserAlreadyExisting() throws ExecutionException, InterruptedException {
+    void shouldConflictAddUserIfUserAlreadyExisting() throws ExecutionException, InterruptedException, IOException {
         log.debug("shouldConflictAddUserIfUserAlreadyExisting()");
 
-        var futureKeycloakResponse = authorizationService.createUser(getCredentialsEncrypted())
-                .thenApply(response -> authorizationService.createUser(getCredentialsEncrypted())).get();
+        var futureKeycloakResponse = authorizationService.createUser(getCredentialsEncrypted(), channel, amqpDeliveryTag)
+                .thenApply(response -> {
+                    try {
+                        return authorizationService.createUser(getCredentialsEncrypted(), channel, amqpDeliveryTag);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).get();
 
         assertThatThrownBy(futureKeycloakResponse::get).hasCauseInstanceOf(AccountAlreadyRegisteredException.class);
     }
 
     @Test
-    void shouldSuccessfullyGetToken() throws ExecutionException, InterruptedException {
+    void shouldSuccessfullyGetToken() throws ExecutionException, InterruptedException, IOException, TimeoutException {
         log.debug("shouldSuccessfullyGetToken()");
 
-        var token = authorizationService.createUser(getCredentialsEncrypted())
+        var token = authorizationService.createUser(getCredentialsEncrypted(), channel, amqpDeliveryTag)
                 .thenApply(response -> authorizationService.getToken(credentials)).get();
 
         assertThat(token).isNotNull();
@@ -101,5 +115,4 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
     }
 
 }
-
 

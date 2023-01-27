@@ -8,7 +8,6 @@ import com.disposableemail.service.api.search.MessageElasticsearchService;
 import com.disposableemail.service.api.util.ElasticMongoIntegrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -23,13 +22,7 @@ public class ElasticMongoIntegrationServiceImpl implements ElasticMongoIntegrati
     private final MessageElasticsearchMapper messageElasticsearchMapper;
     private final MessageService messageService;
 
-    @Async
     @Override
-/*    @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "${exchanges.messages}", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "${queues.messages-getting}"),
-            key = "${routing-keys.messages-getting}"
-    ))*/
     public void saveMessagesFromElasticsearchMailboxToMongo(AccountEntity accountEntity) {
         log.info("Saving a Message collection from Elasticsearch to Mongo | Account: {}, Mailbox: {}",
                 accountEntity.getAddress(), accountEntity.getMailboxId());
