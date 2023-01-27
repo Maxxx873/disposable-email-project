@@ -2,7 +2,11 @@ package com.disposableemail.config;
 
 import com.disposableemail.dao.repository.search.MessageElasticsearchRepository;
 import com.disposableemail.event.EventProducer;
+import com.github.fridujo.rabbitmq.mock.compatibility.MockConnectionFactoryFactory;
 import com.rabbitmq.client.Channel;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,8 +29,20 @@ public class TestConfig {
 
     @Autowired
     private MessageElasticsearchRepository messageElasticsearchRepository;
+
     @Autowired
     private ReactiveJwtDecoder reactiveJwtDecoder;
+
+    @Bean
+    ConnectionFactory connectionFactory() {
+        return new CachingConnectionFactory(
+                MockConnectionFactoryFactory.build());
+    }
+
+    @Bean
+    RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        return new RabbitTemplate(connectionFactory);
+    }
 
     @Bean
     public JavaMailSender getJavaMailSender() {

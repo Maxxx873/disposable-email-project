@@ -6,9 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-@SpringBootTest
 @ActiveProfiles("test")
 @ContextConfiguration(classes = TestConfig.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OpenApiGeneratedServerApplicationTests {
 
     @Test
@@ -16,3 +16,4 @@ class OpenApiGeneratedServerApplicationTests {
     }
 
 }
+
