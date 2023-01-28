@@ -47,6 +47,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Account is already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       summary: Creates a Account resource.
       description: Creates a Account resource.
     parameters: []

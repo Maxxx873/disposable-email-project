@@ -5,6 +5,7 @@ import com.disposableemail.dao.repository.AccountRepository;
 import com.disposableemail.dao.repository.DomainRepository;
 import com.disposableemail.event.Event;
 import com.disposableemail.event.EventProducer;
+import com.disposableemail.exception.AccountAlreadyRegisteredException;
 import com.disposableemail.exception.AccountNotFoundException;
 import com.disposableemail.exception.DomainNotAvailableException;
 import com.disposableemail.rest.model.Credentials;
@@ -57,14 +58,17 @@ public class AccountServiceImpl implements AccountService {
                 .doOnError(throwable -> log.error("Trying to find a Domain", throwable))
                 .map(domainEntity -> {
                     log.info("Using a Domain: {}", domainEntity.toString());
-                    if (domainEntity.getIsActive() && !domainEntity.getIsPrivate()) {
+                    if (Boolean.TRUE.equals(domainEntity.getIsActive()) &&
+                            Boolean.FALSE.equals(domainEntity.getIsPrivate())) {
                         eventProducer.send(new Event<>(START_CREATING_ACCOUNT, getEncryptCredentials(credentials)));
-                        return accountRepository.save(getNewAccountEntity(credentials));
+                        return accountRepository.findByAddress(credentials.getAddress())
+                                .flatMap(accountEntity -> Mono.error(AccountAlreadyRegisteredException::new))
+                                .then(accountRepository.save(getNewAccountEntity(credentials)));
                     } else {
                         return Mono.just(new AccountEntity());
                     }
                 }).flatMap(accountEntity -> accountEntity)
-                .switchIfEmpty(Mono.error(new DomainNotAvailableException()));
+                .switchIfEmpty(Mono.error(DomainNotAvailableException::new));
     }
 
     @Override
