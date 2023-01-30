@@ -2,6 +2,7 @@ package com.disposableemail.service.api.mail;
 
 import com.disposableemail.dao.entity.DomainEntity;
 import com.disposableemail.rest.model.Credentials;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -11,7 +12,7 @@ public interface MailServerClientService {
 
     Flux<DomainEntity> getDomains();
 
-    Mono<Response> createUser(Credentials credentials);
+    Mono<Response> createUser(Credentials credentials) throws JsonProcessingException;
 
     Mono<String> getMailboxId(Credentials credentials, String mailboxName);
 

@@ -4,6 +4,7 @@ import com.disposableemail.dao.entity.DomainEntity;
 import com.disposableemail.event.Event;
 import com.disposableemail.event.EventProducer;
 import com.disposableemail.exception.DomainNotAvailableException;
+import com.disposableemail.exception.MailServerConnectException;
 import com.disposableemail.exception.MailboxNotFoundException;
 import com.disposableemail.rest.model.Credentials;
 import com.disposableemail.service.api.mail.MailServerClientService;
@@ -15,15 +16,9 @@ import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.ExchangeTypes;
-import org.springframework.amqp.rabbit.annotation.Exchange;
-import org.springframework.amqp.rabbit.annotation.Queue;
-import org.springframework.amqp.rabbit.annotation.QueueBinding;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -37,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.disposableemail.event.Event.Type.*;
+import static reactor.util.retry.Retry.fixedDelay;
 
 @Slf4j
 @Service
@@ -49,7 +45,6 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     private String inbox;
     @Value("${mail-server.defaultUserSizeQuota}")
     private String quotaSize;
-
     @Value("${mail-server.quotaPath}")
     private String quotaPath;
 
@@ -65,7 +60,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @PostConstruct
     public void postConstruct() {
         registry.retry("retryMailService").getEventPublisher().onRetry(ev ->
-                log.info("Connect to {} API: {}", mailServerName, ev));
+                log.warn("Retry connect to {} API: {}", mailServerName, ev));
     }
 
     @Override
@@ -75,7 +70,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
         var result = mailServerApiClient.get().uri("/users/{username}/mailboxes", credentials.getAddress())
                 .retrieve()
                 .bodyToMono(String.class)
-                .retryWhen(reactor.util.retry.Retry.fixedDelay(5, Duration.ofSeconds(2)))
+                .retryWhen(fixedDelay(5, Duration.ofSeconds(2)))
                 .map(response -> {
                     try {
                         log.info("Getting mailboxes for user {} | {}", credentials.getAddress(), response);
@@ -117,16 +112,9 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                 .build());
     }
 
-    @Async
     @Override
-    @SneakyThrows
     @Retry(name = "retryMailService")
-    @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "${queues.account-auth-confirmation}"),
-            key = "${routing-keys.account-auth-confirmation}"
-    ))
-    public Mono<Response> createUser(Credentials credentials) {
+    public Mono<Response> createUser(Credentials credentials) throws JsonProcessingException {
         log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
 
         var password = mapper.createObjectNode();
@@ -143,20 +131,22 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                         return response.bodyToMono(Response.class);
                     }
                     return Mono.empty();
-                }).retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
+                })
+                .onErrorResume(ex -> {
+                    log.error("Error creating user on {}: {}", mailServerName, ex.getMessage());
+                    return Mono.error(ex);
+                })
+                .retryWhen(fixedDelay(15, Duration.ofSeconds(5)))
+                .onErrorComplete(throwable -> {
+                    throw new MailServerConnectException();
+                });
         result.subscribe();
         return result;
     }
 
-    @Async
     @Override
     @SneakyThrows
     @Retry(name = "retryMailService")
-    @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "${queues.account-in-mail-service-creating}"),
-            key = "${routing-keys.account-in-mail-service-creating}"
-    ))
     public Mono<Response> createMailbox(Credentials credentials) {
         log.info("Creating a Mailbox in Mail Server {} | User: {}, Mailbox: {}",
                 mailServerName, credentials.getAddress(), inbox);
@@ -171,7 +161,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                         return response.bodyToMono(Response.class);
                     }
                     return Mono.empty();
-                }).retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
+                }).retryWhen(fixedDelay(3, Duration.ofSeconds(2)));
         result.subscribe();
         return result;
     }
@@ -184,18 +174,12 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                 .uri(quotaPath + username + "/size")
                 .retrieve()
                 .bodyToMono(Integer.class)
-                .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
+                .retryWhen(fixedDelay(3, Duration.ofSeconds(2)));
         result.subscribe();
         return result;
     }
 
-    @Async
     @Override
-    @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "${queues.account-mailbox-in-mail-service-creating}"),
-            key = "${routing-keys.account-mailbox-in-mail-service-creating}"
-    ))
     public Mono<Response> updateQuotaSize(Credentials credentials) {
         log.info("Updating the quota size for a user | User: {}", credentials.getAddress());
 
@@ -210,7 +194,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                         return response.bodyToMono(Response.class);
                     }
                     return Mono.empty();
-                }).retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)));
+                }).retryWhen(fixedDelay(3, Duration.ofSeconds(2)));
         result.subscribe();
         return result;
     }
@@ -223,7 +207,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                 .uri(quotaPath + username)
                 .retrieve()
                 .bodyToMono(String.class)
-                .retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2)))
+                .retryWhen(fixedDelay(3, Duration.ofSeconds(2)))
                 .map(jsonString -> {
                     try {
                         var quota = mapper.readTree(jsonString);

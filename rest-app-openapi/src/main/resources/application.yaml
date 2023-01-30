@@ -92,4 +92,4 @@ resilience4j.retry:
         - org.springframework.web.client.HttpServerErrorException
     retryMailService:
       maxAttempts: 15
-      waitDuration: 1s
+      waitDuration: 3s

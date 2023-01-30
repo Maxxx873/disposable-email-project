@@ -15,13 +15,7 @@ import com.disposableemail.service.api.auth.AuthorizationService;
 import com.disposableemail.service.api.mail.MailServerClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.ExchangeTypes;
-import org.springframework.amqp.rabbit.annotation.Exchange;
-import org.springframework.amqp.rabbit.annotation.Queue;
-import org.springframework.amqp.rabbit.annotation.QueueBinding;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -98,13 +92,7 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findById(id);
     }
 
-    @Async
     @Override
-    @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "${queues.account-quota-in-mail-service-updating}"),
-            key = "${routing-keys.account-quota-in-mail-service-updating}"
-    ))
     public Mono<AccountEntity> setMailboxId(Credentials credentials) {
         var result = mailServerClientService.getMailboxId(credentials, inbox)
                 .zipWith(accountRepository.findByAddress(credentials.getAddress()))
