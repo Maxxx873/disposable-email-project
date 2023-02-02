@@ -665,6 +665,7 @@ components:
         address:
           type: string
           format: email
+          x-field-extra-annotation: "@com.fasterxml.jackson.databind.annotation.JsonDeserialize(converter = com.disposableemail.util.ToLowerCaseConverter.class)"
           example: test@example.com
         password:
           type: string

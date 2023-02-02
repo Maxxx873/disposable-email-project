@@ -2,6 +2,7 @@
 
 ```bash
 oc get svc -n maxxx873-dev
+```
 
 #### Install chart
 
@@ -48,7 +49,7 @@ $ helm install cassandra bitnami/cassandra \
 ```
 To install the chart with the release name rabbitmq:
 ```bash
-$ helm install rabbitmq bitnami/rabbitmq \
+$ helm install rabbitmq bitnami/rabbitmq \~~~~
     --set persistence.enabled=false,ingress.enabled=false,auth.username=guest,auth.password=guest \
     --set podSecurityContext.enabled=false \
     --set containerSecurityContext.enabled=false \
@@ -66,29 +67,6 @@ $ helm install mongodb bitnami/mongodb \
 ```
 To install the chart with the release name elasticsearch:
 ```bash
-$ helm install elasticsearch elastic/elasticsearch \
-    --set fullnameOverride=elasticsearch \
-    --set replicas=1 \
-    --set securityContext.runAsUser=null \
-    --set podSecurityContext.fsGroup=null \
-    --set podSecurityContext.runAsUser=null \
-    --set sysctlInitContainer.enabled=false \
-    --set volumeClaimTemplate.resources.requests.storage=1Gi
-```
-2. elastuc quickstart
-```bash
-helm install elasticsearch elastic/elasticsearch \
-   --set fullnameOverride=elasticsearch \
-   --set replicas=1 \
-   --set secret.password=secret \
-   --set securityContext.runAsUser=null \
-   --set podSecurityContext.fsGroup=null \
-   --set podSecurityContext.runAsUser=null \
-   --set sysctlInitContainer.enabled=false \
-   --set volumeClaimTemplate.resources.requests.storage=1Gi
-```
-3.
-```bash
 $ helm install elasticsearch bitnami/elasticsearch \
     --set security.elasticPassword=secret \
     --set master.podSecurityContext.enabled=false \
@@ -98,21 +76,20 @@ $ helm install elasticsearch bitnami/elasticsearch \
     --set data.podSecurityContext.fsGroup=null \
     --set data.containerSecurityContext.enabled=false \
     --set sysctlImage.enabled=false \
-    --set master.persistence.enabled=false \
+    --set master.persistence.enabled=true \
+    --set master.persistence.size=1Gi \
     --set master.replicaCount=1 \
     --set master.autoscaling.minReplicas=1 \
     --set master.autoscaling.maxReplicas=2 \
-    --set data.replicaCount=1 \
-    --set data.persistence.enabled=false \
+    --set data.replicaCount=2 \
+    --set data.persistence.enabled=true \
+    --set data.persistence.size=1Gi \
     --set data.resources.limits.memory=2Gi \
     --set data.resources.requests.memory=2Gi \
     --set ingest.enabled=false \
     --set coordinating.replicaCount=0
 ```
 
-```bash
-helm install -f values.yaml keycloak charts/keycloak-chart
-```
 To install the chart with the release name keycloak:
 ```bash
 $ helm install -f values.yaml keycloak bitnami/keycloak \

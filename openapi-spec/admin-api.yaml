@@ -1,0 +1,8 @@
+openapi: 3.0.3
+info:
+  title: disposable-email-project-admin
+  description: 'Disposable Email Project Admin API'
+  version: 0.0.1
+servers:
+  - url: /api/v1
+    description: ''

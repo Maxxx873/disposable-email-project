@@ -14,7 +14,7 @@ public interface AccountService {
 
     Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange);
 
-    String getDomainFromEmailAddress(String address);
+    Mono<AccountEntity> getAccountWithUsedSize(ServerWebExchange address);
 
     Mono<AccountEntity> getAccountById(String id);
 

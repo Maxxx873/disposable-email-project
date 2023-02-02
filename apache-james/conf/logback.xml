@@ -30,6 +30,13 @@
                 </encoder>
         </appender>
 
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                        <pattern>%d{HH:mm:ss.SSS} %highlight([%-5level]) %logger{15} - %msg%n%rEx</pattern>
+                        <immediateFlush>false</immediateFlush>
+                </encoder>
+        </appender>
+
         <root level="WARN">
                 <appender-ref ref="CONSOLE" />
                 <appender-ref ref="LOG_FILE" />
@@ -37,6 +44,8 @@
 
         <logger name="org.apache.james" level="INFO" />
         <logger name="com.datastax.driver.core.QueryLogger.SLOW" level="DEBUG" />
-
+        <logger name="com.disposableemail.apache.james.mailet.collector.ReactiveSourceCollector" level="INFO" />
+        <logger name="com.disposableemail.apache.james.mailet.collector.SyncSourceCollector" level="INFO" />
+        <logger name="com.disposableemail.apache.james.mailet.collector.CollectorSubscriber" level="INFO" />
 
 </configuration>

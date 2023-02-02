@@ -24,6 +24,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import static com.disposableemail.event.Event.Type.START_CREATING_ACCOUNT;
+import static com.disposableemail.util.EmailUtils.getDomainFromEmailAddress;
 
 @Slf4j
 @Service
@@ -55,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
                     if (Boolean.TRUE.equals(domainEntity.getIsActive()) &&
                             Boolean.FALSE.equals(domainEntity.getIsPrivate())) {
                         eventProducer.send(new Event<>(START_CREATING_ACCOUNT, getEncryptCredentials(credentials)));
-                        return accountRepository.findByAddress(credentials.getAddress())
+                        return accountRepository.findByAddress(credentials.getAddress().toLowerCase())
                                 .flatMap(accountEntity -> Mono.error(AccountAlreadyRegisteredException::new))
                                 .then(accountRepository.save(getNewAccountEntity(credentials)));
                     } else {
@@ -74,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange) {
-        log.info("Getting an Account from {}", PREFERRED_USERNAME);
+        log.info("Getting an Account from | {}", PREFERRED_USERNAME);
 
         return ReactiveSecurityContextHolder.getContext()
                 .map(context -> context.getAuthentication().getPrincipal())
@@ -82,7 +83,28 @@ public class AccountServiceImpl implements AccountService {
                 .map(jwt -> {
                     log.info("Retrieved User name {} from JWT", jwt.getClaimAsString(PREFERRED_USERNAME));
                     return jwt.getClaimAsString(PREFERRED_USERNAME);
-                }).flatMap(accountRepository::findByAddress);
+                })
+                .flatMap(accountRepository::findByAddress);
+    }
+
+    @Override
+    public Mono<AccountEntity> getAccountWithUsedSize(ServerWebExchange exchange) {
+        log.info("Getting an Account with used size | {}", PREFERRED_USERNAME);
+
+        var accountEntity = this.getAccountFromJwt(exchange);
+        var usedSize = accountEntity.flatMap(account -> mailServerClientService.getUsedSize(account.getAddress()));
+        var result = accountEntity
+                .zipWith(usedSize)
+                .map(tuple2 -> {
+                    log.info("Get used size for Account | address: {}, used size: {}",
+                            tuple2.getT1().getAddress(), tuple2.getT2());
+                    var account = tuple2.getT1();
+                    account.setUsed(tuple2.getT2());
+                    return account;
+                })
+                .flatMap(accountRepository::save);
+        result.subscribe();
+        return result;
     }
 
     @Override
@@ -125,11 +147,6 @@ public class AccountServiceImpl implements AccountService {
                     log.info("Account {} is deleted", id);
                     return accountRepository.delete(accountEntity).then(Mono.just(accountEntity));
                 });
-    }
-
-    @Override
-    public String getDomainFromEmailAddress(String address) {
-        return address.substring(address.indexOf("@") + 1);
     }
 
     private AccountEntity getNewAccountEntity(Credentials credentials) {
