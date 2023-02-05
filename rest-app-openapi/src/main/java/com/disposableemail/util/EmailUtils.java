@@ -7,11 +7,11 @@ public class EmailUtils {
     }
 
     public static String getDomainFromEmailAddress(String address) {
-        return address.substring(address.indexOf('@') + 1);
+        return address.replaceAll("(.+)@","");
     }
 
     public static String getNameFromEmailAddress(String address) {
-        return address.substring(0, address.indexOf('@'));
+        return address.replaceAll("@(.+)$","");
     }
 
 }
