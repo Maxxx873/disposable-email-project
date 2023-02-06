@@ -1,0 +1,57 @@
+openapi: 3.0.3
+components:
+  responses:
+    '200':
+      description: Account resource
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/Account'
+    '202':
+      description: Account resource created
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/Account'
+      links:
+        GetAccountItem:
+          operationId: getAccountItem
+          parameters:
+            id: $response.body#/id
+          description: The `id` value returned in the response can be used as the `id` parameter in `GET /accounts/{id}`.
+    '204':
+      description: Account resource deleted
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/Account'
+    '400':
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
+    '401':
+      description: Not registered Account
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
+    '404':
+      description: Account not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
+    '422':
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
+    '409':
+      description: Account is already registered
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'

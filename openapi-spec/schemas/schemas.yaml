@@ -1,0 +1,274 @@
+openapi: 3.0.3
+components:
+  schemas:
+    Account:
+      type: object
+      description: ''
+      properties:
+        id:
+          readOnly: true
+          type: string
+        address:
+          format: email
+          type: string
+        quota:
+          type: integer
+        used:
+          type: integer
+        isDisabled:
+          type: boolean
+        isDeleted:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - address
+    Domain:
+      type: object
+      description: ''
+      properties:
+        id:
+          readOnly: true
+          type: string
+        domain:
+          type: string
+        isActive:
+          type: boolean
+        isPrivate:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Message:
+      type: object
+      description: ''
+      properties:
+        id:
+          readOnly: true
+          type: string
+        accountId:
+          readOnly: true
+          type: string
+          format: iri-reference
+        msgid:
+          readOnly: true
+          type: string
+        from:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: receiver1@example.com
+              name: John Doe
+          readOnly: true
+        to:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: receiver1@example.com
+              name: John Doe
+            - address: receiver2@example.com
+              name: Doe John
+          readOnly: true
+        cc:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: cc1@example.com
+              name: John Doe
+            - address: cc2@example.com
+              name: Doe John
+          readOnly: true
+        bcc:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: bcc1@example.com
+              name: John Doe
+            - address: bcc2@example.com
+              name: Doe John
+          readOnly: true
+        subject:
+          readOnly: true
+          type: string
+        isUnread:
+          type: boolean
+        isFlagged:
+          readOnly: true
+          type: boolean
+        isDeleted:
+          type: boolean
+        text:
+          readOnly: true
+          type: string
+        html:
+          readOnly: true
+          type: array
+          items:
+            type: string
+        hasAttachment:
+          readOnly: true
+          type: boolean
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+          example:
+            - id: 63713e318473775ab3014b56
+              filename: happy.png
+              contentType: image/png
+              disposition: attachment
+              transferEncoding: base64
+              size: 20
+              downloadUrl: /messages/id/attachment/63713e318473775ab3014b56
+            - id: 63713e318473775ab3014b85
+              filename: happy.png
+              contentType: image/png
+              disposition: attachment
+              transferEncoding: base64
+              size: 240
+              downloadUrl: /messages/id/attachment/63713e318473775ab3014b85
+        size:
+          readOnly: true
+          type: integer
+        downloadUrl:
+          readOnly: true
+          type: string
+        createdAt:
+          readOnly: true
+          type: string
+          format: date-time
+        updatedAt:
+          readOnly: true
+          type: string
+          format: date-time
+    Messages:
+      type: object
+      description: ''
+      properties:
+        id:
+          readOnly: true
+          type: string
+        accountId:
+          readOnly: true
+          type: string
+          format: iri-reference
+        msgid:
+          readOnly: true
+          type: string
+        from:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: receiver1@example.com
+              name: John Doe
+          readOnly: true
+        to:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+          example:
+            - address: receiver1@example.com
+              name: John Doe
+            - address: receiver2@example.com
+              name: Doe John
+          readOnly: true
+        subject:
+          readOnly: true
+          type: string
+        isUnread:
+          type: boolean
+        isDeleted:
+          type: boolean
+        hasAttachment:
+          readOnly: true
+          type: boolean
+        size:
+          readOnly: true
+          type: integer
+        downloadUrl:
+          readOnly: true
+          type: string
+        createdAt:
+          readOnly: true
+          type: string
+          format: date-time
+        updatedAt:
+          readOnly: true
+          type: string
+          format: date-time
+    Source:
+      type: object
+      description: ''
+      properties:
+        id:
+          readOnly: true
+          type: string
+        downloadUrl:
+          type: string
+        data:
+          type: string
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+          readOnly: true
+    Credentials:
+      type: object
+      properties:
+        address:
+          type: string
+          format: email
+          x-field-extra-annotation: "@com.fasterxml.jackson.databind.annotation.JsonDeserialize(converter = com.disposableemail.util.ToLowerCaseConverter.class)"
+          example: test@example.com
+        password:
+          type: string
+          example: password
+    Address:
+      type: object
+      properties:
+        address:
+          type: string
+          example: connor@example.com
+        name:
+          type: string
+          example: Jon Connor
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: string
+        filename:
+          type: string
+        contentType:
+          type: string
+        disposition:
+          type: string
+        transferEncoding:
+          type: string
+        size:
+          type: integer
+        downloadUrl:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: A code specific to the particular message
+        message:
+          type: string
+          description: The related error message
+      description: ErrorResponse

@@ -1,0 +1,12 @@
+name: size
+in: query
+description: The collection size
+required: false
+deprecated: false
+allowEmptyValue: true
+schema:
+  type: integer
+  default: 1
+style: form
+explode: false
+allowReserved: false

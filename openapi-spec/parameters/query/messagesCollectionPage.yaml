@@ -1,0 +1,13 @@
+name: page
+in: query
+description: Page index (zero-based 0..N)
+required: false
+deprecated: false
+allowEmptyValue: true
+schema:
+  type: integer
+  default: 0
+  minimum: 0
+style: form
+explode: false
+allowReserved: false

@@ -1,0 +1,11 @@
+name: id
+in: path
+description: Source identifier
+required: true
+deprecated: false
+allowEmptyValue: false
+schema:
+  type: string
+style: simple
+explode: false
+allowReserved: false

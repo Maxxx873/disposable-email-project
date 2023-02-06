@@ -1,0 +1,33 @@
+openapi: 3.0.3
+components:
+  responses:
+    '200':
+      description: Message resource updated
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/Message'
+      links:
+        GetMessageItem:
+          operationId: getMessageItem
+          parameters:
+            id: $response.body#/id
+          description: The `id` value returned in the response can be used as the `id` parameter in `GET /messages/{id}`.
+    '400':
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
+    '404':
+      description: Message not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
+    '422':
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'

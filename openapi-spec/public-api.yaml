@@ -1,0 +1,215 @@
+openapi: 3.0.3
+info:
+  title: disposable-email-project
+  description: 'Disposable Email Project API'
+  version: 0.0.1
+servers:
+  - url: /api/v1
+    description: ''
+paths:
+  /accounts:
+    post:
+      operationId: createAccountItem
+      requestBody:
+        description: The new Account Resource
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/schemas.yaml#/components/schemas/Credentials'
+      responses:
+        '202':
+          $ref: './responses/account-responses.yaml#/components/responses/202'
+        '400':
+          $ref: './responses/account-responses.yaml#/components/responses/400'
+        '401':
+          $ref: './responses/account-responses.yaml#/components/responses/401'
+        '422':
+          $ref: './responses/account-responses.yaml#/components/responses/422'
+        '409':
+          $ref: './responses/account-responses.yaml#/components/responses/409'
+      summary: Creates a Account resource.
+      description: Creates a Account resource.
+    parameters: []
+  /accounts/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      operationId: getAccountItem
+      responses:
+        '200':
+          $ref: './responses/account-responses.yaml#/components/responses/200'
+        '404':
+          $ref: './responses/account-responses.yaml#/components/responses/404'
+      summary: Retrieves a Account resource.
+      description: Retrieves a Account resource.
+      parameters:
+        - $ref: './parameters/path/accountId.yaml'
+      deprecated: false
+    delete:
+      security:
+        - bearerAuth: []
+      operationId: deleteAccountItem
+      responses:
+        '204':
+          $ref: './responses/account-responses.yaml#/components/responses/204'
+        '404':
+          $ref: './responses/account-responses.yaml#/components/responses/404'
+      summary: Removes the Account resource.
+      description: Removes the Account resource.
+      parameters:
+        - $ref: './parameters/path/accountId.yaml'
+      deprecated: false
+    parameters: []
+  /domains:
+    get:
+      operationId: getDomainCollection
+      responses:
+        '200':
+          $ref: './responses/domains-responses.yaml#/components/responses/200'
+      summary: Retrieves the collection of Domain resources.
+      description: Retrieves the collection of Domain resources.
+      parameters:
+        - $ref: './parameters/query/domainsCollectionSize.yaml'
+      deprecated: false
+    parameters: []
+  /domains/{id}:
+    get:
+      operationId: getDomainItem
+      responses:
+        '200':
+          $ref: './responses/domain-responses.yaml#/components/responses/200'
+        '404':
+          $ref: './responses/domain-responses.yaml#/components/responses/404'
+      summary: Retrieves a Domain resource.
+      description: Retrieves a Domain resource.
+      parameters:
+        - $ref: './parameters/path/domainId.yaml'
+      deprecated: false
+    parameters: []
+  /me:
+    get:
+      security:
+        - bearerAuth: []
+      operationId: get_meAccountItem
+      responses:
+        '200':
+          $ref: './responses/me-responses.yaml#/components/responses/200'
+        '404':
+          $ref: './responses/me-responses.yaml#/components/responses/404'
+      summary: Retrieves an Account resource.
+      description: Retrieves an Account resource.
+      parameters: []
+      deprecated: false
+    parameters: []
+  /messages:
+    get:
+      security:
+        - bearerAuth: []
+      operationId: getMessageCollection
+      responses:
+        '200':
+          $ref: './responses/messages-responses.yaml#/components/responses/200'
+      summary: Retrieves the collection of Message resources.
+      description: Retrieves the collection of Message resources.
+      parameters:
+        - $ref: './parameters/query/messagesCollectionPage.yaml'
+        - $ref: './parameters/query/messagesCollectionSize.yaml'
+      deprecated: false
+    parameters: []
+  /messages/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      operationId: getMessageItem
+      responses:
+        '200':
+          $ref: './responses/message-responses.yaml#/components/responses/200'
+        '404':
+          $ref: './responses/message-responses.yaml#/components/responses/404'
+      summary: Retrieves a Message resource.
+      description: Retrieves a Message resource.
+      parameters:
+        - $ref: './parameters/path/messageId.yaml'
+      deprecated: false
+    delete:
+      security:
+        - bearerAuth: []
+      operationId: deleteMessageItem
+      responses:
+        '204':
+          description: Message resource deleted
+        '404':
+          $ref: './responses/message-responses.yaml#/components/responses/404'
+      summary: Removes the Message resource.
+      description: Removes the Message resource.
+      parameters:
+        - $ref: './parameters/path/messageId.yaml'
+      deprecated: false
+    patch:
+      security:
+        - bearerAuth: []
+      operationId: patchMessageItem
+      responses:
+        '200':
+          $ref: './responses/message-responses.yaml#/components/responses/200'
+        '400':
+          $ref: './responses/message-responses.yaml#/components/responses/400'
+        '404':
+          $ref: './responses/message-responses.yaml#/components/responses/404'
+        '422':
+          $ref: './responses/message-responses.yaml#/components/responses/422'
+      summary: Updates the Message resource.
+      description: Updates the Message resource.
+      parameters:
+        - $ref: './parameters/path/messageId.yaml'
+      requestBody:
+        description: The updated Message resource
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/schemas.yaml#/components/schemas/Message'
+        required: true
+      deprecated: false
+    parameters: []
+  /sources/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      operationId: getSourceItem
+      responses:
+        '200':
+          $ref: './responses/sources-responses.yaml#/components/responses/200'
+        '404':
+          $ref: './responses/sources-responses.yaml#/components/responses/404'
+      summary: Retrieves a Source resource.
+      description: Retrieves a Source resource.
+      parameters:
+        - $ref: './parameters/path/sourceId.yaml'
+      deprecated: false
+    parameters: []
+  /token:
+    post:
+      operationId: postCredentialsItem
+      responses:
+        '200':
+          $ref: './responses/token-responses.yaml#/components/responses/200'
+        '401':
+          $ref: './responses/token-responses.yaml#/components/responses/401'
+      summary: Get JWT token to login.
+      description: ''
+      parameters: []
+      requestBody:
+        description: Generate new JWT Token
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/schemas.yaml#/components/schemas/Credentials'
+        required: false
+      deprecated: false
+    parameters: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,15 @@
+openapi: 3.0.3
+components:
+  responses:
+    '200':
+      description: Get JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/Token'
+    '401':
+      description: Not registered Account
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'

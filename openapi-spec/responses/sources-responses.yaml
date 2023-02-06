@@ -1,0 +1,15 @@
+openapi: 3.0.3
+components:
+  responses:
+    '200':
+      description: Source resource
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/Source'
+    '404':
+      description: Source not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'

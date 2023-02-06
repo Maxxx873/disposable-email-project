@@ -1,0 +1,15 @@
+openapi: 3.0.3
+components:
+  responses:
+    '200':
+      description: Account resource
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/Account'
+    '404':
+      description: Account not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'

@@ -1,0 +1,17 @@
+openapi: 3.0.3
+components:
+  responses:
+    '200':
+      description: Domain collection
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../schemas/schemas.yaml#/components/schemas/Domain'
+    '404':
+      description: Domains not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
