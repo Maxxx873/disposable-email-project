@@ -4,13 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.disposableemail</groupId>
-        <artifactId>disposable-email-project</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-
     <artifactId>apache-james-extensions</artifactId>
+    <groupId>com.disposableemail.apache.james</groupId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache James :: Extensions</name>
@@ -28,12 +23,59 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
-        <james.baseVersion>3.7.1</james.baseVersion>
-        <mongodb-driver-sync.version>4.6.1</mongodb-driver-sync.version>
-        <mongodb-driver-reactivestreams.version>4.6.1</mongodb-driver-reactivestreams.version>
+        <projectlombok.version>1.18.26</projectlombok.version>
+        <james.baseVersion>3.7.3</james.baseVersion>
+        <mongodb-driver-sync.version>4.9.0</mongodb-driver-sync.version>
+        <mongodb-driver-reactivestreams.version>4.9.0</mongodb-driver-reactivestreams.version>
+        <de.flapdoodle.embed.mongo.version>3.5.4</de.flapdoodle.embed.mongo.version>
+        <junit-jupiter-api.version>5.9.2</junit-jupiter-api.version>
+        <assertj-core.version>3.24.2</assertj-core.version>
+        <awaitility.version>4.2.0</awaitility.version>
+        <reactor-test.version>3.5.0</reactor-test.version>
+        <slf4j.version>2.0.6</slf4j.version>
+        <reactor-core.version>3.5.3</reactor-core.version>
+        <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>${reactor-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-mailet-base</artifactId>
+            <version>${james.baseVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-james-mailbox-api</artifactId>
+            <version>${james.baseVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${projectlombok.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!--driver-->
+
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
@@ -44,6 +86,76 @@
             <artifactId>mongodb-driver-reactivestreams</artifactId>
             <version>${mongodb-driver-reactivestreams.version}</version>
         </dependency>
+
+        <!--test-->
+
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-james-mailbox-memory</artifactId>
+            <version>${james.baseVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-james-mailbox-memory</artifactId>
+            <version>${james.baseVersion}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-mailet-test</artifactId>
+            <version>${james.baseVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+            <version>${reactor-test.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>${awaitility.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-jupiter-api.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>${de.flapdoodle.embed.mongo.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                        <version>${junit-jupiter-api.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

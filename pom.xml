@@ -6,48 +6,62 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.7</version>
+        <version>3.0.2</version>
         <relativePath/>
     </parent>
     <groupId>com.disposableemail</groupId>
     <artifactId>disposable-email-project</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Disposable Email Project</name>
-    <description>Aggregator for Disposable email project applications</description>
+    <description>
+        Aggregator for Disposable email project applications.
+        The Disposable Email Project contains an API for creating temporary email accounts and getting a list of
+        messages.
+    </description>
 
     <modules>
-        <module>rest-app-openapi</module>
-        <module>apache-james/extensions</module>
+        <module>core</module>
+        <module>config</module>
+        <module>jobs-app</module>
+        <module>external-api-app</module>
     </modules>
 
     <properties>
+        <disposable.email.project.groupId>com.disposableemail</disposable.email.project.groupId>
         <project.version>0.0.1-SNAPSHOT</project.version>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <swagger-annotations.version>2.2.2</swagger-annotations.version>
-        <jackson-databind-nullable.version>0.2.4</jackson-databind-nullable.version>
-        <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
-        <keycloak-admin-client.version>20.0.1</keycloak-admin-client.version>
-        <testcontainers.version>1.17.6</testcontainers.version>
-        <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
-        <resilience4j-spring-boot2.version>1.7.1</resilience4j-spring-boot2.version>
-        <reactor-test.version>3.5.0</reactor-test.version>
+        <spring-boot-maven-plugin.version>3.0.2</spring-boot-maven-plugin.version>
         <versions-maven-plugin.version>2.13.0</versions-maven-plugin.version>
+        <!-- utilities -->
+        <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
+        <projectlombok.version>1.18.26</projectlombok.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <!-- authorization -->
+        <keycloak-admin-client.version>20.0.3</keycloak-admin-client.version>
+        <!-- retry -->
+        <resilience4j-spring-boot3.version>2.0.1</resilience4j-spring-boot3.version>
+        <!-- openapi -->
+        <jakarta.json.bind-api.version>3.0.0</jakarta.json.bind-api.version>
+        <jakarta.json.version>2.0.1</jakarta.json.version>
+        <jackson-databind-nullable.version>0.2.4</jackson-databind-nullable.version>
+        <openapi-generator-maven-plugin.version>6.0.1</openapi-generator-maven-plugin.version>
+        <swagger-annotations.version>2.2.8</swagger-annotations.version>
+        <springdoc-openapi-starter-webflux-ui.version>2.0.2</springdoc-openapi-starter-webflux-ui.version>
+        <springdoc-openapi-ui.version>1.6.14</springdoc-openapi-ui.version>
+        <!-- testing -->
+        <testcontainers.version>1.17.6</testcontainers.version>
         <rabbitmq-mock.version>1.2.0</rabbitmq-mock.version>
+        <reactor-test.version>3.5.0</reactor-test.version>
+        <testcontainers.elasticsearch.version>1.17.6</testcontainers.elasticsearch.version>
+        <de.flapdoodle.embed.mongo.version>3.4.11</de.flapdoodle.embed.mongo.version>
+        <de.flapdoodle.embed.mongo.spring30x.version>4.5.2</de.flapdoodle.embed.mongo.spring30x.version>
     </properties>
+
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-resource-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-jose</artifactId>
-        </dependency>
+
+        <!-- autoconfiguration -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
@@ -69,8 +83,8 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.springframework.boot</groupId>
-           <artifactId>spring-boot-starter-amqp</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
         <!-- data -->
@@ -82,6 +96,21 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+
+        <!-- security -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
 
         <!-- authorization -->
@@ -96,24 +125,24 @@
 
         <dependency>
             <groupId>io.github.resilience4j</groupId>
-            <artifactId>resilience4j-spring-boot2</artifactId>
-            <version>${resilience4j-spring-boot2.version}</version>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>${resilience4j-spring-boot3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-annotations</artifactId>
-            <version>${resilience4j-spring-boot2.version}</version>
+            <version>${resilience4j-spring-boot3.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-retry</artifactId>
-            <version>${resilience4j-spring-boot2.version}</version>
+            <version>${resilience4j-spring-boot3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-reactor</artifactId>
-            <version>${resilience4j-spring-boot2.version}</version>
+            <version>${resilience4j-spring-boot3.version}</version>
         </dependency>
 
         <!-- openapi -->
@@ -124,18 +153,28 @@
             <version>${jackson-databind-nullable.version}</version>
         </dependency>
         <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+            <version>${jakarta.json.bind-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>${jakarta.json.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
             <version>${swagger-annotations.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webflux-ui</artifactId>
-            <version>${springdoc-openapi-ui.version}</version>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+            <version>${springdoc-openapi-starter-webflux-ui.version}</version>
         </dependency>
 
         <!-- utilities -->
@@ -172,6 +211,12 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${testcontainers.elasticsearch.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
@@ -189,7 +234,8 @@
         </dependency>
         <dependency>
             <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>
+            <version>${de.flapdoodle.embed.mongo.spring30x.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -1,0 +1,22 @@
+server:
+  port: ${PORT:8089}
+
+spring:
+  main:
+    web-application-type: none
+    allow-bean-definition-overriding: true
+
+  data:
+    mongodb:
+      database: disposableemail
+      host: localhost
+      port: 0
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.21
+
+logging:
+  level.root: debug

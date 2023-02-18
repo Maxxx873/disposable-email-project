@@ -1,0 +1,79 @@
+server:
+  port: ${PORT:8089}
+
+authorization:
+  service: ${AUTHORIZATION_SERVICE:keycloak}
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  main:
+    web-application-type: none
+    allow-bean-definition-overriding: true
+
+  config:
+    import: optional:.env[.properties]
+
+  data:
+    mongodb:
+      database: disposableemail
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        prefetch: 1
+      direct:
+        prefetch: 1
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_JWT_SET_URI:http://localhost:9080/realms/master/protocol/openid-connect/certs}
+          issuer-uri: ${KEYCLOAK_REALM_ISSUER_URL:http://localhost:9080/realms/master}
+    password: ${CRYPTO_PASSWORD:pass}
+    salt: ${CRYPTO_SALT:e707efd5cf9f191d}
+
+    elasticsearch:
+      rest:
+        uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+      client:
+        reactive:
+          endpoints: ${ELASTICSEARCH_ENDPOINTS:localhost:9200}
+          max-in-memory-size: 512MB
+
+keycloak:
+  server:
+    url: ${KEYCLOAK_SERVER_URL:http://localhost:9080}
+    realm: ${KEYCLOAK_SERVER_REALM:master}
+    username: ${KEYCLOAK_SERVER_USERNAME:admin}
+    password: ${KEYCLOAK_SERVER_PASSWORD:admin}
+    client: ${KEYCLOAK_SERVER_CLIENT:admin-cli}
+
+mail-server:
+  name: ${MAIL_SERVER_NAME:Apache James}
+  mailbox: ${MAILBOX_NAME:INBOX}
+  base-url: ${MAIL_SERVER_BASE_URL:http://localhost:8000}
+  defaultUserSizeQuota: ${DEFAULT_USER_SIZE_QUOTA:40000000}
+  quotaPath: ${QUOTA_PATH:/quota/users/}
+
+logging:
+  level.root: info
+
+resilience4j.retry:
+  instances:
+    retryAuthorizationService:
+      maxAttempts: 15
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+    retryMailService:
+      maxAttempts: 15
+      waitDuration: 3s

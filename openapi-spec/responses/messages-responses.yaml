@@ -9,6 +9,12 @@ components:
             type: array
             items:
               $ref: '../schemas/schemas.yaml#/components/schemas/Messages'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
     '404':
       description: Messages not found
       content:

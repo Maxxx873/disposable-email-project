@@ -7,6 +7,12 @@ components:
         application/json:
           schema:
             $ref: '../schemas/schemas.yaml#/components/schemas/Account'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
     '404':
       description: Account not found
       content:

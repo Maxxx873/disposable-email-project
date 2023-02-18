@@ -1,4 +1,9 @@
 openapi: 3.0.3
+info:
+  title: disposable-email-project
+  description: 'Core DTOs'
+  version: 0.0.1
+paths: {}
 components:
   schemas:
     Account:
@@ -231,7 +236,7 @@ components:
         address:
           type: string
           format: email
-          x-field-extra-annotation: "@com.fasterxml.jackson.databind.annotation.JsonDeserialize(converter = com.disposableemail.util.ToLowerCaseConverter.class)"
+          x-field-extra-annotation: "@com.fasterxml.jackson.databind.annotation.JsonDeserialize(converter = com.disposableemail.core.util.ToLowerCaseConverter.class)"
           example: test@example.com
         password:
           type: string

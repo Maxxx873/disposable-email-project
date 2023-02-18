@@ -1,0 +1,120 @@
+{
+  "_index": "mailbox_v1",
+  "_type": "_doc",
+  "_id": "dfe6fe90-9732-11ed-8985-859682c50720:1",
+  "_version": 2,
+  "_score": 0,
+  "_routing": "dfe6fe90-9732-11ed-8985-859682c50720",
+  "_source": {
+    "attachments": [],
+    "bcc": [],
+    "htmlBody": null,
+    "textBody": "sdfasdasd\r\n\r\n",
+    "cc": [],
+    "date": "2023-01-31T20:08:01+0000",
+    "from": [
+      {
+        "name": "test6@example.com",
+        "address": "test6@example.com"
+      }
+    ],
+    "hasAttachment": false,
+    "headers": [
+      {
+        "name": "return-path",
+        "value": "<test6@example.com>"
+      },
+      {
+        "name": "delivered-to",
+        "value": "t3@example.com"
+      },
+      {
+        "name": "received",
+        "value": "from 172.18.0.1 (EHLO [127.0.0.1]) ([172.18.0.1])          by james.local (JAMES SMTP Server ) with ESMTPA ID -632699781          for <t3@example.com>;          Tue, 31 Jan 2023 20:08:01 +0000 (UTC)"
+      },
+      {
+        "name": "message-id",
+        "value": "<d9a3fad3-2fd0-ac0b-ffb6-1508788c21bf@example.com>"
+      },
+      {
+        "name": "date",
+        "value": "Tue, 31 Jan 2023 23:08:01 +0300"
+      },
+      {
+        "name": "mime-version",
+        "value": "1.0"
+      },
+      {
+        "name": "user-agent",
+        "value": "Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Thunderbird/102.2.2"
+      },
+      {
+        "name": "content-language",
+        "value": "en-US"
+      },
+      {
+        "name": "to",
+        "value": "t3@example.com"
+      },
+      {
+        "name": "from",
+        "value": "\"test6@example.com\" <test6@example.com>"
+      },
+      {
+        "name": "subject",
+        "value": "t3"
+      },
+      {
+        "name": "content-type",
+        "value": "text/plain; charset=UTF-8; format=flowed"
+      },
+      {
+        "name": "content-transfer-encoding",
+        "value": "7bit"
+      }
+    ],
+    "mailboxId": "dfe6fe90-9732-11ed-8985-859682c50720",
+    "mediaType": "text",
+    "messageId": "f6c394a0-a1a2-11ed-9c7c-45671b00b811",
+    "threadId": "f6c394a0-a1a2-11ed-9c7c-45671b00b811",
+    "modSeq": 8,
+    "sentDate": "2023-01-31T23:08:01+0300",
+    "size": 703,
+    "subject": [
+      "t3"
+    ],
+    "subtype": "plain",
+    "to": [
+      {
+        "name": null,
+        "address": "t3@example.com"
+      }
+    ],
+    "uid": 1,
+    "userFlags": [],
+    "mimeMessageID": "<d9a3fad3-2fd0-ac0b-ffb6-1508788c21bf@example.com>",
+    "isUnread": true,
+    "isRecent": false,
+    "isDraft": false,
+    "isDeleted": false,
+    "isAnswered": false,
+    "isFlagged": false
+  },
+  "fields": {
+    "date": [
+      "2023-01-31T20:08:01.000Z"
+    ],
+    "uid": [
+      1
+    ],
+    "sentDate": [
+      "2023-01-31T20:08:01.000Z"
+    ],
+    "mailboxId": [
+      "dfe6fe90-9732-11ed-8985-859682c50720"
+    ],
+    "messageId": [
+      "f6c394a0-a1a2-11ed-9c7c-45671b00b811"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+com/disposableemail/apache/james/mailet/collector/BasicSourceCollector.class
+com/disposableemail/apache/james/mailet/collector/pojo/MailSource.class
+com/disposableemail/apache/james/mailet/collector/CollectorSubscriber.class
+com/disposableemail/apache/james/mailet/collector/SyncSourceCollector.class
+com/disposableemail/apache/james/mailet/collector/ReactiveSourceCollector.class
+com/disposableemail/apache/james/mailet/collector/pojo/MailSource$MailSourceBuilder.class
+com/disposableemail/apache/james/mailet/DumpMimeInToSystemOutMailet.class
+com/disposableemail/apache/james/mailet/collector/pojo/MailAttachment$MailAttachmentBuilder.class
+com/disposableemail/apache/james/mailet/collector/pojo/MailAttachment.class

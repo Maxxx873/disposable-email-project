@@ -19,6 +19,12 @@ components:
         application/json:
           schema:
             $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
     '404':
       description: Message not found
       content:
