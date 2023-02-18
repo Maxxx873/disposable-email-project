@@ -1,7 +1,0 @@
-/home/max/development/disposable-email-project/apache-james/extensions/mailets/src/main/java/com/disposableemail/apache/james/mailet/collector/CollectorSubscriber.java
-/home/max/development/disposable-email-project/apache-james/extensions/mailets/src/main/java/com/disposableemail/apache/james/mailet/collector/ReactiveSourceCollector.java
-/home/max/development/disposable-email-project/apache-james/extensions/mailets/src/main/java/com/disposableemail/apache/james/mailet/collector/pojo/MailAttachment.java
-/home/max/development/disposable-email-project/apache-james/extensions/mailets/src/main/java/com/disposableemail/apache/james/mailet/collector/SyncSourceCollector.java
-/home/max/development/disposable-email-project/apache-james/extensions/mailets/src/main/java/com/disposableemail/apache/james/mailet/collector/pojo/MailSource.java
-/home/max/development/disposable-email-project/apache-james/extensions/mailets/src/main/java/com/disposableemail/apache/james/mailet/collector/BasicSourceCollector.java
-/home/max/development/disposable-email-project/apache-james/extensions/mailets/src/main/java/com/disposableemail/apache/james/mailet/DumpMimeInToSystemOutMailet.java
