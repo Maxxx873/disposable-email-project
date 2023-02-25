@@ -6,7 +6,7 @@ import org.bson.types.ObjectId;
 
 @Data
 @Builder
-public class MailAttachment {
+public class Attachment {
     private ObjectId id;
     private String filename;
     private String contentType;

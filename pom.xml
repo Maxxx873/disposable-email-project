@@ -48,13 +48,11 @@
         <openapi-generator-maven-plugin.version>6.0.1</openapi-generator-maven-plugin.version>
         <swagger-annotations.version>2.2.8</swagger-annotations.version>
         <springdoc-openapi-starter-webflux-ui.version>2.0.2</springdoc-openapi-starter-webflux-ui.version>
-        <springdoc-openapi-ui.version>1.6.14</springdoc-openapi-ui.version>
         <!-- testing -->
         <testcontainers.version>1.17.6</testcontainers.version>
         <rabbitmq-mock.version>1.2.0</rabbitmq-mock.version>
         <reactor-test.version>3.5.0</reactor-test.version>
         <testcontainers.elasticsearch.version>1.17.6</testcontainers.elasticsearch.version>
-        <de.flapdoodle.embed.mongo.version>3.4.11</de.flapdoodle.embed.mongo.version>
         <de.flapdoodle.embed.mongo.spring30x.version>4.5.2</de.flapdoodle.embed.mongo.spring30x.version>
     </properties>
 
@@ -173,7 +171,7 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-common</artifactId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
             <version>${springdoc-openapi-starter-webflux-ui.version}</version>
         </dependency>
 

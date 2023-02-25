@@ -35,13 +35,13 @@ class MailServiceTest {
     }
 
     @Disabled
-    @RepeatedTest(20)
+    @RepeatedTest(2)
     void shouldSendMail() {
         final SimpleMailMessage simpleMail = new SimpleMailMessage();
-        simpleMail.setFrom("t1@example.com");
-        simpleMail.setTo("111@example.com");
-        simpleMail.setSubject("Java Mail 10");
-        simpleMail.setText("Java test mail. No attachments");
+        simpleMail.setFrom("t6@example.com");
+        simpleMail.setTo("test2@example.com");
+        simpleMail.setSubject("Java Mail 670");
+        simpleMail.setText("Java test mail. No attachmentsss...");
         mailSender.send(simpleMail);
         assertThat(mailSender).isNotNull();
     }

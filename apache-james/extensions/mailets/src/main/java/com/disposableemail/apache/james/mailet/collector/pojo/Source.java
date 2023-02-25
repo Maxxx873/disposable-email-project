@@ -10,10 +10,10 @@ import java.util.List;
 
 @Data
 @Builder
-public class MailSource {
+public class Source {
     private ObjectId id;
     private String msgid;
     private String data;
-    private List<MailAttachment> attachments;
+    private List<Attachment> attachments;
     private LocalDateTime createdAt;
 }

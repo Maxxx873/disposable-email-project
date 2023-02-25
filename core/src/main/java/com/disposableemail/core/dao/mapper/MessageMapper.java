@@ -53,5 +53,7 @@ public interface MessageMapper {
                 address.setName("");
             }
         });
+        message.getAttachments().forEach(attachment ->
+                attachment.setDownloadUrl(String.format("/messages/%s/attachment/%s", message.getId(), attachment.getId())));
     }
 }

@@ -46,6 +46,7 @@
         <logger name="com.datastax.driver.core.QueryLogger.SLOW" level="DEBUG" />
         <logger name="com.disposableemail.apache.james.mailet.collector.ReactiveSourceCollector" level="INFO" />
         <logger name="com.disposableemail.apache.james.mailet.collector.SyncSourceCollector" level="INFO" />
-        <logger name="com.disposableemail.apache.james.mailet.collector.CollectorSubscriber" level="INFO" />
+        <logger name="com.disposableemail.apache.james.mailet.collector.subscriber.SourceCollectorSubscriber" level="INFO" />
+        <logger name="com.disposableemail.apache.james.mailet.collector.subscriber.MessageCollectorSubscriber" level="INFO" />
 
 </configuration>

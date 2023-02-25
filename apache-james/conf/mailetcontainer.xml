@@ -40,7 +40,8 @@
             <mailet match="All" class="com.disposableemail.apache.james.mailet.collector.ReactiveSourceCollector">
                 <connectionString>mongodb://mongodb:27017</connectionString>
                 <database>disposableemail</database>
-                <collectionName>source</collectionName>
+                <sourceCollectionName>source</sourceCollectionName>
+                <messageCollectionName>message</messageCollectionName>
             </mailet>
             <mailet match="All" class="PostmasterAlias"/>
             <mailet match="RelayLimit=30" class="Null"/>

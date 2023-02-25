@@ -11,5 +11,7 @@ import reactor.core.publisher.Mono;
 public interface MessageRepository extends ReactiveMongoRepository<MessageEntity, String> {
 
     Flux<MessageEntity> findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(String accountId, Pageable pageable);
+
     Mono<MessageEntity> findByIdAndAccountIdAndIsDeletedFalse(String messageId, String accountId);
+
 }

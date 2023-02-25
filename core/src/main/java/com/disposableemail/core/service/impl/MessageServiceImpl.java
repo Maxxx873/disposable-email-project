@@ -97,4 +97,12 @@ public class MessageServiceImpl implements MessageService {
                                 Pageable.ofSize(size)));
     }
 
+    @Override
+    public Flux<MessageEntity> getMessagesByAccountId(Pageable pageable, ServerWebExchange exchange) {
+        return accountService.getAccountFromJwt(exchange)
+                .flatMapMany(accountEntity -> {
+                    log.info("Getting a Messages collection from Elasticsearch | mailboxId: {}", accountEntity.getMailboxId());
+                    return messageRepository.findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountEntity.getId(), pageable);
+                });
+    }
 }

@@ -1,11 +1,13 @@
 package com.disposableemail.apache.james.mailet;
 
 import com.disposableemail.apache.james.mailet.collector.ReactiveSourceCollector;
+import com.disposableemail.apache.james.mailet.collector.pojo.Account;
+import com.disposableemail.apache.james.mailet.collector.subscriber.SourceCollectorSubscriber;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoDatabase;
-import org.apache.james.core.builder.MimeMessageBuilder;
 import org.apache.mailet.base.test.FakeMail;
 import org.awaitility.Durations;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
@@ -33,6 +36,7 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
 
         var mongoClient = MongoClients.create(String.format(CONNECTION_STRING, ip, port));
         mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
+
     }
 
     @AfterEach
@@ -47,7 +51,7 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
 
         mailet.service(mail);
 
-        StepVerifier.create(mongoDatabase.getCollection(COLLECTION_NAME).countDocuments())
+        StepVerifier.create(mongoDatabase.getCollection(SOURCE_COLLECTION_NAME).countDocuments())
                 .expectSubscription()
                 .expectNext(0L)
                 .expectComplete()
@@ -55,16 +59,24 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
     }
 
     @Test
-    void mailetShouldCreateDocumentWhenMailWithoutAttachmentsIsNotEmpty() throws MessagingException {
+    void mailetShouldCreateDocumentWhenMailWithoutAttachmentsIsNotEmpty() throws MessagingException, FileNotFoundException {
+        var mimeMessage = new MimeMessage(null, new FileInputStream("src/test/resources/test_mail_html_no_attachments.eml"));
+        var mail = FakeMail.defaultFakeMail();
+        mail.setMessage(mimeMessage);
+        var sourceCollection = mongoDatabase.getCollection(SOURCE_COLLECTION_NAME);
+        var messageCollection = mongoDatabase.getCollection(MESSAGE_COLLECTION_NAME);
+        var accountCollection = mongoDatabase.getCollection(ACCOUNT_COLLECTION_NAME, Account.class).withCodecRegistry(pojoCodecRegistry);
 
-        var mail = FakeMail.from(MimeMessageBuilder.mimeMessageBuilder().setText("test message").build());
-        var collection = mongoDatabase.getCollection(COLLECTION_NAME);
+        account.setAddress("t3@example.com");
+        accountCollection.insertOne(account).subscribe(new SourceCollectorSubscriber<>());
+
+        await().pollDelay(Durations.ONE_SECOND).until(() -> true);
 
         mailet.service(mail);
 
-        await().pollDelay(Durations.TWO_SECONDS).until(() -> true);
+        await().pollDelay(Durations.ONE_SECOND).until(() -> true);
 
-        StepVerifier.create(collection.find().first())
+        StepVerifier.create(sourceCollection.find().first())
                 .expectSubscription()
                 .assertNext(doc -> {
                     assertThat(doc).containsKeys("msgid", "data", "attachments");
@@ -73,21 +85,47 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
                 .expectComplete()
                 .verify();
 
+        StepVerifier.create(messageCollection.find().first())
+                .expectSubscription()
+                .assertNext(doc -> {
+                    assertThat(doc).containsKeys("accountId", "msgid", "from", "to", "cc", "bcc", "subject",
+                            "attachments", "isUnread", "isFlagged", "isDeleted", "text", "html", "hasAttachment",
+                            "attachments", "size", "sentDate", "createdAt", "updatedAt");
+                    assertThat(Objects.requireNonNull(doc).getList("attachments", Object.class)).isEmpty();
+                    assertThat(Objects.requireNonNull(doc).get("text")).isEqualTo("Java test mail. No attachments");
+                    assertThat(ObjectId.isValid(Objects.requireNonNull(doc).get("accountId").toString())).isEqualTo(true);
+                    assertThat(Objects.requireNonNull(doc).get("isUnread")).isEqualTo(true);
+                    assertThat(Objects.requireNonNull(doc).get("isUnread")).isEqualTo(true);
+                    assertThat(Objects.requireNonNull(doc).get("isFlagged")).isEqualTo(false);
+                    assertThat(Objects.requireNonNull(doc).get("isDeleted")).isEqualTo(false);
+                    assertThat(Objects.requireNonNull(doc).get("hasAttachment")).isEqualTo(false);
+                    assertThat(Objects.requireNonNull(doc).get("html").toString().contains(EXPECTED_HTML)).isTrue();
+                    assertThat(Integer.parseInt(Objects.requireNonNull(doc).get("size").toString())).isGreaterThan(0);
+                })
+                .expectComplete()
+                .verify();
     }
 
     @Test
     void mailetShouldCreateDocumentWhenMailHasAttachments() throws MessagingException, IOException {
         var mail = FakeMail.defaultFakeMail();
-        var mimeMessage = new MimeMessage(null, new FileInputStream("src/test/resources/test-mail.eml"));
+        var mimeMessage = new MimeMessage(null, new FileInputStream("src/test/resources/test_mail_with_attachments.eml"));
         var multiPart = (Multipart) mimeMessage.getContent();
         mail.setMessage(mimeMessage);
-        var collection = mongoDatabase.getCollection(COLLECTION_NAME);
+        var sourceCollection = mongoDatabase.getCollection(SOURCE_COLLECTION_NAME);
+        var messageCollection = mongoDatabase.getCollection(MESSAGE_COLLECTION_NAME);
+        var accountCollection = mongoDatabase.getCollection(ACCOUNT_COLLECTION_NAME, Account.class).withCodecRegistry(pojoCodecRegistry);
+
+        account.setAddress("test6@example.com");
+        accountCollection.insertOne(account).subscribe(new SourceCollectorSubscriber<>());
+
+        await().pollDelay(Durations.ONE_SECOND).until(() -> true);
 
         mailet.service(mail);
 
-        await().pollDelay(Durations.TWO_SECONDS).until(() -> true);
+        await().pollDelay(Durations.ONE_SECOND).until(() -> true);
 
-        StepVerifier.create(collection.find().first())
+        StepVerifier.create(sourceCollection.find().first())
                 .expectSubscription()
                 .thenAwait(Duration.ofSeconds(10))
                 .assertNext(doc -> {
@@ -101,5 +139,28 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
                 .expectComplete()
                 .verify();
 
+        StepVerifier.create(messageCollection.find().first())
+                .expectSubscription()
+                .thenAwait(Duration.ofSeconds(10))
+                .assertNext(doc -> {
+                    assertThat(doc).containsKeys("accountId", "msgid", "from", "to", "cc", "bcc", "subject",
+                            "attachments", "isUnread", "isFlagged", "isDeleted", "text", "html", "hasAttachment",
+                            "attachments", "size", "sentDate", "createdAt", "updatedAt");
+                    try {
+                        assertThat(Objects.requireNonNull(doc).getList("attachments", Object.class)).hasSize(getExpectedPartCount(multiPart));
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    assertThat(Objects.requireNonNull(doc).get("text")).isEqualTo("test text message\n");
+                    assertThat(ObjectId.isValid(Objects.requireNonNull(doc).get("accountId").toString())).isTrue();
+                    assertThat(Objects.requireNonNull(doc).get("isUnread")).isEqualTo(true);
+                    assertThat(Objects.requireNonNull(doc).get("isUnread")).isEqualTo(true);
+                    assertThat(Objects.requireNonNull(doc).get("isFlagged")).isEqualTo(false);
+                    assertThat(Objects.requireNonNull(doc).get("isDeleted")).isEqualTo(false);
+                    assertThat(Objects.requireNonNull(doc).get("hasAttachment")).isEqualTo(true);
+                    assertThat(Integer.parseInt(Objects.requireNonNull(doc).get("size").toString())).isPositive();
+                })
+                .expectComplete()
+                .verify();
     }
 }

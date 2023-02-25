@@ -2,17 +2,14 @@ package com.disposableemail.rest.delegate;
 
 import com.disposableemail.api.MessagesApiDelegate;
 import com.disposableemail.core.dao.mapper.MessageMapper;
-import com.disposableemail.core.dao.mapper.search.MessageElasticsearchMapper;
 import com.disposableemail.core.exception.custom.MessageNotFoundException;
 import com.disposableemail.core.exception.custom.MessagesNotFoundException;
 import com.disposableemail.core.model.Message;
 import com.disposableemail.core.model.Messages;
 import com.disposableemail.core.service.api.MessageService;
-import com.disposableemail.core.service.api.search.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,17 +27,14 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
 
     private final MessageMapper messageMapper;
     private final MessageService messageService;
-    private final MessageElasticsearchService messageElasticsearchService;
-    private final MessageElasticsearchMapper messageElasticsearchMapper;
 
     @Override
     public Mono<ResponseEntity<Flux<Messages>>> getMessageCollection(Integer page, Integer size, ServerWebExchange exchange) {
 
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(messageElasticsearchService.getMessagesFromMailbox(
-                                        PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date")), exchange)
-                                .map(messageElasticsearchMapper::messageElasticsearchEntityToMessages)))
+                        .body(messageService.getMessagesByAccountId(PageRequest.of(page, size), exchange)
+                                .map(messageMapper::messageEntityToMessages)))
                 .switchIfEmpty(Mono.error(new MessagesNotFoundException()));
     }
 

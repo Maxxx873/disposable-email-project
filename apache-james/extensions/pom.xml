@@ -21,20 +21,20 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-        <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
-        <projectlombok.version>1.18.26</projectlombok.version>
         <james.baseVersion>3.7.3</james.baseVersion>
-        <mongodb-driver-sync.version>4.9.0</mongodb-driver-sync.version>
-        <mongodb-driver-reactivestreams.version>4.9.0</mongodb-driver-reactivestreams.version>
+        <projectlombok.version>1.18.26</projectlombok.version>
+        <mongodb-driver-sync.version>4.7.2</mongodb-driver-sync.version>
+        <mongodb-driver-reactivestreams.version>4.7.2</mongodb-driver-reactivestreams.version>
         <de.flapdoodle.embed.mongo.version>3.5.4</de.flapdoodle.embed.mongo.version>
         <junit-jupiter-api.version>5.9.2</junit-jupiter-api.version>
         <assertj-core.version>3.24.2</assertj-core.version>
         <awaitility.version>4.2.0</awaitility.version>
         <reactor-test.version>3.5.0</reactor-test.version>
-        <slf4j.version>2.0.6</slf4j.version>
-        <reactor-core.version>3.5.3</reactor-core.version>
+        <slf4j.version>2.0.1</slf4j.version>
+        <jsoup.version>1.15.4</jsoup.version>
         <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
     </properties>
 
     <dependencies>
@@ -49,24 +49,16 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-            <version>${reactor-core.version}</version>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.james</groupId>
             <artifactId>apache-mailet-base</artifactId>
             <version>${james.baseVersion}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>apache-james-mailbox-api</artifactId>
-            <version>${james.baseVersion}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -93,12 +85,12 @@
             <groupId>org.apache.james</groupId>
             <artifactId>apache-james-mailbox-memory</artifactId>
             <version>${james.baseVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>apache-james-mailbox-memory</artifactId>
-            <version>${james.baseVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.james</groupId>
+                    <artifactId>apache-james-mailbox-api</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>

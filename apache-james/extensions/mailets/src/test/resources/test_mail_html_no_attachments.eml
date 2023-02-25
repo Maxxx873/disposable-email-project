@@ -1,0 +1,72 @@
+Return-Path: <test6@example.com>
+Delivered-To: t3@example.com
+Received: from 172.18.0.1 (EHLO [127.0.0.1]) ([172.18.0.1])
+          by james.local (JAMES SMTP Server ) with ESMTPA ID -1877163522
+          for <t3@example.com>;
+          Wed, 15 Feb 2023 20:16:53 +0000 (UTC)
+Content-Type: multipart/alternative;
+ boundary="------------kE6jDKM0b8wbp5lD5R22gVAa"
+Message-ID: <a0044fca-a994-1f54-eb37-44a32646cf45@example.com>
+Date: Wed, 15 Feb 2023 23:16:53 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Fwd: Java Mail 7
+References: <278738215.0.1674165338300@max-System>
+Content-Language: en-US
+To: t3@example.com
+From: "test6@example.com" <test6@example.com>
+In-Reply-To: <278738215.0.1674165338300@max-System>
+X-Forwarded-Message-Id: <278738215.0.1674165338300@max-System>
+
+This is a multi-part message in MIME format.
+--------------kE6jDKM0b8wbp5lD5R22gVAa
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Java test mail. No attachments
+--------------kE6jDKM0b8wbp5lD5R22gVAa
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<html>
+  <head>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <p><br>
+    </p>
+    <div class="moz-forward-container"><br>
+      <br>
+      -------- Forwarded Message --------
+      <table class="moz-email-headers-table" cellspacing="0"
+        cellpadding="0" border="0">
+        <tbody>
+          <tr>
+            <th valign="BASELINE" nowrap="nowrap" align="RIGHT">Subject:
+            </th>
+            <td>Java Mail 7</td>
+          </tr>
+          <tr>
+            <th valign="BASELINE" nowrap="nowrap" align="RIGHT">Date: </th>
+            <td>Fri, 20 Jan 2023 00:55:38 +0300 (MSK)</td>
+          </tr>
+          <tr>
+            <th valign="BASELINE" nowrap="nowrap" align="RIGHT">From: </th>
+            <td><a class="moz-txt-link-abbreviated" href="mailto:t1@example.com">t1@example.com</a></td>
+          </tr>
+          <tr>
+            <th valign="BASELINE" nowrap="nowrap" align="RIGHT">To: </th>
+            <td><a class="moz-txt-link-abbreviated" href="mailto:test6@example.com">test6@example.com</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <br>
+      Java test mail. No attachments<br>
+    </div>
+  </body>
+</html>
+
+--------------kE6jDKM0b8wbp5lD5R22gVAa--

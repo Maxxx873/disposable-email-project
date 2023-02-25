@@ -81,9 +81,11 @@
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <reactive>true</reactive>
                                 <delegatePattern>true</delegatePattern>
-                                <!--suppress UnresolvedMavenProperty -->
-                                <additionalModelTypeAnnotations>@lombok.Builder @lombok.NoArgsConstructor
+                                <additionalModelTypeAnnotations>
+                                    @lombok.Builder
+                                    @lombok.NoArgsConstructor
                                     @lombok.AllArgsConstructor
+                                    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
                                 </additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
