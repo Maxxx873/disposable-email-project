@@ -14,6 +14,7 @@ public class TextEncryptorConfig {
 
     @Value("${spring.security.salt}")
     private String salt;
+
     @Bean
     public TextEncryptor textEncryptor() {
         return Encryptors.text(password, salt);

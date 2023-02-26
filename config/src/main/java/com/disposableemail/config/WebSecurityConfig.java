@@ -34,6 +34,7 @@ public class WebSecurityConfig {
         http.oauth2ResourceServer()
                 .jwt()
                 .jwtDecoder(jwtDecoder());
+        http.cors().and().csrf().disable();
         return http.build();
     }
 

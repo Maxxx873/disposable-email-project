@@ -27,12 +27,11 @@
     </modules>
 
     <properties>
+        <!-- build properties -->
         <disposable.email.project.groupId>com.disposableemail</disposable.email.project.groupId>
         <project.version>0.0.1-SNAPSHOT</project.version>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-boot-maven-plugin.version>3.0.2</spring-boot-maven-plugin.version>
-        <versions-maven-plugin.version>2.13.0</versions-maven-plugin.version>
         <!-- utilities -->
         <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
         <projectlombok.version>1.18.26</projectlombok.version>
@@ -54,7 +53,27 @@
         <reactor-test.version>3.5.0</reactor-test.version>
         <testcontainers.elasticsearch.version>1.17.6</testcontainers.elasticsearch.version>
         <de.flapdoodle.embed.mongo.spring30x.version>4.5.2</de.flapdoodle.embed.mongo.spring30x.version>
+        <!-- plugin versions -->
+        <spring-boot-maven-plugin.version>3.0.2</spring-boot-maven-plugin.version>
+        <versions-maven-plugin.version>2.13.0</versions-maven-plugin.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.disposableemail</groupId>
+                <artifactId>disposable-email-core</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.disposableemail</groupId>
+                <artifactId>disposable-email-config</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
 

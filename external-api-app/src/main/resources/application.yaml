@@ -39,6 +39,8 @@ spring:
           issuer-uri: ${KEYCLOAK_REALM_ISSUER_URL}
     password: ${CRYPTO_PASSWORD:pass}
     salt: ${CRYPTO_SALT:e707efd5cf9f191d}
+    cors:
+      allowed-origins: http://localhost:3000
 
 jwt:
   auth:

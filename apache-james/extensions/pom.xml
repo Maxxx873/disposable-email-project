@@ -18,9 +18,11 @@
     </modules>
 
     <properties>
+        <!-- build properties -->
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- dependency versions -->
         <james.baseVersion>3.7.3</james.baseVersion>
         <projectlombok.version>1.18.26</projectlombok.version>
         <mongodb-driver-sync.version>4.7.2</mongodb-driver-sync.version>
@@ -32,6 +34,7 @@
         <reactor-test.version>3.5.0</reactor-test.version>
         <slf4j.version>2.0.1</slf4j.version>
         <jsoup.version>1.15.4</jsoup.version>
+        <!-- plugin versions -->
         <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>

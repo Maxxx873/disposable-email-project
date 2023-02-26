@@ -18,13 +18,11 @@
         <dependency>
             <groupId>com.disposableemail</groupId>
             <artifactId>disposable-email-core</artifactId>
-            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.disposableemail</groupId>
             <artifactId>disposable-email-config</artifactId>
-            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
