@@ -1,5 +1,5 @@
 
-# <div align="center"> <img src="img/logoDisposableEmail.png.png" width="100" title="logo"> Disposable Email Project </div>
+# <div align="center"> <img src="img/logoDisposableEmail.png" width="50" title="logo"> Disposable Email Project </div>
 
 <div align="center">
 
