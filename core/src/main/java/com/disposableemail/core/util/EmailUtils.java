@@ -1,5 +1,7 @@
 package com.disposableemail.core.util;
 
+import java.util.Objects;
+
 public class EmailUtils {
 
     private EmailUtils() {
@@ -7,11 +9,18 @@ public class EmailUtils {
     }
 
     public static String getDomainFromEmailAddress(String address) {
-        return address.replaceAll("(.+)@","");
+        if (Objects.equals(address, null)) {
+            throw new IllegalStateException("Address is null");
+        }
+        return address.replaceAll("(.+)@", "");
+
     }
 
     public static String getNameFromEmailAddress(String address) {
-        return address.replaceAll("@(.+)$","");
+        if (Objects.equals(address, null)) {
+            throw new IllegalStateException("Address is null");
+        }
+        return address.replaceAll("@(.+)$", "");
     }
 
 }

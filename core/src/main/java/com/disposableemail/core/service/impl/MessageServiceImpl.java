@@ -2,12 +2,9 @@ package com.disposableemail.core.service.impl;
 
 import com.disposableemail.core.dao.entity.AccountEntity;
 import com.disposableemail.core.dao.entity.MessageEntity;
-import com.disposableemail.core.dao.entity.search.MessageElasticsearchEntity;
 import com.disposableemail.core.dao.repository.MessageRepository;
-import com.disposableemail.core.dao.repository.search.MessageElasticsearchRepository;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.MessageService;
-import com.disposableemail.core.service.api.search.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -17,18 +14,13 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final MessageElasticsearchService messageElasticsearchService;
     private final AccountService accountService;
-
-    private final MessageElasticsearchRepository elasticsearchRepository;
 
     @Override
     public Mono<MessageEntity> saveMessage(MessageEntity messageEntity) {
@@ -75,13 +67,6 @@ public class MessageServiceImpl implements MessageService {
                 .map(messageEntity -> {
                     messageEntity.setIsDeleted(true);
                     messageRepository.save(messageEntity).subscribe();
-
-                    elasticsearchRepository.findByMessageId(messageId)
-                            .map(MessageElasticsearchEntity::getId)
-                            .map(Collections::singletonList)
-                            .flatMap(elasticsearchRepository::deleteAllById)
-                            .doOnSuccess(result -> log.info("Deleted Message in ElasticSearch | Id: {}", messageEntity.getId()))
-                            .subscribe();
                     return messageEntity;
                 });
     }
@@ -101,7 +86,7 @@ public class MessageServiceImpl implements MessageService {
     public Flux<MessageEntity> getMessagesByAccountId(Pageable pageable, ServerWebExchange exchange) {
         return accountService.getAccountFromJwt(exchange)
                 .flatMapMany(accountEntity -> {
-                    log.info("Getting a Messages collection from Elasticsearch | mailboxId: {}", accountEntity.getMailboxId());
+                    log.info("Getting a Messages collection | mailboxId: {}", accountEntity.getMailboxId());
                     return messageRepository.findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountEntity.getId(), pageable);
                 });
     }

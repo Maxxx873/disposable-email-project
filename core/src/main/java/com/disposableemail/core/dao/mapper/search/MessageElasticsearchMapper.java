@@ -15,6 +15,7 @@ public interface MessageElasticsearchMapper {
     @Mapping(source = "textBody", target = "text")
     @Mapping(source = "htmlBody", target = "html")
     @Mapping(source = "mimeMessageID", target = "msgid")
+    @Mapping(target = "sentDate", expression = "java(messageElasticsearchEntity.getDate().toLocalDateTime())")
     @Mapping(target = "createdAt", expression = "java(messageElasticsearchEntity.getDate().toLocalDateTime())")
     @Mapping(target = "updatedAt", expression = "java(messageElasticsearchEntity.getDate().toLocalDateTime())")
     MessageEntity messageElasticsearchEntityToMessageEntity(MessageElasticsearchEntity messageElasticsearchEntity);

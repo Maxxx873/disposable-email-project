@@ -103,6 +103,10 @@ components:
             - address: bcc2@example.com
               name: Doe John
           readOnly: true
+        sentDate:
+          readOnly: true
+          type: string
+          format: date-time
         subject:
           readOnly: true
           type: string

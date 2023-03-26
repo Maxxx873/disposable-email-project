@@ -1,4 +1,5 @@
-# <div align="center"> Disposable Email Project </div>
+
+# <div align="center"> <img src="img/logoDisposableEmail.png.png" width="100" title="logo"> Disposable Email Project </div>
 
 <div align="center">
 
@@ -12,7 +13,7 @@
 ![Docker](https://img.shields.io/badge/Docker-2F3134?style=for-the-badge&logo=docker)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-2F3134?style=for-the-badge&logo=kubernetes)
 ![Helm](https://img.shields.io/badge/Helm-2F3134?style=for-the-badge&logo=helm)
-
+![Telegram](https://img.shields.io/badge/Telegram-2F3134?style=for-the-badge&logo=telegram)
 </div>
 
 ## Project information
@@ -23,7 +24,7 @@ Processing emails is based on distributed [Apache James](https://james.apache.or
 Incoming messages are processed and added to the `MongoDB` database.
 
 <p align="center">
-  <img src="img/topology.png" width="1000" title="hover text">
+  <img src="img/topology.png" width="1000" title="topology">
 </p>
 
 

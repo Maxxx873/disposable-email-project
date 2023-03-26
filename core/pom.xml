@@ -64,7 +64,7 @@
                             <typeMappings>
                                 <typeMapping>OffsetDateTime=java.time.LocalDateTime</typeMapping>
                             </typeMappings>
-                            <inputSpec>${project.parent.basedir}/openapi-spec//schemas/schemas.yaml</inputSpec>
+                            <inputSpec>${project.parent.basedir}/openapi-spec/schemas/schemas.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <generateApis>false</generateApis>
                             <generateSupportingFiles>false</generateSupportingFiles>

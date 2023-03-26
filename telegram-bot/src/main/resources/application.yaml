@@ -1,0 +1,32 @@
+server:
+  port: ${PORT:8090}
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  config:
+    import: optional:.env[.properties]
+
+  security:
+    password: ${CRYPTO_PASSWORD}
+    salt: ${CRYPTO_SALT}
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/disposableemailbot}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  liquibase:
+    enabled: false
+
+telegram.bot:
+  name: ${BOT_NAME}
+  token: ${BOT_TOKEN}
+
+disposableemail.api:
+  base-path: ${API_PATH}

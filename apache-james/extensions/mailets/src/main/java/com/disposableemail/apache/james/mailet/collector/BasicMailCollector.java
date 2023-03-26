@@ -22,6 +22,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -77,7 +78,7 @@ public class BasicMailCollector extends GenericMailet {
         return Source.builder()
                 .id(new ObjectId())
                 .msgid(mimeMessage.getMessageID())
-                .data(out.toString())
+                .data(out.toString(StandardCharsets.UTF_8))
                 .attachments(getAttachments(mimeMessage))
                 .createdAt(LocalDateTime.now())
                 .build();

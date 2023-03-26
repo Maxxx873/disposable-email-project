@@ -12,6 +12,14 @@
     <artifactId>mailets</artifactId>
     <name>Apache James :: Custom Mailets</name>
     <description>Operations performed with mail.</description>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>4.7.3</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

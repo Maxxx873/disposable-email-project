@@ -39,9 +39,9 @@ class MailServiceTest {
     void shouldSendMail() {
         final SimpleMailMessage simpleMail = new SimpleMailMessage();
         simpleMail.setFrom("t6@example.com");
-        simpleMail.setTo("test2@example.com");
-        simpleMail.setSubject("Java Mail 670");
-        simpleMail.setText("Java test mail. No attachmentsss...");
+        simpleMail.setTo("ffg@example.com");
+        simpleMail.setSubject("Java Mail");
+        simpleMail.setText("Test1");
         mailSender.send(simpleMail);
         assertThat(mailSender).isNotNull();
     }
