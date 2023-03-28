@@ -13,6 +13,7 @@ import com.vdurmont.emoji.EmojiParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ import static com.disposableemail.telegram.dao.entity.CustomerEntity.getNewCusto
 
 @Slf4j
 @Service
-@Transactional
+@Transactional(rollbackFor = DataIntegrityViolationException.class)
 @RequiredArgsConstructor
 public class BotService {
 
@@ -119,25 +120,33 @@ public class BotService {
         long chatId = update.getMessage().getChatId();
         var customer = customerService.getByChatId(chatId);
         var message = update.getMessage().getText();
-        String reply = "";
+        StringBuilder reply = new StringBuilder(100);
         if (customer.isPresent()) {
             switch (customer.get().getBotState()) {
                 case WAITING_FOR_LOGIN_ENTRY -> {
                     var account = customer.get().getAccounts().stream()
-                            .filter(accountEntity -> Objects.equals(accountEntity.getPassword(), null))
+                            .filter(accountEntity -> Objects.equals(accountEntity.getPassword(), null) && !Objects.equals(accountEntity.getCreatedDate(), null))
                             .min(Comparator.comparing(AccountEntity::getCreatedDate));
                     String domain = account.map(AccountEntity::getDomain).orElse("");
-                    account.ifPresent(accountEntity ->
-                            accountEntity.setAddress(message.toLowerCase().trim() + '@' + domain)
-                    );
-                    customer.get().setBotState(BotState.WAITING_FOR_PASSWORD_ENTRY);
-                    customerService.save(customer.get());
-                    reply = botMessageSource.getMessage("bot.accounts.password.enter.reply") + " " + domain;
+                    if (account.isPresent()) {
+                        String address = message.toLowerCase().trim() + '@' + domain;
+                        if (accountService.findByAddress(address).isEmpty()) {
+                            account.get().setAddress(address);
+                            customer.get().setBotState(BotState.WAITING_FOR_PASSWORD_ENTRY);
+                            customerService.save(customer.get());
+                            reply.append(botMessageSource.getMessage("bot.accounts.password.enter.reply")).append(" ").append(domain);
+                        } else {
+                            customer.get().removeAccount(account.get());
+                            customer.get().setBotState(BotState.START);
+                            customerService.save(customer.get());
+                            reply.append(botMessageSource.getMessage("bot.accounts.error.reply"));
+                        }
+                    }
                 }
                 case WAITING_FOR_PASSWORD_ENTRY -> {
                     var account = customer.get()
                             .getAccounts().stream()
-                            .filter(accountEntity -> Objects.equals(accountEntity.getPassword(), null))
+                            .filter(accountEntity -> Objects.equals(accountEntity.getPassword(), null) && !Objects.equals(accountEntity.getCreatedDate(), null))
                             .min(Comparator.comparing(AccountEntity::getCreatedDate));
                     account.ifPresent(accountEntity -> {
                         publishCreationAccountEvent(message, accountEntity);
@@ -146,12 +155,12 @@ public class BotService {
                     customer.get().setBotState(BotState.START);
                     customerService.save(customer.get());
                     String address = account.map(AccountEntity::getAddress).orElse("");
-                    reply = botMessageSource.getMessage("bot.accounts.added.reply") + " " + address;
+                    reply.append(botMessageSource.getMessage("bot.accounts.added.reply")).append(" ").append(address);
                 }
-                default -> reply = botMessageSource.getMessage("bot.unknown.reply");
+                default -> reply.append(botMessageSource.getMessage("bot.unknown.reply"));
             }
         }
-        return Mono.just(prepareSendMessage(chatId, EmojiParser.parseToUnicode(reply)));
+        return Mono.just(prepareSendMessage(chatId, EmojiParser.parseToUnicode(reply.toString())));
     }
 
     private void publishCreationAccountEvent(String message, AccountEntity account) {

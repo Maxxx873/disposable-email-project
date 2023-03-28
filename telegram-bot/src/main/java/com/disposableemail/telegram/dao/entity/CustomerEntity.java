@@ -26,6 +26,7 @@ public class CustomerEntity extends Auditable {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "bot_state", nullable = false)
     private BotState botState;
 
@@ -43,10 +44,12 @@ public class CustomerEntity extends Auditable {
 
     public void addAccount(AccountEntity accountEntity) {
         this.accounts.add(accountEntity);
+        accountEntity.setCustomer(this);
     }
 
     public void removeAccount(AccountEntity accountEntity) {
         this.accounts.remove(accountEntity);
+        accountEntity.setCustomer(null);
     }
 
     public void removeAccountByAddress(String address) {

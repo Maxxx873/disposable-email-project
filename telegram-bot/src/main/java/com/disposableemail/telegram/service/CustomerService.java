@@ -8,6 +8,6 @@ public interface CustomerService {
 
     Optional<CustomerEntity> getByChatId(long chatId);
 
-    Optional<CustomerEntity> save(CustomerEntity customerEntity);
+    CustomerEntity save(CustomerEntity customerEntity);
 
 }

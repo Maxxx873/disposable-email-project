@@ -27,9 +27,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @CachePut(cacheNames = "customers", key = "#customerEntity.chatId")
-    public Optional<CustomerEntity> save(CustomerEntity customerEntity) {
+    public CustomerEntity save(CustomerEntity customerEntity) {
         log.info("Saving customer | {}", customerEntity.getName());
-        customerRepository.save(customerEntity);
-        return Optional.of(customerEntity);
+        return customerRepository.save(customerEntity);
     }
 }

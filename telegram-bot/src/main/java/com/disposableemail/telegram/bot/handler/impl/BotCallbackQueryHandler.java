@@ -11,6 +11,7 @@ import com.vdurmont.emoji.EmojiParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -30,7 +31,7 @@ public class BotCallbackQueryHandler {
     private final AccountService accountService;
     private final BotService botService;
 
-    @Transactional
+    @Transactional(rollbackFor = DataIntegrityViolationException.class)
     public Publisher<SendMessage> processCallbackQuery(CallbackQuery callbackQuery) {
         long chatId = callbackQuery.getMessage().getChatId();
         String text = callbackQuery.getMessage().getText();
@@ -63,10 +64,9 @@ public class BotCallbackQueryHandler {
     }
 
     private AccountEntity getNewAccount(CallbackQuery callbackQuery, CustomerEntity customer) {
-        var account = AccountEntity.builder()
+        return accountService.createAccount(AccountEntity.builder()
                 .domain(callbackQuery.getMessage().getText())
                 .customer(customer)
-                .build();
-        return accountService.createAccount(account);
+                .build());
     }
 }
