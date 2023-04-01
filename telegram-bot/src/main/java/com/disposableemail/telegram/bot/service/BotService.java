@@ -3,6 +3,7 @@ package com.disposableemail.telegram.bot.service;
 import com.disposableemail.telegram.bot.BotMessageSource;
 import com.disposableemail.telegram.bot.event.AccountCreationEventPublisher;
 import com.disposableemail.telegram.bot.handler.BotState;
+import com.disposableemail.telegram.bot.util.EmailLoginValidation;
 import com.disposableemail.telegram.client.disposableemail.webclient.model.Credentials;
 import com.disposableemail.telegram.dao.entity.AccountEntity;
 import com.disposableemail.telegram.service.AccountService;
@@ -130,7 +131,7 @@ public class BotService {
                     String domain = account.map(AccountEntity::getDomain).orElse("");
                     if (account.isPresent()) {
                         String address = message.toLowerCase().trim() + '@' + domain;
-                        if (accountService.findByAddress(address).isEmpty()) {
+                        if (accountService.findByAddress(address).isEmpty() && EmailLoginValidation.isValid(message)) {
                             account.get().setAddress(address);
                             customer.get().setBotState(BotState.WAITING_FOR_PASSWORD_ENTRY);
                             customerService.save(customer.get());

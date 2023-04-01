@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
-public class BotOutgoingMessage {
+public final class BotOutgoingMessage {
 
     private BotOutgoingMessage() {
         throw new IllegalStateException("Utility class");

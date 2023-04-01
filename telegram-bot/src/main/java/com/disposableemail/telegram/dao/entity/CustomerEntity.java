@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -30,7 +31,7 @@ public class CustomerEntity extends Auditable {
     @Column(name = "bot_state", nullable = false)
     private BotState botState;
 
-    @OneToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "customer", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "customer", orphanRemoval = true)
     private List<AccountEntity> accounts;
 
     public static CustomerEntity getNewCustomer(Long chatId, String name) {
@@ -53,6 +54,6 @@ public class CustomerEntity extends Auditable {
     }
 
     public void removeAccountByAddress(String address) {
-        accounts.removeIf(accountEntity -> accountEntity.getAddress().equals(address));
+        accounts.removeIf(accountEntity -> Objects.equals(accountEntity.getAddress(), address));
     }
 }
