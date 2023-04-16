@@ -9,16 +9,20 @@ public class EmailUtils {
     }
 
     public static String getDomainFromEmailAddress(String address) {
-        if (Objects.equals(address, null)) {
-            throw new IllegalStateException("Address is null");
+        if (isInvalidEmail(address)) {
+            throw new IllegalStateException("Address is invalid");
         }
         return address.replaceAll("(.+)@", "");
 
     }
 
+    private static Boolean isInvalidEmail(String address) {
+        return address == null || !address.contains("@");
+    }
+
     public static String getNameFromEmailAddress(String address) {
-        if (Objects.equals(address, null)) {
-            throw new IllegalStateException("Address is null");
+        if (isInvalidEmail(address)) {
+            throw new IllegalStateException("Address is invalid");
         }
         return address.replaceAll("@(.+)$", "");
     }
