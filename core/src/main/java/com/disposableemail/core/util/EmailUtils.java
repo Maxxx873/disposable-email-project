@@ -1,8 +1,10 @@
 package com.disposableemail.core.util;
 
-import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class EmailUtils {
+
+ private static final String REGEX_PATTERN_VALID_MAIL = "[A-Z-a-z0-9!#$%&'*+/=?^_`{|}~]+(?:\\.[A-Z-a-z0-9!#$%&'*+/=?^_`{|}~]+)*+@([\\w-]+\\.)+[\\w-]+$";
 
     private EmailUtils() {
         throw new IllegalStateException("EmailUtils class");
@@ -17,7 +19,13 @@ public class EmailUtils {
     }
 
     private static Boolean isInvalidEmail(String address) {
-        return address == null || !address.contains("@");
+        if (address == null) {
+            return true;
+        } else {
+            return !Pattern.compile(REGEX_PATTERN_VALID_MAIL)
+                    .matcher(address)
+                    .matches();
+        }
     }
 
     public static String getNameFromEmailAddress(String address) {
