@@ -1,72 +1,73 @@
 package com.disposableemail.telegram.bot.handler.impl;
 
-import com.disposableemail.telegram.bot.BotMessageSource;
-import com.disposableemail.telegram.bot.handler.BotState;
-import com.disposableemail.telegram.bot.service.BotService;
+import com.disposableemail.telegram.bot.model.CallbackData;
+import com.disposableemail.telegram.bot.replier.BotReplier;
+import com.disposableemail.telegram.bot.service.BotAccountService;
+import com.disposableemail.telegram.bot.service.BotCallbackService;
+import com.disposableemail.telegram.bot.service.BotMessageService;
+import com.disposableemail.telegram.client.disposableemail.webclient.model.Domain;
 import com.disposableemail.telegram.dao.entity.AccountEntity;
-import com.disposableemail.telegram.dao.entity.CustomerEntity;
-import com.disposableemail.telegram.service.AccountService;
 import com.disposableemail.telegram.service.CustomerService;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
+import java.util.Optional;
 
-import static com.disposableemail.telegram.bot.util.BotOutgoingMessage.prepareSendMessage;
+import static com.disposableemail.telegram.bot.replier.BotReplier.ADDITIONAL_HELP;
+import static com.disposableemail.telegram.bot.replier.BotReplier.OUTDATED;
+import static com.disposableemail.telegram.bot.util.BotOutgoingMessage.editMessage;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class BotCallbackQueryHandler {
-    private final CustomerService customerService;
-    private final BotMessageSource botMessageSource;
-    private final AccountService accountService;
-    private final BotService botService;
 
-    @Transactional(rollbackFor = DataIntegrityViolationException.class)
-    public Publisher<SendMessage> processCallbackQuery(CallbackQuery callbackQuery) {
+    private final BotCallbackService botCallbackService;
+    private final CustomerService customerService;
+    private final BotAccountService botAccountService;
+    private final BotReplier botReplier;
+    private final BotMessageService botMessageService;
+
+    private Optional<CallbackData<?>> callbackData;
+
+    @Transactional
+    public Publisher<?> processCallbackQuery(CallbackQuery callbackQuery) {
         long chatId = callbackQuery.getMessage().getChatId();
-        String text = callbackQuery.getMessage().getText();
         var customer = customerService.getByChatId(chatId);
-        if (customer.isPresent() && customer.get().getBotState().equals(BotState.WAITING_FOR_DOMAIN_CHOICE)) {
-            updateCustomer(customer.get(), getNewAccount(callbackQuery, customer.get()));
-            String reply = botMessageSource.getMessage("bot.accounts.login.enter.reply") + " " + text;
-            return Mono.just(prepareSendMessage(chatId, reply));
+        callbackData = botCallbackService.getCallbackData(callbackQuery.getData());
+
+        if (callbackData.isEmpty()) {
+            String messageText = botReplier.reply(OUTDATED) + botReplier.reply(ADDITIONAL_HELP);
+            return Mono.just(editMessage(callbackQuery.getMessage(), EmojiParser.parseToUnicode(messageText)));
         }
-        if (customer.isPresent() && customer.get().getBotState().equals(BotState.WAITING_FOR_ACCOUNT_CHOICE)) {
-            if (Objects.equals(callbackQuery.getData(), botMessageSource.getMessage("bot.button.account.messages"))) {
-                return botService.showMessages(chatId, text);
-            }
-            if (Objects.equals(callbackQuery.getData(), botMessageSource.getMessage("bot.button.account.delete"))) {
-                customer.get().removeAccountByAddress(text);
-                accountService.deleteByAddress(text);
-                customerService.save(customer.get());
-                String reply = botMessageSource.getMessage("bot.accounts.deleted.reply") + " " + text;
-                String answer = EmojiParser.parseToUnicode(reply);
-                return Mono.just(prepareSendMessage(chatId, answer));
-            }
+
+        if (customer.isPresent()) {
+            return switch (callbackData.get().getData()) {
+                case AccountEntity account -> choiceAccountAnswer(chatId, account);
+                case Domain domain -> botAccountService.createAccount(chatId, domain);
+                default -> throw new IllegalStateException("Unexpected value: " + callbackData.get().getData());
+            };
         }
         return Mono.empty();
     }
 
-    private void updateCustomer(CustomerEntity customer, AccountEntity account) {
-        customer.addAccount(account);
-        customer.setBotState(BotState.WAITING_FOR_LOGIN_ENTRY);
-        customerService.save(customer);
+    private Publisher<?> choiceAccountAnswer(long chatId, AccountEntity account) {
+        if (callbackData.isPresent()) {
+            return switch (callbackData.get().getAction()) {
+                case GET -> botMessageService.showMessages(chatId, account);
+                case DELETE -> {
+                    botCallbackService.deleteCallbackData(callbackData.get().getId());
+                    yield botAccountService.deleteAccount(chatId, account);
+                }
+            };
+        }
+        return Mono.empty();
     }
 
-    private AccountEntity getNewAccount(CallbackQuery callbackQuery, CustomerEntity customer) {
-        return accountService.createAccount(AccountEntity.builder()
-                .domain(callbackQuery.getMessage().getText())
-                .customer(customer)
-                .build());
-    }
 }

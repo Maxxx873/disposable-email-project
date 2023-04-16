@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
 
@@ -18,8 +17,7 @@ public class BotHandlerImpl implements BotHandler {
     private final BotMessageHandler messageHandler;
 
     @Override
-    public Publisher<SendMessage> handleUpdate(Update update) {
-
+    public Publisher<?> handleUpdate(Update update) {
         if (update.hasCallbackQuery()) {
             return callbackQueryHandler.processCallbackQuery(update.getCallbackQuery());
         }

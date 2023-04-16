@@ -1,5 +1,6 @@
-package com.disposableemail.telegram.dto;
+package com.disposableemail.telegram.bot.model.mapper;
 
+import com.disposableemail.telegram.bot.model.dto.MessageDto;
 import com.disposableemail.telegram.client.disposableemail.webclient.model.Message;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -25,7 +25,7 @@ public class MessageCollectorSubscriber implements Subscriber<Account> {
 
     @Override
     public void onNext(final Account account) {
-        LOGGER.info("Received Id for Account {} | Id: {}", account.getAddress(), account.getAddress());
+        LOGGER.info("Received Id for Account {} | Id: {}", account.getAddress(), account.getId());
         message.setAccountId(account.getId().toString());
         messageCollection.insertOne(message).subscribe(new SourceCollectorSubscriber<>());
     }

@@ -1,23 +1,15 @@
 package com.disposableemail.telegram.service.impl;
 
-import com.disposableemail.telegram.bot.event.AccountCreationEvent;
-import com.disposableemail.telegram.bot.event.AccountDeletionEvent;
 import com.disposableemail.telegram.client.disposableemail.webclient.api.DefaultApi;
 import com.disposableemail.telegram.client.disposableemail.webclient.model.*;
-import com.disposableemail.telegram.dto.MessageDto;
-import com.disposableemail.telegram.dto.MessageMapper;
 import com.disposableemail.telegram.service.EmailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -26,11 +18,10 @@ public class DisposableEmailServiceImpl implements EmailService {
 
     private final DefaultApi api;
     private final ObjectMapper objectMapper;
-    private final MessageMapper mapper;
 
     @Override
-    public Flux<String> getDomains(Integer size) {
-        return api.getDomainCollection(size).map(Domain::getDomain);
+    public Flux<Domain> getDomains(Integer size) {
+        return api.getDomainCollection(size);
     }
 
     @Override
@@ -39,17 +30,23 @@ public class DisposableEmailServiceImpl implements EmailService {
     }
 
     @Override
-    public Flux<String> getMessages(Integer page, Integer size) {
-        return api.getMessageCollection(page, size)
-                .map(Messages::getId)
-                .flatMap(api::getMessageItem)
-                .map(mapper::messageToDto)
-                .map(MessageDto::toString);
+    public Mono<Message> getMessage(String messageId) {
+        return api.getMessageItem(messageId);
+    }
+
+    @Override
+    public Flux<Message> getMessages(Credentials credentials, Integer page, Integer size) {
+        return getTokenMono(credentials).flatMapMany(token -> {
+            api.getApiClient().setBearerToken(token.getToken());
+            return api.getMessageCollection(page, size)
+                    .map(Messages::getId)
+                    .flatMap(api::getMessageItem);
+        });
     }
 
     @Override
     public Mono<String> getToken(Credentials credentials) {
-        return api.postCredentialsItem(credentials).map(Token::getToken);
+        return getTokenMono(credentials).map(Token::getToken);
     }
 
     @Override
@@ -57,27 +54,21 @@ public class DisposableEmailServiceImpl implements EmailService {
         return api.getMeAccountItem().map(this::apply);
     }
 
-    @Async
     @Override
-    @EventListener(AccountCreationEvent.class)
-    public void createAccount(AccountCreationEvent event) {
-        var credentials = event.get();
-        if (!Objects.equals(credentials, null)) {
-            log.info("Account creation event | {}", credentials.getAddress());
-            api.createAccountItem(credentials).subscribe();
-        }
+    public void createAccount(Credentials credentials) {
+        api.createAccountItem(credentials).subscribe();
     }
 
-    @Async
     @Override
-    @EventListener(AccountDeletionEvent.class)
-    public void deleteAccount(AccountDeletionEvent event) {
-        var credentials = event.get();
-        if (!Objects.equals(credentials, null)) {
-            log.info("Account deletion event | {}", credentials.getAddress());
-            api.getApiClient().setBearerToken(api.postCredentialsItem(credentials).map(Token::getToken).block());
-            api.getMeAccountItem().map(Account::getId).flatMap(api::deleteAccountItem).subscribe();
-        }
+    public void deleteAccount(Credentials credentials) {
+        getTokenMono(credentials).map(token -> {
+            api.getApiClient().setBearerToken(token.getToken());
+            return api.getMeAccountItem().map(Account::getId).flatMap(api::deleteAccountItem).subscribe();
+        }).subscribe();
+    }
+
+    private Mono<Token> getTokenMono(Credentials credentials) {
+        return api.postCredentialsItem(credentials);
     }
 
     private String apply(Object object) {

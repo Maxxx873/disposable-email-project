@@ -21,7 +21,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Cacheable(cacheNames = "customers", key = "#chatId")
     public Optional<CustomerEntity> getByChatId(long chatId) {
-        log.info("Fetching customer by id | {}", chatId);
+        log.info("Getting customer by chatId | {}", chatId);
         return customerRepository.getByChatId(chatId);
     }
 

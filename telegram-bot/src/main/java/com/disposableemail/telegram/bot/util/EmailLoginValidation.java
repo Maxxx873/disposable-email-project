@@ -5,11 +5,12 @@ import java.util.regex.Pattern;
 
 public final class EmailLoginValidation {
 
+    private static final String REGEX_PATTERN = "[\\w!#$%&'*+/=?^`{|}~]+(?:\\.[\\w!#$%&'*+/=?^`{|}~]+)*+";
+
+
     private EmailLoginValidation() {
         throw new IllegalStateException("Utility class");
     }
-
-    private static final String REGEX_PATTERN = "[A-Z-a-z0-9!#$%&'*+/=?^_`{|}~]+(?:\\.[A-Z-a-z0-9!#$%&'*+/=?^_`{|}~]+)*+";
 
     public static boolean isValid(String emailLogin) {
         if (Objects.equals(emailLogin, null)) {

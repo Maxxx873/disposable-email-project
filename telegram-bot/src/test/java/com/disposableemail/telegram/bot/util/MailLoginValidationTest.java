@@ -1,27 +1,31 @@
 package com.disposableemail.telegram.bot.util;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MailLoginValidationTest {
-    private String mailLogin;
 
     @Test
     void shouldValidMailLogin() {
-        mailLogin = "Username345_";
+        String mailLogin = "Username_345_";
         assertThat(EmailLoginValidation.isValid(mailLogin)).isTrue();
     }
 
     @Test
-    void shouldNotValidMailLogin() {
-        mailLogin = ".username";
-        assertThat(EmailLoginValidation.isValid(mailLogin)).isFalse();
+    void shouldNotValidIfMailLoginIsNull() {
+        assertThat(EmailLoginValidation.isValid(null)).isFalse();
     }
 
-    @Test
-    void shouldNotValidIfMailLoginIsNull() {
-        mailLogin = null;
+    @ParameterizedTest
+    @ValueSource(strings = {
+            ".username",
+            "",
+            "username@username.com"
+    })
+    void shouldNotValidMailLogin(String mailLogin) {
         assertThat(EmailLoginValidation.isValid(mailLogin)).isFalse();
     }
 

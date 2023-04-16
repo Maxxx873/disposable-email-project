@@ -2,7 +2,7 @@ package com.disposableemail.telegram.bot;
 
 import com.disposableemail.telegram.bot.config.BotConfig;
 import com.disposableemail.telegram.bot.handler.BotHandler;
-import com.disposableemail.telegram.bot.handler.BotUpdateSubscriber;
+import com.disposableemail.telegram.bot.subscriber.BotUpdateSubscriber;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        botHandler.handleUpdate(update).subscribe(new BotUpdateSubscriber(this));
+        botHandler.handleUpdate(update).subscribe(new BotUpdateSubscriber<>(this));
     }
 
 }

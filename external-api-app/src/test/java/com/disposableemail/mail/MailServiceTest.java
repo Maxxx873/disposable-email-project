@@ -1,11 +1,14 @@
 package com.disposableemail.mail;
 
 import com.disposableemail.config.TestConfig;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -35,14 +38,57 @@ class MailServiceTest {
     }
 
     @Disabled
-    @RepeatedTest(5)
-    void shouldSendMail() {
-        final SimpleMailMessage simpleMail = new SimpleMailMessage();
-        simpleMail.setFrom("t6@example.com");
-        simpleMail.setTo("asdasd@example.com");
-        simpleMail.setSubject("Hello Java Mail");
-        simpleMail.setText("Hello from bot");
-        mailSender.send(simpleMail);
+    @RepeatedTest(1)
+    void shouldSendMail() throws MessagingException {
+        MimeMessage mailMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+        helper.setFrom("t6@example.com");
+        helper.setTo("test6@example.com");
+        helper.setSubject("Hello Java Mail");
+        helper.setText("<html> <body><h1>Hello </h1> </body></html>",true);
+        String htmlContent = """
+                <html>
+                  <head>
+                                
+                    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+                  </head>
+                  <body>
+                    <p><br>
+                    </p>
+                    <div class="moz-forward-container"><br>
+                      <br>
+                      -------- Forwarded Message --------
+                      <table class="moz-email-headers-table" cellspacing="0"
+                        cellpadding="0" border="0">
+                        <tbody>
+                          <tr>
+                            <th valign="BASELINE" nowrap="nowrap" align="RIGHT">Subject:
+                            </th>
+                            <td>Java Mail 7</td>
+                          </tr>
+                          <tr>
+                            <th valign="BASELINE" nowrap="nowrap" align="RIGHT">Date: </th>
+                            <td>Fri, 20 Jan 2023 00:55:38 +0300 (MSK)</td>
+                          </tr>
+                          <tr>
+                            <th valign="BASELINE" nowrap="nowrap" align="RIGHT">From: </th>
+                            <td><a class="moz-txt-link-abbreviated" href="mailto:t1@example.com">t1@example.com</a></td>
+                          </tr>
+                          <tr>
+                            <th valign="BASELINE" nowrap="nowrap" align="RIGHT">To: </th>
+                            <td><a class="moz-txt-link-abbreviated" href="mailto:test6@example.com">test6@example.com</a></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <br>
+                      <br>
+                      Java test mail. No attachments<br>
+                    </div>
+                  </body>
+                </html>
+                """;
+     //   helper.setText(htmlContent, true);
+        mailSender.send(mailMessage);
         assertThat(mailSender).isNotNull();
     }
 }

@@ -1,16 +1,18 @@
-package com.disposableemail.telegram.bot.handler;
+package com.disposableemail.telegram.bot.subscriber;
 
 import com.disposableemail.telegram.bot.TelegramBot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @RequiredArgsConstructor
-public class BotUpdateSubscriber implements Subscriber<SendMessage> {
+public class BotUpdateSubscriber<T> implements Subscriber<T> {
 
     private final TelegramBot telegramBot;
 
@@ -20,9 +22,17 @@ public class BotUpdateSubscriber implements Subscriber<SendMessage> {
     }
 
     @Override
-    public void onNext(SendMessage sendMessage) {
+    public void onNext(T t) {
         try {
-            telegramBot.execute(sendMessage);
+            if (t instanceof SendMessage sendMessage) {
+                telegramBot.execute(sendMessage);
+            }
+            if (t instanceof SendDocument sendDocument) {
+                telegramBot.execute(sendDocument);
+            }
+            if (t instanceof EditMessageText editMessageText) {
+                telegramBot.execute(editMessageText);
+            }
         } catch (TelegramApiException e) {
             log.error(e.getLocalizedMessage());
         }
