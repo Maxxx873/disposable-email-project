@@ -1,5 +1,6 @@
 package com.disposableemail.telegram.service;
 
+import com.disposableemail.telegram.client.disposableemail.webclient.model.Account;
 import com.disposableemail.telegram.client.disposableemail.webclient.model.Credentials;
 import com.disposableemail.telegram.client.disposableemail.webclient.model.Domain;
 import com.disposableemail.telegram.client.disposableemail.webclient.model.Message;
@@ -12,18 +13,10 @@ public interface EmailService {
 
     Flux<Domain> getDomains(@Min(1) Integer size);
 
-    Mono<String> getDomain(String id);
+    Mono<Account> createAccount(Credentials credentials);
 
-    Mono<String> getToken(Credentials credentials);
-
-    Mono<Message> getMessage(String messageId);
+    Mono<Account> deleteAccount(Credentials credentials);
 
     Flux<Message> getMessages(Credentials credentials, @Min(0) Integer page, @Max(500) Integer size);
-
-    Mono<String> getMe();
-
-    void createAccount(Credentials credentials);
-
-    void deleteAccount(Credentials credentials);
 
 }

@@ -1,23 +1,29 @@
 package com.disposableemail.telegram.bot.service.impl;
 
+import com.disposableemail.telegram.bot.error.BotErrorHandler;
 import com.disposableemail.telegram.bot.model.dto.MessageDto;
 import com.disposableemail.telegram.bot.model.mapper.MessageMapper;
 import com.disposableemail.telegram.bot.replier.BotReplier;
 import com.disposableemail.telegram.bot.service.BotMessageService;
-import com.disposableemail.telegram.bot.util.BotFileHelper;
 import com.disposableemail.telegram.dao.entity.AccountEntity;
 import com.disposableemail.telegram.dao.mapper.AccountEntityMapper;
 import com.disposableemail.telegram.service.CustomerService;
 import com.disposableemail.telegram.service.EmailService;
-import com.vdurmont.emoji.EmojiParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import reactor.core.publisher.Mono;
 
-import static com.disposableemail.telegram.bot.replier.BotReplier.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import static com.disposableemail.telegram.bot.handler.BotState.START;
+import static com.disposableemail.telegram.bot.replier.BotReplier.BUTTON_MESSAGES_NOT_FOUND;
+import static com.disposableemail.telegram.bot.replier.BotReplier.HTML_PART_NAME;
+import static com.disposableemail.telegram.bot.util.BotFileHelper.getHtmlPartsInputStream;
 import static com.disposableemail.telegram.bot.util.BotOutgoingMessage.prepareSendDocument;
 import static com.disposableemail.telegram.bot.util.BotOutgoingMessage.prepareSendMessage;
 
@@ -31,41 +37,42 @@ public class BotMessageServiceImpl implements BotMessageService {
     private final EmailService emailService;
     private final AccountEntityMapper accountEntityMapper;
     private final MessageMapper messageMapper;
+    private final BotErrorHandler errorHandler;
 
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_SIZE = 10;
 
     @Override
-    public Publisher<SendMessage> getHtmlPart(long chatId, MessageDto messageDto) {
-        return null;
-    }
-
-    @Override
     public Publisher<?> showMessages(long chatId, AccountEntity account) {
         var customer = customerService.getByChatId(chatId);
         if (customer.isPresent()) {
-            String reply = botReplier.reply(BUTTON_MESSAGES_NOT_FOUND);
-            String answer = EmojiParser.parseToUnicode(reply);
+            customer.get().setBotState(START);
+            customerService.save(customer.get());
             return emailService.getMessages(accountEntityMapper.accountEntityToCredentials(account),
                             DEFAULT_PAGE, DEFAULT_SIZE)
                     .map(messageMapper::messageToDto)
-                    .map(messageDto -> {
-                        if (messageDto.getHtml().isEmpty()) {
-                            return prepareSendMessage(customer.get().getChatId(), messageDto.toString());
-                        } else {
-                            return prepareSendDocument(customer.get().getChatId(), botReplier.reply(HTML_PART_NAME),
-                                    messageDto.toString(), BotFileHelper.getHtmlPartasInputStream(messageDto.getHtml()));
-                        }
-                    })
-                    .defaultIfEmpty(prepareSendMessage(chatId, answer));
-
+                    .collectSortedList(Comparator.reverseOrder())
+                    .map(messagesDto -> getPreparedMessages(chatId, account.getAddress(), messagesDto))
+                    .onErrorResume(e -> Mono.just(Collections.singletonList(errorHandler.handleErrorSendMessage(chatId, e))));
         } else {
-            return getDefaultMessage(chatId);
+            return Mono.just(errorHandler.handleNotRegisteredCustomerError(chatId));
         }
     }
 
-    private Mono<SendMessage> getDefaultMessage(long chatId) {
-        String messageText = botReplier.reply(NOT_REGISTERED);
-        return Mono.just(prepareSendMessage(chatId, EmojiParser.parseToUnicode(messageText)));
+    private List<Object> getPreparedMessages(long chatId, String address, List<MessageDto> messagesDto) {
+        var reply = String.join(" ", botReplier.reply(BUTTON_MESSAGES_NOT_FOUND), address);
+        var result = new ArrayList<>();
+        messagesDto.forEach(messageDto -> {
+            if (messageDto.getHtml().isEmpty()) {
+                result.add(prepareSendMessage(chatId, messageDto.getSendMessageText()));
+            } else {
+                result.add(prepareSendDocument(chatId, botReplier.reply(HTML_PART_NAME),
+                        messageDto.getSendDocumentCaption(), getHtmlPartsInputStream(messageDto.getHtml())));
+            }
+        });
+        if (result.isEmpty()) {
+            result.add(prepareSendMessage(chatId, reply));
+        }
+        return result;
     }
 }

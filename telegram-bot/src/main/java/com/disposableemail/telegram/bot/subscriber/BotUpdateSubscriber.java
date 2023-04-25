@@ -10,6 +10,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.List;
+import java.util.Objects;
+
 @Slf4j
 @RequiredArgsConstructor
 public class BotUpdateSubscriber<T> implements Subscriber<T> {
@@ -23,18 +26,10 @@ public class BotUpdateSubscriber<T> implements Subscriber<T> {
 
     @Override
     public void onNext(T t) {
-        try {
-            if (t instanceof SendMessage sendMessage) {
-                telegramBot.execute(sendMessage);
-            }
-            if (t instanceof SendDocument sendDocument) {
-                telegramBot.execute(sendDocument);
-            }
-            if (t instanceof EditMessageText editMessageText) {
-                telegramBot.execute(editMessageText);
-            }
-        } catch (TelegramApiException e) {
-            log.error(e.getLocalizedMessage());
+        if (Objects.requireNonNull(t) instanceof List<?> messages) {
+            messages.forEach(this::executeMessage);
+        } else {
+            executeMessage(t);
         }
     }
 
@@ -46,5 +41,18 @@ public class BotUpdateSubscriber<T> implements Subscriber<T> {
     @Override
     public void onComplete() {
         log.info("BotUpdateSubscriber is done!");
+    }
+
+    private void executeMessage(Object message) {
+        try {
+            switch (message) {
+                case SendMessage sendMessage -> telegramBot.execute(sendMessage);
+                case SendDocument sendDocument -> telegramBot.execute(sendDocument);
+                case EditMessageText editMessageText -> telegramBot.execute(editMessageText);
+                default -> throw new IllegalStateException("Unexpected value: " + message);
+            }
+        } catch (TelegramApiException e) {
+            log.error(e.getLocalizedMessage());
+        }
     }
 }

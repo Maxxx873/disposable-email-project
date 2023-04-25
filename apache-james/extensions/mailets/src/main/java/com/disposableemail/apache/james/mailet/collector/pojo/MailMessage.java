@@ -4,8 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -28,7 +28,7 @@ public class MailMessage {
     private boolean hasAttachment;
     private List<Attachment> attachments;
     private Integer size;
-    private LocalDate sentDate;
+    private Date sentDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

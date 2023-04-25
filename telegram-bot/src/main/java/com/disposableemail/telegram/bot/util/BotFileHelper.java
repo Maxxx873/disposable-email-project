@@ -14,8 +14,8 @@ public final class BotFileHelper {
         throw new IllegalStateException("Utility class");
     }
 
-    public static InputStream getHtmlPartasInputStream(List<String> htmlParts) {
-        if (!Objects.equals(htmlParts, null)) {
+    public static InputStream getHtmlPartsInputStream(List<String> htmlParts) {
+        if (Objects.nonNull(htmlParts)) {
             var outputStream = new ByteArrayOutputStream();
             htmlParts.forEach(htmlPart -> {
                 try {

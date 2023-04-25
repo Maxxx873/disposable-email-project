@@ -1,7 +1,6 @@
 package com.disposableemail.telegram.bot.util;
 
 import com.disposableemail.telegram.bot.model.CallbackData;
-import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -14,46 +13,59 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.vdurmont.emoji.EmojiParser.parseToUnicode;
+
 public final class BotOutgoingMessage {
 
-    private static final int MAX_CAPTION_SIZE = 1024;
-    private static final int MAX_TEXT_SIZE = 4096;
-    private static final String END_MESSAGE = "...";
-
+    private static final String HTML_PARSE_MODE = "HTML";
 
     private BotOutgoingMessage() {
         throw new IllegalStateException("Utility class");
     }
 
-    public static EditMessageText editMessage(Message message, String reply) {
+    public static EditMessageText prepareEditMessage(Message message, String reply) {
+        return EditMessageText.builder()
+                .chatId(message.getChatId())
+                .parseMode(HTML_PARSE_MODE)
+                .messageId(message.getMessageId())
+                .text(parseToUnicode(reply))
+                .build();
+    }
+
+    public static <T> EditMessageText editMessageWithInlineKeyboard(Message message, List<CallbackData<T>> callbackData, String reply) {
         return EditMessageText.builder()
                 .chatId(message.getChatId())
                 .messageId(message.getMessageId())
-                .text(reply)
+                .text(parseToUnicode(reply))
+                .replyMarkup(getInlineButtons(callbackData))
                 .build();
     }
 
     public static SendDocument prepareSendDocument(long chatId, String filename, String caption, InputStream inputStream) {
-        var sendDocumentRequest = new SendDocument();
-        sendDocumentRequest.setChatId(chatId);
-        sendDocumentRequest.setDocument(new InputFile(inputStream, filename));
-        sendDocumentRequest.setCaption(truncateCaption(caption));
-        return sendDocumentRequest;
+        return SendDocument.builder()
+                .chatId(chatId)
+                .parseMode(HTML_PARSE_MODE)
+                .document(new InputFile(inputStream, filename))
+                .caption(parseToUnicode(caption))
+                .build();
     }
 
     public static SendMessage prepareSendMessage(long chatId, String textToSend) {
-        var message = new SendMessage();
-        message.setChatId(chatId);
-        message.setText(textToSend);
-        return message;
+        return SendMessage.builder()
+                .chatId(chatId)
+                .parseMode(HTML_PARSE_MODE)
+                .text(parseToUnicode(textToSend))
+                .build();
     }
 
-    public static <T> SendMessage prepareSendMessageWithInlineKeyboard(long chatId, List<CallbackData<T>> callbackData, String textToSend) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(truncateText(textToSend));
-        message.setReplyMarkup(getInlineButtons(callbackData));
-        return message;
+    public static <T> SendMessage prepareSendMessageWithInlineKeyboard(long chatId, List<CallbackData<T>> callbackData,
+                                                                       String textToSend) {
+        return SendMessage.builder()
+                .chatId(chatId)
+                .text(parseToUnicode(textToSend))
+                .parseMode(HTML_PARSE_MODE)
+                .replyMarkup(getInlineButtons(callbackData))
+                .build();
     }
 
     private static <T> InlineKeyboardMarkup getInlineButtons(List<CallbackData<T>> callbackData) {
@@ -73,17 +85,4 @@ public final class BotOutgoingMessage {
         return keyboardButtonsRow;
     }
 
-    private static String truncateCaption(String caption) {
-        if (caption.length() > MAX_CAPTION_SIZE) {
-            return StringUtils.truncate(caption, MAX_CAPTION_SIZE - END_MESSAGE.length()) + END_MESSAGE;
-        }
-        return caption;
-    }
-
-    private static String truncateText(String text) {
-        if (text.length() > MAX_TEXT_SIZE) {
-            return StringUtils.truncate(text, MAX_TEXT_SIZE - END_MESSAGE.length()) + END_MESSAGE;
-        }
-        return text;
-    }
 }

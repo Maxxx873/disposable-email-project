@@ -16,6 +16,9 @@ import com.disposableemail.core.service.api.mail.MailServerClientService;
 import com.disposableemail.core.util.EmailUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.IDToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
@@ -24,7 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import static com.disposableemail.core.event.Event.Type;
+import static com.disposableemail.core.event.Event.Type.*;
 
 @Slf4j
 @Service
@@ -55,7 +58,7 @@ public class AccountServiceImpl implements AccountService {
                     log.info("Using a Domain: {}", domainEntity.toString());
                     if (Boolean.TRUE.equals(domainEntity.getIsActive()) &&
                             Boolean.FALSE.equals(domainEntity.getIsPrivate())) {
-                        eventProducer.send(new Event<>(Type.START_CREATING_ACCOUNT, getEncryptCredentials(credentials)));
+                        eventProducer.send(new Event<>(START_CREATING_ACCOUNT, getEncryptCredentials(credentials)));
                         return accountRepository.findByAddress(credentials.getAddress().toLowerCase())
                                 .flatMap(accountEntity -> Mono.error(AccountAlreadyRegisteredException::new))
                                 .then(accountRepository.save(getNewAccountEntity(credentials)));
@@ -86,6 +89,25 @@ public class AccountServiceImpl implements AccountService {
                 })
                 .flatMap(accountRepository::findByAddress);
     }
+
+    //TODO get userID
+    public Mono<String> getUserIdFromJwt() {
+        log.info("Getting an User ID from JWT");
+
+        return ReactiveSecurityContextHolder.getContext()
+                .map(context -> context.getAuthentication().getPrincipal())
+                .map(principal -> {
+                    String userIdfromJwt = "";
+                    if (principal instanceof KeycloakPrincipal) {
+                        KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
+                        IDToken token = kPrincipal.getKeycloakSecurityContext().getIdToken();
+                        userIdfromJwt = token.getSubject();
+                        log.info("Received User ID from JWT | {}", userIdfromJwt);
+                    }
+                    return userIdfromJwt;
+                });
+    }
+
 
     @Override
     public Mono<AccountEntity> getAccountWithUsedSize(ServerWebExchange exchange) {
@@ -146,6 +168,21 @@ public class AccountServiceImpl implements AccountService {
                 .flatMap(accountEntity -> {
                     log.info("Account {} is deleted", id);
                     return accountRepository.delete(accountEntity).then(Mono.just(accountEntity));
+                });
+    }
+
+    @Override
+    public Mono<AccountEntity> softDeleteAccount(String id) {
+        log.info("Soft deleting an Account {}}", id);
+
+        return accountRepository
+                .findById(id)
+                .switchIfEmpty(Mono.error(new AccountNotFoundException()))
+                .flatMap(accountEntity -> {
+                    log.info("Account {} is soft deleted", id);
+                    accountEntity.setIsDeleted(true);
+              //      eventProducer.send(new Event<>(START_DELETING_ACCOUNT, id));
+                    return accountRepository.save(accountEntity).then(Mono.just(accountEntity));
                 });
     }
 

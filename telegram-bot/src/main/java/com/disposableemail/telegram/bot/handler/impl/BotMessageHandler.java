@@ -27,7 +27,7 @@ public class BotMessageHandler {
 
     private BotState botState;
 
-    public Publisher<SendMessage> processMessage(Update update) {
+    public Publisher<?> processMessage(Update update) {
         long chatId = update.getMessage().getChatId();
         var customer = customerService.getByChatId(chatId);
         customer.ifPresent(customerEntity -> botState = customerEntity.getBotState());

@@ -19,6 +19,9 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.MimeBodyPart;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -38,9 +41,8 @@ public class SourceCollectorTestHelper {
     protected MongodConfig mongodConfig;
     protected BasicMailCollector mailet;
     protected Account account;
-
     protected CodecRegistry pojoCodecRegistry;
-
+    protected SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault());
 
 
     @BeforeEach

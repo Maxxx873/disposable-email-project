@@ -8,20 +8,20 @@ import com.disposableemail.telegram.bot.service.BotMessageService;
 import com.disposableemail.telegram.client.disposableemail.webclient.model.Domain;
 import com.disposableemail.telegram.dao.entity.AccountEntity;
 import com.disposableemail.telegram.service.CustomerService;
-import com.vdurmont.emoji.EmojiParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
 import static com.disposableemail.telegram.bot.replier.BotReplier.ADDITIONAL_HELP;
 import static com.disposableemail.telegram.bot.replier.BotReplier.OUTDATED;
-import static com.disposableemail.telegram.bot.util.BotOutgoingMessage.editMessage;
+import static com.disposableemail.telegram.bot.util.BotOutgoingMessage.prepareEditMessage;
 
 @Slf4j
 @Component
@@ -44,12 +44,12 @@ public class BotCallbackQueryHandler {
 
         if (callbackData.isEmpty()) {
             String messageText = botReplier.reply(OUTDATED) + botReplier.reply(ADDITIONAL_HELP);
-            return Mono.just(editMessage(callbackQuery.getMessage(), EmojiParser.parseToUnicode(messageText)));
+            return Mono.just(prepareEditMessage(callbackQuery.getMessage(), messageText));
         }
 
         if (customer.isPresent()) {
             return switch (callbackData.get().getData()) {
-                case AccountEntity account -> choiceAccountAnswer(chatId, account);
+                case AccountEntity account -> choiceAccountAnswer(callbackQuery.getMessage(), account);
                 case Domain domain -> botAccountService.createAccount(chatId, domain);
                 default -> throw new IllegalStateException("Unexpected value: " + callbackData.get().getData());
             };
@@ -57,13 +57,15 @@ public class BotCallbackQueryHandler {
         return Mono.empty();
     }
 
-    private Publisher<?> choiceAccountAnswer(long chatId, AccountEntity account) {
+    private Publisher<?> choiceAccountAnswer(Message message, AccountEntity account) {
         if (callbackData.isPresent()) {
             return switch (callbackData.get().getAction()) {
-                case GET -> botMessageService.showMessages(chatId, account);
-                case DELETE -> {
+                case GET_MESSAGES -> botMessageService.showMessages(message.getChatId(), account);
+                case CANCEL -> botAccountService.showAccount(message, account);
+                case DELETE -> botAccountService.deleteAccountQuestion(message, account);
+                case CONFIRM_DELETE -> {
                     botCallbackService.deleteCallbackData(callbackData.get().getId());
-                    yield botAccountService.deleteAccount(chatId, account);
+                    yield botAccountService.deleteAccount(message, account);
                 }
             };
         }

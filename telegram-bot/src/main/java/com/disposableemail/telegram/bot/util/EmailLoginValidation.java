@@ -13,7 +13,7 @@ public final class EmailLoginValidation {
     }
 
     public static boolean isValid(String emailLogin) {
-        if (Objects.equals(emailLogin, null)) {
+        if (Objects.isNull(emailLogin)) {
             return false;
         } else {
             return Pattern.compile(REGEX_PATTERN)

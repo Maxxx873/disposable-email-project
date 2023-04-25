@@ -13,6 +13,7 @@ public class CallbackData<T> {
 
     private String id;
     private long chatId;
+    private long messageId;
     private BotAction action;
     private String text;
     private T data;

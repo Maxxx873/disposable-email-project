@@ -19,7 +19,10 @@ import javax.mail.internet.MimeMessage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,6 +96,8 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
                             "attachments", "size", "sentDate", "createdAt", "updatedAt");
                     assertThat(Objects.requireNonNull(doc).getList("attachments", Object.class)).isEmpty();
                     assertThat(Objects.requireNonNull(doc).get("text")).isEqualTo("Java test mail. No attachments");
+                    assertThat(simpleDateFormat.format(Objects.requireNonNull(doc).get("sentDate")))
+                            .isEqualTo("2023-02-15T23:16:53.000+03:00");
                     assertThat(ObjectId.isValid(Objects.requireNonNull(doc).get("accountId").toString())).isEqualTo(true);
                     assertThat(Objects.requireNonNull(doc).get("isUnread")).isEqualTo(true);
                     assertThat(Objects.requireNonNull(doc).get("isUnread")).isEqualTo(true);
@@ -147,11 +152,14 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
                             "attachments", "isUnread", "isFlagged", "isDeleted", "text", "html", "hasAttachment",
                             "attachments", "size", "sentDate", "createdAt", "updatedAt");
                     try {
-                        assertThat(Objects.requireNonNull(doc).getList("attachments", Object.class)).hasSize(getExpectedPartCount(multiPart));
+                        assertThat(Objects.requireNonNull(doc).getList("attachments", Object.class))
+                                .hasSize(getExpectedPartCount(multiPart));
                     } catch (MessagingException e) {
                         throw new RuntimeException(e);
                     }
                     assertThat(Objects.requireNonNull(doc).get("text")).isEqualTo("test text message\n");
+                    assertThat(simpleDateFormat.format(Objects.requireNonNull(doc).get("sentDate")))
+                            .isEqualTo("2022-11-13T22:41:43.000+03:00");
                     assertThat(ObjectId.isValid(Objects.requireNonNull(doc).get("accountId").toString())).isTrue();
                     assertThat(Objects.requireNonNull(doc).get("isUnread")).isEqualTo(true);
                     assertThat(Objects.requireNonNull(doc).get("isUnread")).isEqualTo(true);

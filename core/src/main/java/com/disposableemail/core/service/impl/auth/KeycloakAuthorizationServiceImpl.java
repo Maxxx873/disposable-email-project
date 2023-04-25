@@ -18,8 +18,9 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.disposableemail.core.event.Event.Type;
+import static com.disposableemail.core.event.Event.Type.*;
 
 
 @Slf4j
@@ -44,7 +45,14 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         userRepresentation.setUsername(credentials.getAddress());
         credentialRepresentation.setValue(encryptor.decrypt(credentials.getPassword()));
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
-        return CompletableFuture.completedFuture(getKeycloakResponse(credentials));
+        return CompletableFuture.completedFuture(getKeycloakCreateUserResponse(credentials));
+    }
+
+    //TODO delete
+
+    public CompletableFuture<Response> deleteUser(String username) {
+        userRepresentation.setUsername(username);
+        return CompletableFuture.completedFuture(getKeycloakDeleteUserResponse(username));
     }
 
     @Override
@@ -56,7 +64,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         return new Token(tokenManager.getAccessTokenString());
     }
 
-    private Response getKeycloakResponse(Credentials credentials) {
+    private Response getKeycloakCreateUserResponse(Credentials credentials) {
         var response = keycloak.realm(realm).users().create(userRepresentation);
         if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {
             log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
@@ -64,7 +72,23 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
             throw new AccountAlreadyRegisteredException();
         }
         if (response.getStatusInfo().equals(Response.Status.CREATED)) {
-            eventProducer.send(new Event<>(Type.KEYCLOAK_REGISTER_CONFIRMATION, credentials));
+            eventProducer.send(new Event<>(KEYCLOAK_REGISTER_CONFIRMATION, credentials));
+        }
+        log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
+                response.getStatus(), response.getStatusInfo());
+        return response;
+    }
+
+    //TODO delete
+    private Response getKeycloakDeleteUserResponse(String id) {
+        var response = keycloak.realm(realm).users().delete(userRepresentation.getId());
+        if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {
+            log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
+                    response.getStatus(), response.getStatusInfo());
+            throw new AccountAlreadyRegisteredException();
+        }
+        if (response.getStatusInfo().equals(Response.Status.CREATED)) {
+            eventProducer.send(new Event<>(KEYCLOAK_DELETING_CONFIRMATION, id));
         }
         log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
                 response.getStatus(), response.getStatusInfo());

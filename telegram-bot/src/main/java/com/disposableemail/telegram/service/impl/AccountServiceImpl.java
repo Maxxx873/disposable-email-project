@@ -1,6 +1,5 @@
 package com.disposableemail.telegram.service.impl;
 
-import com.disposableemail.telegram.bot.event.AccountDeletionEventPublisher;
 import com.disposableemail.telegram.client.disposableemail.webclient.model.Credentials;
 import com.disposableemail.telegram.dao.entity.AccountEntity;
 import com.disposableemail.telegram.dao.repository.AccountRepository;
@@ -23,7 +22,6 @@ import java.util.Optional;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
-    private final AccountDeletionEventPublisher publisher;
     private final TextEncryptor encryptor;
 
     @Override
@@ -43,7 +41,6 @@ public class AccountServiceImpl implements AccountService {
             credentials.setAddress(accountEntity.getAddress());
             credentials.setPassword(encryptor.decrypt(accountEntity.getPassword()));
             accountRepository.deleteById(accountEntity.getId());
-            publisher.publish(credentials);
         });
     }
 

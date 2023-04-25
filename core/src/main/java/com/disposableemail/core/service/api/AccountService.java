@@ -23,4 +23,6 @@ public interface AccountService {
     Mono<AccountEntity> getAccountByAddress(String address);
 
     Mono<AccountEntity> deleteAccount(String id);
+
+    Mono<AccountEntity> softDeleteAccount(String id);
 }

@@ -28,11 +28,12 @@ public class DomainServiceImpl implements DomainService {
         log.info("Getting a Domains collection | Size {}", size);
 
         return mailServerClientService.getDomains()
-                .flatMap(domainEntity -> domainRepository.findByDomain(domainEntity.getDomain()).switchIfEmpty(Mono.defer(() -> {
-                    log.info("Added a new Domain from {} | {} ", mailServerName, domainEntity.getDomain());
-                    return domainRepository.save(domainEntity);
+                .flatMap(domain -> domainRepository.findByDomain(domain.getDomain()).switchIfEmpty(Mono.defer(() -> {
+                    log.info("Added a new Domain from {} | {} ", mailServerName, domain.getDomain());
+                    return domainRepository.save(domain);
                 })))
-                .thenMany(domainRepository.findByIdNotNullOrderByCreatedAtDesc(PageRequest.ofSize(size)));
+                .thenMany(domainRepository.findByIdNotNullOrderByCreatedAtDesc(PageRequest.ofSize(size)))
+                .filter(domain -> !(domain.getDomain() != null && domain.getDomain().equals("localhost")));
     }
 
     @Override

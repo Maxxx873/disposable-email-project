@@ -23,9 +23,7 @@ import javax.mail.internet.MimeMultipart;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -133,7 +131,7 @@ public class BasicMailCollector extends GenericMailet {
                 .hasAttachment(!attachments.isEmpty())
                 .attachments(attachments)
                 .size(mimeMessage.getSize())
-                .sentDate(convertToLocalDateViaInstant(mimeMessage.getSentDate()))
+                .sentDate(mimeMessage.getSentDate())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -178,14 +176,7 @@ public class BasicMailCollector extends GenericMailet {
     }
 
     protected static String getShortContentType(String contentType) {
-        var items = contentType.split(";");
-        return items[0];
-    }
-
-    private static LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
-        return dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+        return Arrays.stream(contentType.split(";")).findFirst().orElse("");
     }
 
     private static List<Address> mapJavaxMailAddressToAddress(javax.mail.Address[] addresses) {
