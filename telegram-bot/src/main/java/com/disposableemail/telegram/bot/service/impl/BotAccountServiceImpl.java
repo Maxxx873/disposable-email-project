@@ -53,6 +53,23 @@ public class BotAccountServiceImpl implements BotAccountService {
     private static final int BUILDER_CAPACITY = 100;
 
     @Override
+    public Publisher<SendMessage> createAccount(long chatId, Domain domain) {
+        var customer = customerService.getByChatId(chatId);
+        if (customer.isPresent()) {
+            var account = AccountEntity.builder()
+                    .domain(domain.getDomain())
+                    .customer(customer.get())
+                    .build();
+            incompleteAccounts.putIfAbsent(chatId, account);
+            var reply = String.join(" ", botReplier.reply(ACCOUNTS_LOGIN_ENTER), domain.getDomain());
+            customer.get().setBotState(WAITING_FOR_LOGIN_ENTRY);
+            customerService.save(customer.get());
+            return Mono.just(prepareSendMessage(chatId, reply));
+        }
+        return Mono.empty();
+    }
+
+    @Override
     public Publisher<SendMessage> enterLogin(long chatId, String login) {
         var reply = new StringBuilder(BUILDER_CAPACITY);
         var customer = customerService.getByChatId(chatId);
@@ -78,7 +95,6 @@ public class BotAccountServiceImpl implements BotAccountService {
         }
         customer.ifPresent(customerEntity -> customerService.save(customer.get()));
         return Mono.just(prepareSendMessage(chatId, reply.toString()));
-
     }
 
     @Override
@@ -94,23 +110,6 @@ public class BotAccountServiceImpl implements BotAccountService {
                 .doOnSuccess(a -> botSaveAccount(chatId, account, customer))
                 .map(a -> prepareSendMessage(chatId, reply))
                 .onErrorResume(e -> Mono.just(errorHandler.handleErrorSendMessage(chatId, e)));
-    }
-
-    @Override
-    public Publisher<SendMessage> createAccount(long chatId, Domain domain) {
-        var customer = customerService.getByChatId(chatId);
-        if (customer.isPresent()) {
-            var account = AccountEntity.builder()
-                    .domain(domain.getDomain())
-                    .customer(customer.get())
-                    .build();
-            incompleteAccounts.putIfAbsent(chatId, account);
-            var reply = String.join(" ", botReplier.reply(ACCOUNTS_LOGIN_ENTER), domain.getDomain());
-            customer.get().setBotState(WAITING_FOR_LOGIN_ENTRY);
-            customerService.save(customer.get());
-            return Mono.just(prepareSendMessage(chatId, reply));
-        }
-        return Mono.empty();
     }
 
     @Override
@@ -142,18 +141,9 @@ public class BotAccountServiceImpl implements BotAccountService {
         var reply = String.join(" ", botReplier.reply(ACCOUNT_DELETED), account.getAddress(),
                 botReplier.reply(ADDITIONAL_HELP));
         return emailService.deleteAccount(accountEntityMapper.accountEntityToCredentials(account))
-                .doOnSuccess(a -> botDeleteAccount(message, account))
                 .map(a -> prepareEditMessage(message, reply))
-                .onErrorResume(e -> Mono.just(errorHandler.handleErrorEditMessage(message, e)));
-    }
-
-    private void botDeleteAccount(Message message, AccountEntity account) {
-        var customer = customerService.getByChatId(message.getChatId());
-        customer.ifPresent(customerEntity -> {
-            customerEntity.removeAccountByAddress(account.getAddress());
-            accountService.deleteByAddress(account.getAddress());
-            customerService.save(customerEntity);
-        });
+                .onErrorResume(e -> Mono.just(errorHandler.handleErrorEditMessage(message, e)))
+                .doOnSuccess(a -> accountService.delete(account));
     }
 
     private void botSaveAccount(long chatId, AccountEntity account, Optional<CustomerEntity> customer) {

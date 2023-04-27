@@ -17,8 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,14 +77,14 @@ class SyncSourceCollectorMailetTest extends SourceCollectorTestHelper {
         assertThat(Objects.requireNonNull(messageDoc).get("text")).isEqualTo("Java test mail. No attachments");
         assertThat(simpleDateFormat.format(Objects.requireNonNull(messageDoc).get("sentDate")))
                 .isEqualTo("2023-02-15T23:16:53.000+03:00");
-        assertThat(ObjectId.isValid(Objects.requireNonNull(messageDoc).get("accountId").toString())).isEqualTo(true);
+        assertThat(ObjectId.isValid(Objects.requireNonNull(messageDoc).get("accountId").toString())).isTrue();
         assertThat(Objects.requireNonNull(messageDoc).get("isUnread")).isEqualTo(true);
         assertThat(Objects.requireNonNull(messageDoc).get("isUnread")).isEqualTo(true);
         assertThat(Objects.requireNonNull(messageDoc).get("isFlagged")).isEqualTo(false);
         assertThat(Objects.requireNonNull(messageDoc).get("isDeleted")).isEqualTo(false);
         assertThat(Objects.requireNonNull(messageDoc).get("hasAttachment")).isEqualTo(false);
-        assertThat(Objects.requireNonNull(messageDoc).get("html").toString().contains(EXPECTED_HTML)).isTrue();
-        assertThat(Integer.parseInt(Objects.requireNonNull(messageDoc).get("size").toString())).isGreaterThan(0);
+        assertThat(Objects.requireNonNull(messageDoc).get("html").toString()).contains(EXPECTED_HTML);
+        assertThat(Integer.parseInt(Objects.requireNonNull(messageDoc).get("size").toString())).isPositive();
 
     }
 
@@ -119,7 +117,6 @@ class SyncSourceCollectorMailetTest extends SourceCollectorTestHelper {
         assertThat(simpleDateFormat.format(Objects.requireNonNull(messageDoc).get("sentDate")))
                 .isEqualTo("2022-11-13T22:41:43.000+03:00");
         assertThat(ObjectId.isValid(Objects.requireNonNull(messageDoc).get("accountId").toString())).isTrue();
-        assertThat(Objects.requireNonNull(messageDoc).get("isUnread")).isEqualTo(true);
         assertThat(Objects.requireNonNull(messageDoc).get("isUnread")).isEqualTo(true);
         assertThat(Objects.requireNonNull(messageDoc).get("isFlagged")).isEqualTo(false);
         assertThat(Objects.requireNonNull(messageDoc).get("isDeleted")).isEqualTo(false);

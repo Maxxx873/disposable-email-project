@@ -7,7 +7,8 @@ import java.util.Optional;
 public interface AccountService {
 
     Optional<AccountEntity> findByAddress(String address);
-    void deleteByAddress(String address);
+
+    void delete(AccountEntity account);
 
     AccountEntity createAccount(AccountEntity accountEntity);
 }

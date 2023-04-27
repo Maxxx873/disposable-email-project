@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.OffsetDateTime;
+
 /**
  * A Domain entity.
  */
@@ -32,9 +34,9 @@ public class DomainEntity {
 
     @CreatedDate
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private java.time.LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @LastModifiedBy
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private java.time.LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 }

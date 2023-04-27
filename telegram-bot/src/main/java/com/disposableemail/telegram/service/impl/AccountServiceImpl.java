@@ -1,6 +1,5 @@
 package com.disposableemail.telegram.service.impl;
 
-import com.disposableemail.telegram.client.disposableemail.webclient.model.Credentials;
 import com.disposableemail.telegram.dao.entity.AccountEntity;
 import com.disposableemail.telegram.dao.repository.AccountRepository;
 import com.disposableemail.telegram.service.AccountService;
@@ -9,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.crypto.encrypt.TextEncryptor;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,6 @@ import java.util.Optional;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
-    private final TextEncryptor encryptor;
 
     @Override
     @Cacheable(cacheNames = "accounts", key = "#address")
@@ -32,16 +30,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @CacheEvict(value = "accounts", key = "#address")
-    public void deleteByAddress(String address) {
-        log.info("Deleting an Account by address | {}", address);
-        var account = accountRepository.findByAddress(address);
-        account.ifPresent(accountEntity -> {
-            var credentials = new Credentials();
-            credentials.setAddress(accountEntity.getAddress());
-            credentials.setPassword(encryptor.decrypt(accountEntity.getPassword()));
-            accountRepository.deleteById(accountEntity.getId());
-        });
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "accounts", key="#account.address"),
+            @CacheEvict(cacheNames = "customers", key="#account.customer.chatId")
+    })
+    public void delete(AccountEntity account) {
+        log.info("Deleting an Account | {}", account.getAddress());
+        accountRepository.delete(account);
     }
 
     @Override

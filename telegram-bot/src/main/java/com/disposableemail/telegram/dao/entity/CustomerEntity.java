@@ -48,11 +48,6 @@ public class CustomerEntity extends Auditable {
         accountEntity.setCustomer(this);
     }
 
-    public void removeAccount(AccountEntity accountEntity) {
-        this.accounts.remove(accountEntity);
-        accountEntity.setCustomer(null);
-    }
-
     public void removeAccountByAddress(String address) {
         accounts.removeIf(accountEntity -> Objects.equals(accountEntity.getAddress(), address));
     }

@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -42,7 +42,10 @@ public class MessageEntity {
     private Boolean isFlagged;
     private Boolean isDeleted;
     private String text;
-    private LocalDateTime sentDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private OffsetDateTime sentDate;
+
     private List<String> html;
     private Boolean hasAttachment;
     private List<AttachmentEntity> attachments;
@@ -50,9 +53,9 @@ public class MessageEntity {
 
     @CreatedDate
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @LastModifiedBy
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 }
