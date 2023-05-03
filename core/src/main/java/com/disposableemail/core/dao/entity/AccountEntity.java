@@ -1,30 +1,24 @@
 package com.disposableemail.core.dao.entity;
 
+import com.disposableemail.core.model.Credentials;
 import jakarta.validation.constraints.Email;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.OffsetDateTime;
 
 /**
  * An Account entity.
  */
-@Data
+@Getter
+@Setter
 @Builder
-@ToString
 @NoArgsConstructor
-@EqualsAndHashCode
 @AllArgsConstructor
 @Document(collection = "account")
-public class AccountEntity {
+public class AccountEntity extends Auditable {
 
     @Id
-    @Setter(AccessLevel.NONE)
     private String id;
 
     @Email
@@ -37,12 +31,14 @@ public class AccountEntity {
     private Integer quota;
     private Integer used;
 
-    @CreatedDate
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private OffsetDateTime createdAt;
-
-    @LastModifiedBy
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private OffsetDateTime updatedAt;
+    public static AccountEntity createAccountEntityFromCredentials(Credentials credentials, String quotaSize) {
+        return AccountEntity.builder()
+                .address(credentials.getAddress())
+                .isDeleted(false)
+                .isDisabled(false)
+                .used(0)
+                .quota(Integer.parseInt(quotaSize))
+                .build();
+    }
 
 }

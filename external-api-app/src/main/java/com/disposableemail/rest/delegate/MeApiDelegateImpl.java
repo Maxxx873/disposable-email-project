@@ -27,7 +27,7 @@ public class MeApiDelegateImpl implements MeApiDelegate {
     @Override
     public Mono<ResponseEntity<Account>> getMeAccountItem(ServerWebExchange exchange) {
 
-        return accountService.getAccountWithUsedSize(exchange)
+        return accountService.getAuthorizedAccountWithUsedSize(exchange)
                 .map(accountMapper::accountEntityToAccount)
                 .map(account -> {
                     log.info("Extracted authenticated Account: {}", account.toString());

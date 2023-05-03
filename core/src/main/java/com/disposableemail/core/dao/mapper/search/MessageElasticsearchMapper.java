@@ -15,6 +15,7 @@ public interface MessageElasticsearchMapper {
     @Mapping(source = "textBody", target = "text")
     @Mapping(source = "htmlBody", target = "html")
     @Mapping(source = "mimeMessageID", target = "msgid")
+    @BeanMapping(builder = @Builder(disableBuilder = true))
     MessageEntity messageElasticsearchEntityToMessageEntity(MessageElasticsearchEntity messageElasticsearchEntity);
 
     @Mapping(source = "messageId", target = "id")

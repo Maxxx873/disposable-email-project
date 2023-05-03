@@ -23,7 +23,13 @@ public class EventProducer {
     private String messagesGettingRoutingKey;
 
     @Value("${routing-keys.account-start-creating}")
-    private String accountStartCrestingRoutingKey;
+    private String accountStartCreatingRoutingKey;
+
+    @Value("${routing-keys.account-auth-deleting}")
+    private String accountAuthDeletingRoutingKey;
+
+    @Value("${routing-keys.account-mail-deleting}")
+    private String accountMailDeletingRoutingKey;
 
     @Value("${routing-keys.account-auth-confirmation}")
     private String accountAuthConfirmRoutingKey;
@@ -37,6 +43,7 @@ public class EventProducer {
     @Value("${routing-keys.account-quota-in-mail-service-updating}")
     private String accountQuotaInMailServiceUpdatingRoutingKey;
 
+
     private final RabbitTemplate rabbitTemplate;
 
     public void send(Event<?> event) {
@@ -46,8 +53,8 @@ public class EventProducer {
             case GETTING_MESSAGES ->
                     rabbitTemplate.convertAndSend(messagesExchange, messagesGettingRoutingKey, event.getData());
             case START_CREATING_ACCOUNT ->
-                    rabbitTemplate.convertAndSend(accountsExchange, accountStartCrestingRoutingKey, event.getData());
-            case KEYCLOAK_REGISTER_CONFIRMATION ->
+                    rabbitTemplate.convertAndSend(accountsExchange, accountStartCreatingRoutingKey, event.getData());
+            case AUTH_REGISTER_CONFIRMATION ->
                     rabbitTemplate.convertAndSend(accountsExchange, accountAuthConfirmRoutingKey, event.getData());
             case ACCOUNT_CREATED_IN_MAIL_SERVICE ->
                     rabbitTemplate.convertAndSend(accountsExchange, accountInMailServiceCreatingRoutingKey, event.getData());
@@ -55,6 +62,10 @@ public class EventProducer {
                     rabbitTemplate.convertAndSend(accountsExchange, accountMailboxInMailServiceCreatingRoutingKey, event.getData());
             case QUOTA_SIZE_UPDATED_IN_MAIL_SERVICE ->
                     rabbitTemplate.convertAndSend(accountsExchange, accountQuotaInMailServiceUpdatingRoutingKey, event.getData());
+            case AUTH_DELETING_ACCOUNT ->
+                    rabbitTemplate.convertAndSend(accountsExchange, accountAuthDeletingRoutingKey, event.getData());
+            case MAIL_DELETING_ACCOUNT ->
+                    rabbitTemplate.convertAndSend(accountsExchange, accountMailDeletingRoutingKey, event.getData());
             default -> throw new UnsupportedOperationException();
         }
     }

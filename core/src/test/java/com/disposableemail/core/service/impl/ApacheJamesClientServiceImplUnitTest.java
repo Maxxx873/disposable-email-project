@@ -101,6 +101,8 @@ class ApacheJamesClientServiceImplUnitTest {
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersSpec;
     @Mock
+    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    @Mock
     private WebClient.ResponseSpec response;
 
     private MailServerClientService mailServerClientService;
@@ -166,6 +168,23 @@ class ApacheJamesClientServiceImplUnitTest {
                 .thenReturn(Mono.empty());
 
         Mono<Response> response = mailServerClientService.createUser(credentials);
+
+        StepVerifier.create(response).expectComplete().verify();
+
+    }
+
+    @Test
+    void shouldDeleteUser() throws JsonProcessingException {
+
+        var credentials = new Credentials(USERNAME, PASSWORD);
+        var uri = String.format("/users/%s", USERNAME);
+
+        when(webClientMock.delete()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(uri)).thenReturn(requestBodySpec);
+        when(requestBodySpec.exchangeToMono(ArgumentMatchers.<Function<ClientResponse, ? extends Mono<String>>>notNull()))
+                .thenReturn(Mono.empty());
+
+        Mono<Response> response = mailServerClientService.deleteUser(credentials.getAddress());
 
         StepVerifier.create(response).expectComplete().verify();
 
@@ -241,7 +260,7 @@ class ApacheJamesClientServiceImplUnitTest {
     }
 
     @Test
-    void shouldGetUsedSizeForUSer() {
+    void shouldGetUsedSizeForUser() {
 
         var expectedUsedSize = 33640;
         var uri = String.format("/quota/users/%s", USERNAME);

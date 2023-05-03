@@ -16,6 +16,8 @@ public interface MailServerClientService {
 
     Mono<String> getMailboxId(Credentials credentials, String mailboxName);
 
+    Mono<Response>  deleteUser(String username);
+
     Mono<Response> createMailbox(Credentials credentials);
 
     Mono<Integer> getQuotaSize(String username);

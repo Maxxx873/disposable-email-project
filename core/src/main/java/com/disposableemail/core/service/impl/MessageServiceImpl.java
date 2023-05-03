@@ -3,6 +3,7 @@ package com.disposableemail.core.service.impl;
 import com.disposableemail.core.dao.entity.AccountEntity;
 import com.disposableemail.core.dao.entity.MessageEntity;
 import com.disposableemail.core.dao.repository.MessageRepository;
+import com.disposableemail.core.security.UserCredentials;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import static com.disposableemail.core.security.SecurityUtils.getCredentialsFromJwt;
 
 @Slf4j
 @Service
@@ -40,7 +43,7 @@ public class MessageServiceImpl implements MessageService {
     public Mono<MessageEntity> getMessage(String messageId, ServerWebExchange exchange) {
         log.info("Getting a Message | Id {}", messageId);
 
-        return accountService.getAccountFromJwt(exchange).map(AccountEntity::getId)
+        return getAccountEntityMono().map(AccountEntity::getId)
                 .flatMap(accountId -> messageRepository.findByIdAndAccountIdAndIsDeletedFalse(messageId, accountId));
     }
 
@@ -48,7 +51,7 @@ public class MessageServiceImpl implements MessageService {
     public Mono<MessageEntity> updateMessage(String messageId, MessageEntity messageEntity, ServerWebExchange exchange) {
         log.info("Updating a Message | Id: {}", messageId);
 
-        return accountService.getAccountFromJwt(exchange).map(AccountEntity::getId)
+        return getAccountEntityMono().map(AccountEntity::getId)
                 .flatMap(accountId -> messageRepository.findByIdAndAccountIdAndIsDeletedFalse(messageId, accountId))
                 .map(message -> {
                     messageRepository.save(messageEntity).subscribe();
@@ -62,7 +65,7 @@ public class MessageServiceImpl implements MessageService {
     public Mono<MessageEntity> softDeleteMessage(String messageId, ServerWebExchange exchange) {
         log.info("Deleting a Message | Id: {}", messageId);
 
-        return accountService.getAccountFromJwt(exchange).map(AccountEntity::getId)
+        return getAccountEntityMono().map(AccountEntity::getId)
                 .flatMap(accountId -> messageRepository.findByIdAndAccountIdAndIsDeletedFalse(messageId, accountId))
                 .map(messageEntity -> {
                     messageEntity.setIsDeleted(true);
@@ -75,7 +78,7 @@ public class MessageServiceImpl implements MessageService {
     public Flux<MessageEntity> getMessages(Integer size, ServerWebExchange exchange) {
         log.info("Getting a Messages collection | Size: {}", size);
 
-        return accountService.getAccountFromJwt(exchange)
+        return getAccountEntityMono()
                 .map(AccountEntity::getId)
                 .flatMapMany(accountId ->
                         messageRepository.findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountId,
@@ -84,10 +87,15 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Flux<MessageEntity> getMessagesByAccountId(Pageable pageable, ServerWebExchange exchange) {
-        return accountService.getAccountFromJwt(exchange)
+        return getAccountEntityMono()
                 .flatMapMany(accountEntity -> {
                     log.info("Getting a Messages collection | mailboxId: {}", accountEntity.getMailboxId());
                     return messageRepository.findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountEntity.getId(), pageable);
                 });
+    }
+
+    private Mono<AccountEntity> getAccountEntityMono() {
+        return getCredentialsFromJwt().map(UserCredentials::getPreferredUsername).map(accountService::getAccountByAddress)
+                .flatMap(accountEntityMono -> accountEntityMono);
     }
 }

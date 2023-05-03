@@ -23,6 +23,7 @@ import javax.mail.internet.MimeMultipart;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
@@ -131,9 +132,9 @@ public class BasicMailCollector extends GenericMailet {
                 .hasAttachment(!attachments.isEmpty())
                 .attachments(attachments)
                 .size(mimeMessage.getSize())
-                .sentDate(mimeMessage.getSentDate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .sentDate(mimeMessage.getSentDate().toInstant())
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
     }
 

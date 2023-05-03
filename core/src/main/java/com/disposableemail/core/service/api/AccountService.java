@@ -12,9 +12,7 @@ public interface AccountService {
 
     Mono<Token> getTokenFromAuthorizationService(Credentials credentials);
 
-    Mono<AccountEntity> getAccountFromJwt(ServerWebExchange exchange);
-
-    Mono<AccountEntity> getAccountWithUsedSize(ServerWebExchange address);
+    Mono<AccountEntity> getAuthorizedAccountWithUsedSize(ServerWebExchange exchange);
 
     Mono<AccountEntity> getAccountById(String id);
 
@@ -24,5 +22,5 @@ public interface AccountService {
 
     Mono<AccountEntity> deleteAccount(String id);
 
-    Mono<AccountEntity> softDeleteAccount(String id);
+    Mono<AccountEntity> softDeleteAccount(String id, ServerWebExchange exchange);
 }

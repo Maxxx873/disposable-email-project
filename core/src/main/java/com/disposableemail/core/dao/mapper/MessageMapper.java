@@ -38,21 +38,27 @@ public interface MessageMapper {
 
     @AfterMapping
     default void updateResult(@MappingTarget Message message) {
-        message.getFrom().forEach(address -> {
-            if (Objects.equals(address.getName(), null)) {
-                address.setName("");
-            }
-        });
-        message.getTo().forEach(address -> {
-            if (Objects.equals(address.getName(), null)) {
-                address.setName("");
-            }
-        });
-        message.getBcc().forEach(address -> {
-            if (Objects.equals(address.getName(), null)) {
-                address.setName("");
-            }
-        });
+        if (Objects.nonNull(message.getFrom())) {
+            message.getFrom().forEach(address -> {
+                if (Objects.equals(address.getName(), null)) {
+                    address.setName("");
+                }
+            });
+        }
+        if (Objects.nonNull(message.getTo())) {
+            message.getTo().forEach(address -> {
+                if (Objects.equals(address.getName(), null)) {
+                    address.setName("");
+                }
+            });
+        }
+        if (Objects.nonNull(message.getBcc())) {
+            message.getBcc().forEach(address -> {
+                if (Objects.equals(address.getName(), null)) {
+                    address.setName("");
+                }
+            });
+        }
         message.getAttachments().forEach(attachment ->
                 attachment.setDownloadUrl(String.format("/messages/%s/attachment/%s", message.getId(), attachment.getId())));
     }

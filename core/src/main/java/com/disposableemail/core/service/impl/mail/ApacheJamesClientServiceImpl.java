@@ -98,18 +98,19 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     public Flux<DomainEntity> getDomains() {
 
         return mailServerApiClient.get().uri("/domains").retrieve().bodyToMono(String.class).map(response -> {
-            try {
-                log.info("Getting domains from {} | {}", mailServerName, response);
-                return mapper.readValue(response, new TypeReference<List<String>>() {
-                });
-            } catch (JsonProcessingException ex) {
-                throw new DomainNotAvailableException();
-            }
-        }).flatMapIterable(domains -> domains).map(domainName -> DomainEntity.builder()
-                .domain(domainName)
-                .isActive(true)
-                .isPrivate(false)
-                .build());
+                    try {
+                        log.info("Getting domains from {} | {}", mailServerName, response);
+                        return mapper.readValue(response, new TypeReference<List<String>>() {
+                        });
+                    } catch (JsonProcessingException ex) {
+                        throw new DomainNotAvailableException();
+                    }
+                }).flatMapIterable(domains -> domains).map(domainName -> DomainEntity.builder()
+                        .domain(domainName)
+                        .isActive(true)
+                        .isPrivate(false)
+                        .build())
+                .filter(domain -> !(domain.getDomain() != null && domain.getDomain().equals("localhost")));
     }
 
     @Override
@@ -140,6 +141,24 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                 .onErrorComplete(throwable -> {
                     throw new MailServerConnectException();
                 });
+        result.subscribe();
+        return result;
+    }
+
+    @Override
+    public Mono<Response> deleteUser(String username) {
+        log.info("Deleting | User: {}", username);
+
+        var result = mailServerApiClient.delete()
+                .uri("/users/" + username)
+                .exchangeToMono(response -> {
+                    if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
+                        log.info("Deleted user in Mail Server | Status code: {} | Address: {}",
+                                response.statusCode(), username);
+                        return response.bodyToMono(Response.class);
+                    }
+                    return Mono.empty();
+                }).retryWhen(fixedDelay(3, Duration.ofSeconds(2)));
         result.subscribe();
         return result;
     }

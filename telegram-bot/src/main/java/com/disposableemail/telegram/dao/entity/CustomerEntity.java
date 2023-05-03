@@ -8,7 +8,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -48,7 +47,4 @@ public class CustomerEntity extends Auditable {
         accountEntity.setCustomer(this);
     }
 
-    public void removeAccountByAddress(String address) {
-        accounts.removeIf(accountEntity -> Objects.equals(accountEntity.getAddress(), address));
-    }
 }

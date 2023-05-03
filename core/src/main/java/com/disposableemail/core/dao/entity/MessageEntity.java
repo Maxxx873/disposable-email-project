@@ -2,30 +2,27 @@ package com.disposableemail.core.dao.entity;
 
 import com.disposableemail.core.model.Address;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A Message entity.
  */
-@Data
+@Getter
+@Setter
 @Builder
-@ToString
-@AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@AllArgsConstructor
 @Document(collection = "message")
-public class MessageEntity {
+public class MessageEntity extends Auditable {
 
     @Id
-    @Setter(AccessLevel.NONE)
     private String id;
 
     private String accountId;
@@ -44,18 +41,11 @@ public class MessageEntity {
     private String text;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private OffsetDateTime sentDate;
+    private Instant sentDate;
 
     private List<String> html;
     private Boolean hasAttachment;
     private List<AttachmentEntity> attachments;
     private Integer size;
 
-    @CreatedDate
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private OffsetDateTime createdAt;
-
-    @LastModifiedBy
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private OffsetDateTime updatedAt;
 }

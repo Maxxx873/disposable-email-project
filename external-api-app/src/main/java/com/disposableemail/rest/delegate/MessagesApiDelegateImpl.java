@@ -69,5 +69,4 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
                 })
                 .switchIfEmpty(Mono.error(new MessageNotFoundException()));
     }
-
 }

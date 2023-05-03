@@ -50,16 +50,14 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
 
     @AfterEach
     void clearUsers() {
-        List<RealmRepresentation> realmReps = keycloak.realms().findAll();
-        for (RealmRepresentation realmRep : realmReps) {
-            String realm = realmRep.getRealm();
-            List<UserRepresentation> userReps = keycloak.realm(realm).users().list();
-            userReps.forEach(user -> {
+        getRealms().forEach(realmRepresentation -> {
+            getUsers(realmRepresentation).forEach(user -> {
+                var realm = realmRepresentation.getRealm();
                 if (user.getUsername().equals(credentials.getAddress())) {
                     keycloak.realm(realm).users().delete(user.getId());
                 }
             });
-        }
+        });
     }
 
     @Test
@@ -98,6 +96,51 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
 
         assertThatThrownBy(() -> authorizationService.getToken(credentials))
                 .isInstanceOf(NotAuthorizedException.class);
+    }
+
+    @Test
+    void shouldSuccessfullyDeleteUser() throws ExecutionException, InterruptedException {
+        log.debug("shouldSuccessfullyDeleteUser()");
+
+        authorizationService.createUser(getCredentialsEncrypted());
+
+        var futureKeycloakResponse = authorizationService.deleteUser(getUserId());
+
+        assertThat(futureKeycloakResponse.get().getStatusInfo()).isEqualTo(Response.Status.NO_CONTENT);
+    }
+
+    @Test
+    void shouldNotFoundDeleteNonExistentUser() throws ExecutionException, InterruptedException {
+        log.debug("shouldNotFoundDeleteNonExistentUser()");
+
+        authorizationService.createUser(getCredentialsEncrypted());
+
+        var futureKeycloakResponse = authorizationService.deleteUser("nonExistentId");
+
+        assertThat(futureKeycloakResponse.get().getStatusInfo()).isEqualTo(Response.Status.NOT_FOUND);
+    }
+
+    @NotNull
+    private String getUserId() {
+        var ref = new Object() {
+            String userId = "";
+        };
+        getRealms().forEach(realmRepresentation -> {
+            getUsers(realmRepresentation).forEach(user -> {
+                if (user.getUsername().equals(credentials.getAddress())) {
+                    ref.userId = user.getId();
+                }
+            });
+        });
+        return ref.userId;
+    }
+
+    private List<UserRepresentation> getUsers(RealmRepresentation realmRepresentation) {
+        return keycloak.realm(realmRepresentation.getRealm()).users().list();
+    }
+
+    private List<RealmRepresentation> getRealms() {
+        return keycloak.realms().findAll();
     }
 
     @NotNull

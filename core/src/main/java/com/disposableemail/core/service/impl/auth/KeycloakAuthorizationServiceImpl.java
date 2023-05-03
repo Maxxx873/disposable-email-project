@@ -18,9 +18,8 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.disposableemail.core.event.Event.Type.*;
+import static com.disposableemail.core.event.Event.Type.AUTH_REGISTER_CONFIRMATION;
 
 
 @Slf4j
@@ -48,11 +47,9 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         return CompletableFuture.completedFuture(getKeycloakCreateUserResponse(credentials));
     }
 
-    //TODO delete
-
-    public CompletableFuture<Response> deleteUser(String username) {
-        userRepresentation.setUsername(username);
-        return CompletableFuture.completedFuture(getKeycloakDeleteUserResponse(username));
+    @Override
+    public CompletableFuture<Response> deleteUser(String id) {
+        return CompletableFuture.completedFuture(getKeycloakDeleteUserResponse(id));
     }
 
     @Override
@@ -72,25 +69,16 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
             throw new AccountAlreadyRegisteredException();
         }
         if (response.getStatusInfo().equals(Response.Status.CREATED)) {
-            eventProducer.send(new Event<>(KEYCLOAK_REGISTER_CONFIRMATION, credentials));
+            eventProducer.send(new Event<>(AUTH_REGISTER_CONFIRMATION, credentials));
         }
         log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
                 response.getStatus(), response.getStatusInfo());
         return response;
     }
 
-    //TODO delete
     private Response getKeycloakDeleteUserResponse(String id) {
-        var response = keycloak.realm(realm).users().delete(userRepresentation.getId());
-        if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {
-            log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
-                    response.getStatus(), response.getStatusInfo());
-            throw new AccountAlreadyRegisteredException();
-        }
-        if (response.getStatusInfo().equals(Response.Status.CREATED)) {
-            eventProducer.send(new Event<>(KEYCLOAK_DELETING_CONFIRMATION, id));
-        }
-        log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
+        var response = keycloak.realm(realm).users().delete(id);
+        log.info("Keycloak |  Deleting user: {} | Status: {} | Status Info: {}", id,
                 response.getStatus(), response.getStatusInfo());
         return response;
     }

@@ -8,4 +8,5 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface AccountRepository extends ReactiveMongoRepository<AccountEntity, String> {
     Mono<AccountEntity> findByAddress(String address);
+
 }

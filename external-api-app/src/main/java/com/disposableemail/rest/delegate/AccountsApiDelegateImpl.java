@@ -29,7 +29,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Account>> deleteAccountItem(String id, ServerWebExchange exchange) {
 
-        return accountService.softDeleteAccount(id)
+        return accountService.softDeleteAccount(id, exchange)
                 .map(accountMapper::accountEntityToAccount)
                 .map(account -> ResponseEntity.status(HttpStatus.NO_CONTENT)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -42,7 +42,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
 
         return accountService.getAccountById(id)
                 .map(accountEntity -> {
-                    log.info("Retrieved Account: {}", accountEntity.toString());
+                    log.info("Retrieved Account: {}", accountEntity.getAddress());
                     return ResponseEntity.status(HttpStatus.OK)
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(accountMapper.accountEntityToAccount(accountEntity));
@@ -54,7 +54,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     public Mono<ResponseEntity<Account>> createAccountItem(Mono<Credentials> credentials, ServerWebExchange exchange) {
 
         return credentials.flatMap(accountService::createAccount).map(accountEntity -> {
-            log.info("Saved Account: {}", accountEntity.toString());
+            log.info("Saved Account: {}", accountEntity.getAddress());
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(accountMapper.accountEntityToAccount(accountEntity));

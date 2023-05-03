@@ -61,6 +61,9 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
+                            <typeMappings>
+                                <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
+                            </typeMappings>
                             <inputSpec>${project.parent.basedir}/openapi-spec/schemas/schemas.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <generateApis>false</generateApis>
@@ -78,6 +81,7 @@
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <reactive>true</reactive>
                                 <delegatePattern>true</delegatePattern>
+                                <serializableModel>true</serializableModel>
                                 <additionalModelTypeAnnotations>
                                     @lombok.Builder
                                     @lombok.NoArgsConstructor

@@ -5,6 +5,7 @@ import com.disposableemail.core.dao.entity.search.MessageElasticsearchEntity;
 import com.disposableemail.core.dao.repository.search.MessageElasticsearchRepository;
 import com.disposableemail.core.event.Event;
 import com.disposableemail.core.event.EventProducer;
+import com.disposableemail.core.security.UserCredentials;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.search.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.disposableemail.core.security.SecurityUtils.getCredentialsFromJwt;
 
 @Slf4j
 @Service
@@ -24,7 +26,6 @@ public class MessageElasticsearchServiceImpl implements MessageElasticsearchServ
     private final MessageElasticsearchRepository messageElasticsearchRepository;
     private final AccountService accountService;
     private final EventProducer eventProducer;
-
 
     @Override
     public Flux<MessageElasticsearchEntity> getMessagesFromMailbox(AccountEntity accountEntity) {
@@ -41,7 +42,7 @@ public class MessageElasticsearchServiceImpl implements MessageElasticsearchServ
     @Override
     public Flux<MessageElasticsearchEntity> getMessagesFromMailbox(Pageable pageable, ServerWebExchange exchange) {
 
-        return accountService.getAccountFromJwt(exchange)
+        return getAccountEntityMono()
                 .map(accountEntity -> {
                             eventProducer.send(new Event<>(Event.Type.GETTING_MESSAGES, accountEntity));
                             return accountEntity;
@@ -62,7 +63,7 @@ public class MessageElasticsearchServiceImpl implements MessageElasticsearchServ
     public Mono<MessageElasticsearchEntity> getMessage(String messageId, ServerWebExchange exchange) {
         log.info("Getting a Message from Elasticsearch | id: {}", messageId);
 
-        return accountService.getAccountFromJwt(exchange)
+        return getAccountEntityMono()
                 .map(AccountEntity::getAddress)
                 .flatMap(address -> messageElasticsearchRepository.findByAddressToAndMessageId(address, messageId));
     }
@@ -90,5 +91,11 @@ public class MessageElasticsearchServiceImpl implements MessageElasticsearchServ
                 .flatMap(messageElasticsearchRepository::save);
         result.subscribe();
         return result;
+    }
+
+    private Mono<AccountEntity> getAccountEntityMono() {
+        return getCredentialsFromJwt().map(UserCredentials::getPreferredUsername)
+                .map(accountService::getAccountByAddress)
+                .flatMap(accountEntityMono -> accountEntityMono);
     }
 }

@@ -1,18 +1,16 @@
 package com.disposableemail.core.event.handler;
 
-import com.disposableemail.core.model.Credentials;
-import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
 import com.disposableemail.core.service.api.mail.MailServerClientService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import static org.springframework.amqp.core.ExchangeTypes.TOPIC;
 
 @Component
 @RequiredArgsConstructor
@@ -23,22 +21,22 @@ public class AccountEventDeletionHandler {
 
     @Async
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "${queues.account-start-creating}"),
-            key = "${routing-keys.account-start-creating}"
+            exchange = @Exchange(name = "${exchanges.accounts}", type = TOPIC),
+            value = @Queue(name = "${queues.account-auth-deleting}"),
+            key = "${routing-keys.account-auth-deleting}"
     ))
-    public void handleStartDeletingAccountEvent(Credentials credentials) {
-        authorizationService.createUser(credentials);
+    public void handleAuthServiceDeletingAccountEvent(String id) {
+        authorizationService.deleteUser(id);
     }
 
     @Async
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(name = "${exchanges.accounts}", type = ExchangeTypes.TOPIC),
-            value = @Queue(name = "${queues.account-auth-confirmation}"),
-            key = "${routing-keys.account-auth-confirmation}"
+            exchange = @Exchange(name = "${exchanges.accounts}", type = TOPIC),
+            value = @Queue(name = "${queues.account-mail-deleting}"),
+            key = "${routing-keys.account-mail-deleting}"
     ))
-    public void handleKeycloakRegisterConfirmationEvent(Credentials credentials) throws JsonProcessingException {
-        mailServerClientService.createUser(credentials);
+    public void handleMAilServerDeletingAccountEvent(String username) {
+        mailServerClientService.deleteUser(username);
     }
 
 }

@@ -5,10 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.UUID;
-
-import static java.time.ZonedDateTime.now;
 
 @Data
 @Builder
@@ -19,13 +17,12 @@ public class Event<T> {
     public enum Type {
         GETTING_MESSAGES,
         START_CREATING_ACCOUNT,
-        KEYCLOAK_REGISTER_CONFIRMATION,
+        AUTH_REGISTER_CONFIRMATION,
         ACCOUNT_CREATED_IN_MAIL_SERVICE,
         MAILBOX_CREATED_IN_MAIL_SERVICE,
         QUOTA_SIZE_UPDATED_IN_MAIL_SERVICE,
-        START_DELETING_ACCOUNT,
-        KEYCLOAK_DELETING_CONFIRMATION,
-        //TODO delete
+        AUTH_DELETING_ACCOUNT,
+        MAIL_DELETING_ACCOUNT
     }
 
     @Builder.Default
@@ -34,5 +31,5 @@ public class Event<T> {
     private final T data;
 
     @Builder.Default
-    private ZonedDateTime eventCreatedAt = now();
+    private Instant eventCreatedAt = Instant.now();
 }
