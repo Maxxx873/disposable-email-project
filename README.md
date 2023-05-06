@@ -14,6 +14,9 @@
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-2F3134?style=for-the-badge&logo=kubernetes)
 ![Helm](https://img.shields.io/badge/Helm-2F3134?style=for-the-badge&logo=helm)
 ![Telegram](https://img.shields.io/badge/Telegram-2F3134?style=for-the-badge&logo=telegram)
+
+
+[![Java CI with Maven](https://github.com/Maxxx873/disposable-email-project/actions/workflows/maven.yml/badge.svg)](https://github.com/Maxxx873/disposable-email-project/actions/workflows/maven.yml)
 </div>
 
 ## Project information
