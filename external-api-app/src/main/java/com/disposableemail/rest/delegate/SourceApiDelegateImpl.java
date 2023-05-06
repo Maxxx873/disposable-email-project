@@ -40,6 +40,4 @@ public class SourceApiDelegateImpl implements SourcesApiDelegate {
                             .body(sourceMapper.sourceEntityToSource(sourceEntity));
                 }).switchIfEmpty(Mono.error(new SourceNotFoundException()));
     }
-
-
 }

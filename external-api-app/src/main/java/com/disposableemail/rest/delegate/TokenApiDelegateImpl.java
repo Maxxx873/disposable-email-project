@@ -28,5 +28,4 @@ public class TokenApiDelegateImpl implements TokenApiDelegate {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(token));
     }
-
 }

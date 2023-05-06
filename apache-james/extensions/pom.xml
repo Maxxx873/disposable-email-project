@@ -35,7 +35,7 @@
         <slf4j.version>2.0.1</slf4j.version>
         <jsoup.version>1.15.4</jsoup.version>
         <!-- plugin versions -->
-        <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
     </properties>

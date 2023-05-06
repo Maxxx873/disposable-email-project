@@ -1,6 +1,9 @@
 server:
   port: ${PORT:8089}
 
+search:
+  service: ${SEARCH_SERVICE:elasticsearch}
+
 authorization:
   service: ${AUTHORIZATION_SERVICE:keycloak}
 

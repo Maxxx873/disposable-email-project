@@ -1,6 +1,7 @@
 package com.disposableemail.core.dao.repository.search;
 
 import com.disposableemail.core.dao.entity.search.MessageElasticsearchEntity;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ReactiveElasticsearchRepository;
@@ -9,6 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
+@ConditionalOnProperty(name = "search.service", havingValue = "elasticsearch")
 public interface MessageElasticsearchRepository extends ReactiveElasticsearchRepository<MessageElasticsearchEntity, String> {
 
     @Query("""

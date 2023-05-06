@@ -120,7 +120,6 @@
                             <modelPackage>com.disposableemail.core.model</modelPackage>
                             <invokerPackage>${project-base-package}.app</invokerPackage>
                             <skipValidateSpec>false</skipValidateSpec>
-<!--                            <strictSpec>true</strictSpec>-->
                             <generateModels>false</generateModels>
                             <generateModelTests>false</generateModelTests>
                             <generateAliasAsModel>false</generateAliasAsModel>
@@ -132,6 +131,24 @@
                                 <reactive>true</reactive>
                                 <delegatePattern>true</delegatePattern>
                             </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- remove the unwanted generated testcases by the spring generator of openapi -->
+                                <delete dir="${project.build.directory}/generated-sources/openapi/src/test" />
+                            </target>
                         </configuration>
                     </execution>
                 </executions>

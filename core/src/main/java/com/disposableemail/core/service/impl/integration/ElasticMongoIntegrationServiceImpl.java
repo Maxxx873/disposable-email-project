@@ -8,6 +8,7 @@ import com.disposableemail.core.service.api.search.MessageElasticsearchService;
 import com.disposableemail.core.service.api.util.ElasticMongoIntegrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "search.service", havingValue = "elasticsearch")
 public class ElasticMongoIntegrationServiceImpl implements ElasticMongoIntegrationService {
 
     private final SourceService sourceService;

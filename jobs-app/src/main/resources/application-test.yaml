@@ -1,6 +1,9 @@
 server:
   port: ${PORT:8089}
 
+search:
+  service: elasticsearch
+
 spring:
   main:
     web-application-type: none

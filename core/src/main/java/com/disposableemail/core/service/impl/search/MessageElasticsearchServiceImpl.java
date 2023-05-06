@@ -10,6 +10,7 @@ import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.search.MessageElasticsearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
@@ -21,6 +22,7 @@ import static com.disposableemail.core.security.SecurityUtils.getCredentialsFrom
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "search.service", havingValue = "elasticsearch")
 public class MessageElasticsearchServiceImpl implements MessageElasticsearchService {
 
     private final MessageElasticsearchRepository messageElasticsearchRepository;

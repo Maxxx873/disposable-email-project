@@ -1,7 +1,6 @@
 package com.disposableemail.keycloak;
 
 import com.disposableemail.config.TestConfig;
-import com.disposableemail.core.dao.repository.search.MessageElasticsearchRepository;
 import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
@@ -14,8 +13,6 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,7 +30,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 @ActiveProfiles("test")
 @ContextConfiguration(classes = TestConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@MockBeans({@MockBean(MessageElasticsearchRepository.class)})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
 

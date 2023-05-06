@@ -4,6 +4,9 @@ server:
 authorization:
   service: ${AUTHORIZATION_SERVICE:keycloak}
 
+search:
+  service: ${SEARCH_SERVICE:elasticsearch}
+
 spring:
   output:
     ansi:
