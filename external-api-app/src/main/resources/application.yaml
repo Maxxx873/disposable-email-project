@@ -5,7 +5,7 @@ authorization:
   service: ${AUTHORIZATION_SERVICE:keycloak}
 
 search:
-  service: ${SEARCH_SERVICE:elasticsearch}
+  service: ${SEARCH_SERVICE:none}
 
 spring:
   output:
