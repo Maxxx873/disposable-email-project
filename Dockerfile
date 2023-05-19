@@ -2,7 +2,7 @@ FROM eclipse-temurin:17-jdk-alpine as builder
 COPY . extracted
 WORKDIR extracted
 RUN chmod +x mvnw && ./mvnw clean package -DskipTests
-ENV JAR_FILE=*.jar
+ENV JAR_FILE=disposable-email-external-api-app-0.0.1-SNAPSHOT.jar
 ADD ./external-api-app/target/${JAR_FILE} disposable-email-external-api.jar
 RUN java -Djarmode=layertools -jar ${JAR_FILE} extract
 
