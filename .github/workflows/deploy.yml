@@ -21,6 +21,5 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        file: ./external-api-app/Dockerfile
         push: true
         tags: maxxx873/dsp-eml-prj-rest:latest
