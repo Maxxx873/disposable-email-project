@@ -3,7 +3,7 @@ COPY . extracted
 WORKDIR extracted
 RUN chmod +x mvnw && ./mvnw clean package -DskipTests
 ENV JAR_FILE=*.jar
-ADD external-api-app/target/${JAR_FILE} disposable-email-external-api.jar
+ADD ./external-api-app/target/${JAR_FILE} disposable-email-external-api.jar
 RUN java -Djarmode=layertools -jar ${JAR_FILE} extract
 
 FROM eclipse-temurin:17-jre-alpine
