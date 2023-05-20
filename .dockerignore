@@ -1,3 +1,4 @@
+!target/
 telegram-bot/
 apache-james/
 k8s/
