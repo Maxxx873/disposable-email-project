@@ -54,7 +54,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: disposable-email-external-api
-          path: disposable-email-external-api.jar
+          path: external-api-app/disposable-email-external-api.jar
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
