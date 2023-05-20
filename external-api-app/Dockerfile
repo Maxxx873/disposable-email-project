@@ -1,7 +1,7 @@
 FROM eclipse-temurin:17-jre-alpine as builder
 RUN mkdir /app
 
-COPY disposable-email-external-api.jar /app/disposable-email-external-api.jar
+COPY ./disposable-email-external-api.jar /app/disposable-email-external-api.jar
 
 WORKDIR /app
 
