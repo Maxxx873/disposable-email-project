@@ -72,7 +72,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: disposable-email-project/external-api-app
+          file: external-api-app
           push: true
           tags: maxxx873/dsp-eml-prj-rest:latest
 
