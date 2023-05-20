@@ -30,4 +30,7 @@ hs_err_pid*
 *.env
 *keystore*
 
-*/target/**
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
