@@ -28,8 +28,6 @@ jobs:
       name: Build and push
       uses: docker/build-push-action@v4
       with:
-        context: .
-        file: ./Dockerfile
         pull: true
         push: true
         tags: maxxx873/dsp-eml-prj-rest:latest
