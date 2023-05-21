@@ -57,7 +57,7 @@ jobs:
           path: external-api-app/target/disposable-email-external-api.jar
       - uses: montudor/action-zip@v1
         with:
-          args: unzip -qq ./external-api-app/target/disposable-email-external-api.zip -d disposable-email-external-api.jar
+          args: unzip -qq ./external-api-app/target/disposable-email-external-api -d disposable-email-external-api.jar
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
