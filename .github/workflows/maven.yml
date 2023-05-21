@@ -53,7 +53,8 @@ jobs:
       
       - uses: actions/download-artifact@v3
         with:
-          name: disposable-email-external-api.zip
+          name: disposable-email-external-api
+          path: disposable-email-external-api.zip
           # path: external-api-app/target/disposable-email-external-api
       - uses: montudor/action-zip@v1
         with:
