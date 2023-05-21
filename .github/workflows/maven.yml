@@ -65,7 +65,6 @@ jobs:
 
       - name: Unzip artifact
         run: unzip -qq './external-api-app/target/*.jar' -d ./external-api-app/target/
-        working-directory: external-api-app/target/
     
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
