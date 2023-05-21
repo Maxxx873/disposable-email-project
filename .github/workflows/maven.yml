@@ -64,7 +64,7 @@ jobs:
         uses: montudor/action-zip@v1
 
       - name: Unzip artifact
-        run: unzip -qq *.jar
+        run: unzip -qq *.zip
         working-directory: external-api-app/target/
     
       - name: Set up QEMU
