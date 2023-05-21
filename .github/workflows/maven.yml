@@ -57,7 +57,7 @@ jobs:
           path: external-api-app/target/disposable-email-external-api.zip
           
       - name: Display structure of downloaded files
-        run: ls -l --block-size=M
+        run: ls -sh
         working-directory: external-api-app/target/
   
       - name: Unzip artifact
