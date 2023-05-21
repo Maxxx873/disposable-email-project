@@ -54,11 +54,14 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
     #      name: disposable-email-external-api
-          path: external-api-app/target/
+     #     path: external-api-app/target/
+          path: ${{ github.WORKSPACE }}
           
       - name: Display structure of downloaded files
         run: ls -sh
-        working-directory: external-api-app/target/
+       # working-directory: external-api-app/target/
+        working-directory: ${{ github.WORKSPACE }}
+       
   
       - name: Unzip artifact
         run: unzip *.zip
