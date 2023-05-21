@@ -60,13 +60,13 @@ jobs:
         run: ls -R
         working-directory: external-api-app/target/
   
-  #    - uses: montudor/action-zip@v1
-   #     with:
-    #      args: unzip -qq disposable-email-external-api.zip -d disposable-email-external-api.jar
-      
-    #  - name: Copy Jar file
-     #   run: mv disposable-email-external-api.jar external-api-app/target/
-      
+      - name: Install zip
+        uses: montudor/action-zip@v1
+
+      - name: Unzip artifact
+        run: unzip -qq disposable-email-external-api.zip -d disposable-email-external-api.jar
+        working-directory: external-api-app/target/
+    
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       
