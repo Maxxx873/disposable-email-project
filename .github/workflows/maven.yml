@@ -71,7 +71,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./external-api-app
           file: external-api-app/Dockerfile
           push: true
           tags: maxxx873/dsp-eml-prj-rest:latest
