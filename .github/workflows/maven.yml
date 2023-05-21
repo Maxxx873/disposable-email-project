@@ -53,7 +53,7 @@ jobs:
       
       - uses: actions/download-artifact@v3
         with:
-          name: disposable-email-external-api.zip
+          name: disposable-email-external-api
           path: external-api-app/target/disposable-email-external-api
           
       - name: Display structure of downloaded files
