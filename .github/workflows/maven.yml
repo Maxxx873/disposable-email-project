@@ -57,7 +57,7 @@ jobs:
           path: external-api-app/target/disposable-email-external-api.jar
           
       - name: Display structure of downloaded files
-        run: ls -lh
+        run: stat disposable-email-external-api.jar 
         working-directory: external-api-app/target/
           
       - name: Unzip artifact
