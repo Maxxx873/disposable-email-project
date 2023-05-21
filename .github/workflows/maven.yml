@@ -41,6 +41,11 @@ jobs:
       with:
         name: disposable-email-external-api
         path: disposable-email-external-api.jar
+     
+    - uses: actions/download-artifact@v3
+      with:
+        name: disposable-email-external-api
+        path: external-api-app/target/disposable-email-external-api.jar
         
   build-image:
   
