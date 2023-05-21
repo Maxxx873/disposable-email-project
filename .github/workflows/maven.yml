@@ -54,7 +54,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: disposable-email-external-api
-          path: external-api-app/target/disposable-email-external-api.zip
+          path: external-api-app/target/disposable-email-external-api.jar
           
       - name: Display structure of downloaded files
         run: ls -R
@@ -64,7 +64,7 @@ jobs:
         uses: montudor/action-zip@v1
 
       - name: Unzip artifact
-        run: unzip -qq disposable-email-external-api.zip -d disposable-email-external-api.jar
+        run: unzip -qq './external-api-app/target/*.jar' -d ./external-api-app/target/
         working-directory: external-api-app/target/
     
       - name: Set up QEMU
