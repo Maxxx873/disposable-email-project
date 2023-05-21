@@ -61,7 +61,7 @@ jobs:
         working-directory: external-api-app/target/
   
       - name: Unzip artifact
-        run: unzip -qq *.zip
+        run: unzip *.zip
         working-directory: external-api-app/target/
     
       - name: Set up QEMU
