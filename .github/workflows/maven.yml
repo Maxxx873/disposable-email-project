@@ -28,7 +28,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn clean install -DskipTests
+      run: mvn -B package --file pom.xml -DskipTests
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
@@ -55,6 +55,9 @@ jobs:
         with:
           name: disposable-email-external-api
           path: external-api-app/target/disposable-email-external-api.jar
+      - uses: montudor/action-zip@v1
+        with:
+          args: unzip -qq disposable-email-external-api.zip -d disposable-email-external-api.jar
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
