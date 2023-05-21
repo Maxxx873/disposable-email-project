@@ -54,7 +54,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: disposable-email-external-api
-          path: external-api-app/target/disposable-email-external-api.jar
+          path: external-api-app/target/disposable-email-external-api.zip
           
       - name: Display structure of downloaded files
         run: ls -R
