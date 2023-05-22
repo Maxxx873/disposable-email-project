@@ -37,7 +37,7 @@ jobs:
     - name: Copy Jar file
       run: mv external-api-app/target/*.jar disposable-email-external-api.jar
    
-    - name: "📂 Upload external API artifact"
+    - name: Upload external API artifact
     - uses: actions/upload-artifact@v3
       with:
         name: disposable-email-external-api
@@ -52,13 +52,13 @@ jobs:
       
       - uses: actions/checkout@v3
       
-      - name: "📂 Download external API artifact"
+      - name: Download external API artifact
       - uses: actions/download-artifact@v3
         with:
           name: disposable-email-external-api
           path: external-api-app/target/
           
-      - name: "🔍 Display structure of downloaded files"
+      - name: Display structure of downloaded files
         run: stat disposable-email-external-api.jar 
         working-directory: external-api-app/target/
             
