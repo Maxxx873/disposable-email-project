@@ -41,12 +41,7 @@ jobs:
       with:
         name: disposable-email-external-api
         path: disposable-email-external-api.jar
-     
-    - uses: actions/download-artifact@v3
-      with:
-        name: disposable-email-external-api
-        path: external-api-app/target/disposable-email-external-api.jar
-        
+            
   build-image:
   
     runs-on: ubuntu-latest
@@ -59,16 +54,12 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: disposable-email-external-api
-          path: external-api-app/target/disposable-email-external-api.jar
+          path: external-api-app/target/
           
       - name: Display structure of downloaded files
         run: stat disposable-email-external-api.jar 
         working-directory: external-api-app/target/
-          
-      - name: Unzip artifact
-        run: unzip *.zip
-        working-directory: external-api-app/target/
-    
+            
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       
