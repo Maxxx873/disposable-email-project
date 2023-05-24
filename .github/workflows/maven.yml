@@ -66,7 +66,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: apache-james-mailets
-        path: apache-james/extensions/mailets/target/*.jar
+        path: apache-james/extensions/mailets/target/*dependencies.jar
         
         
   build-external-api-image:
@@ -123,7 +123,7 @@ jobs:
 
         - name: Display structure of downloaded files
           run: ls -a
-          working-directory: apache-james-extensions
+          working-directory: apache-james/extensions-jars
 
         - name: Set up QEMU
           uses: docker/setup-qemu-action@v2
