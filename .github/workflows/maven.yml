@@ -143,4 +143,4 @@ jobs:
             context: ./apache-james
             file: apache-james/Dockerfile
             push: true
-            tags: dsp-eml-prj-james:latest
+            tags: maxxx873/dsp-eml-prj-james:latest
