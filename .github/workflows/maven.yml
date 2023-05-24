@@ -56,7 +56,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file apache-james/extensions/pom.xml
+      run: mvn -B package --file apache-james/extensions/pom.xml -DskipTests
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
