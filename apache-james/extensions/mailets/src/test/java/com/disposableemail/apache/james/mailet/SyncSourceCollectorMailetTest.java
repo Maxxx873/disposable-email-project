@@ -75,7 +75,7 @@ class SyncSourceCollectorMailetTest extends SourceCollectorTestHelper {
         assertThat(Objects.requireNonNull(messageDoc).getList("attachments", Object.class)).isEmpty();
         assertThat(Objects.requireNonNull(messageDoc).get("text").toString()).contains("Java test mail. No attachments");
         assertThat(simpleDateFormat.format(Objects.requireNonNull(messageDoc).get("sentDate")))
-                .isEqualTo("2023-02-15T23:16:53Z");
+                .isEqualTo("2023-02-15T20:16:53Z");
         assertThat(ObjectId.isValid(Objects.requireNonNull(messageDoc).get("accountId").toString())).isTrue();
         assertThat(getBoolean(doc, "isFlagged")).isFalse();
         assertThat(getBoolean(doc, "isDeleted")).isFalse();
@@ -112,7 +112,7 @@ class SyncSourceCollectorMailetTest extends SourceCollectorTestHelper {
                 "attachments", "size", "sentDate", "createdAt", "updatedAt");
         assertThat(Objects.requireNonNull(doc).get("text").toString()).contains("test text message\n");
         assertThat(simpleDateFormat.format(Objects.requireNonNull(doc).get("sentDate")))
-                .isEqualTo("2022-11-13T22:41:43Z");
+                .isEqualTo("2022-11-13T19:41:43Z");
         assertThat(ObjectId.isValid(Objects.requireNonNull(doc).get("accountId").toString())).isTrue();
         assertThat(getBoolean(doc, "isUnread")).isTrue();
         assertThat(getBoolean(doc, "isFlagged")).isFalse();

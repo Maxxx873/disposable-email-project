@@ -21,6 +21,7 @@ import javax.mail.Part;
 import javax.mail.internet.MimeBodyPart;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -46,7 +47,7 @@ public class SourceCollectorTestHelper {
 
     @BeforeEach
     protected void setConfig() throws Exception {
-
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         mongodConfig = MongodConfig
                 .builder()
                 .version(Version.Main.V3_6)
