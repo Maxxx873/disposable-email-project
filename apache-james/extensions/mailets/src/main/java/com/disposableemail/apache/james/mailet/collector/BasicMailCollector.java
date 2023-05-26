@@ -24,7 +24,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -79,7 +78,7 @@ public class BasicMailCollector extends GenericMailet {
                 .msgid(mimeMessage.getMessageID())
                 .data(out.toString(StandardCharsets.UTF_8))
                 .attachments(getAttachments(mimeMessage))
-                .createdAt(LocalDateTime.now())
+                .createdAt(Instant.now())
                 .build();
     }
 
@@ -132,7 +131,7 @@ public class BasicMailCollector extends GenericMailet {
                 .hasAttachment(!attachments.isEmpty())
                 .attachments(attachments)
                 .size(mimeMessage.getSize())
-                .sentDate(mimeMessage.getSentDate().toInstant())
+                .sentDate(getInstant(mimeMessage))
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .build();
@@ -189,5 +188,9 @@ public class BasicMailCollector extends GenericMailet {
                         .address(((InternetAddress) address).getAddress())
                         .name(((InternetAddress) address).getPersonal())
                         .build()).collect(Collectors.toList());
+    }
+
+    private static Instant getInstant(MimeMessage mimeMessage) throws MessagingException {
+        return mimeMessage.getSentDate().toInstant();
     }
 }

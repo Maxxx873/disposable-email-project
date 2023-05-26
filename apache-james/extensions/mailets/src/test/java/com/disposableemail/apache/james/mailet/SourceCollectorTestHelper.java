@@ -10,6 +10,7 @@ import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
 import org.apache.mailet.base.test.FakeMailetConfig;
+import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +19,8 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.MimeBodyPart;
-
 import java.text.SimpleDateFormat;
-import java.util.Locale;
+import java.util.Objects;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -42,8 +42,7 @@ public class SourceCollectorTestHelper {
     protected BasicMailCollector mailet;
     protected Account account;
     protected CodecRegistry pojoCodecRegistry;
-    protected SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault());
-
+    protected SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     @BeforeEach
     protected void setConfig() throws Exception {
@@ -83,6 +82,14 @@ public class SourceCollectorTestHelper {
             }
         }
         return expectedPartCount;
+    }
+
+    protected static boolean getBoolean(Document doc, String field) {
+        var value = Objects.requireNonNull(doc).get(field);
+        if (value == null) {
+            return false;
+        }
+        return Boolean.parseBoolean(Objects.requireNonNull(doc).get(field).toString());
     }
 
 }

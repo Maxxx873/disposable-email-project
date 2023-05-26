@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -15,5 +15,5 @@ public class Source {
     private String msgid;
     private String data;
     private List<Attachment> attachments;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }
