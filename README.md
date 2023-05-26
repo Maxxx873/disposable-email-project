@@ -16,8 +16,8 @@
 ![Telegram](https://img.shields.io/badge/Telegram-2F3134?style=for-the-badge&logo=telegram)
 
 
-[![API Deploy](https://github.com/Maxxx873/disposable-email-project/actions/workflows/maven.yml/badge.svg)](https://github.com/Maxxx873/disposable-email-project/actions/workflows/api-deploy.yml)
-[![James Deploy](https://github.com/Maxxx873/disposable-email-project/actions/workflows/maven.yml/badge.svg)](https://github.com/Maxxx873/disposable-email-project/actions/workflows/james-deploy.yml)
+[![API Deploy](https://github.com/Maxxx873/disposable-email-project/actions/workflows/api-deploy.yml/badge.svg)](https://github.com/Maxxx873/disposable-email-project/actions/workflows/api-deploy.yml)
+[![James Deploy](https://github.com/Maxxx873/disposable-email-project/actions/workflows/james-deploy.yml/badge.svg)](https://github.com/Maxxx873/disposable-email-project/actions/workflows/james-deploy.yml)
 </div>
 
 ## Project information

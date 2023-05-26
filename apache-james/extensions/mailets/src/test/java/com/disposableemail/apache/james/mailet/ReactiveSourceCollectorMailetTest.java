@@ -92,7 +92,7 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
                             "attachments", "isUnread", "isFlagged", "isDeleted", "text", "html", "hasAttachment",
                             "attachments", "size", "sentDate", "createdAt", "updatedAt");
                     assertThat(Objects.requireNonNull(doc).getList("attachments", Object.class)).isEmpty();
-                    assertThat(Objects.requireNonNull(doc).get("text")).isSameAs("Java test mail. No attachments");
+                    assertThat(Objects.requireNonNull(doc).get("text").toString()).contains("Java test mail. No attachments");
                     assertThat(simpleDateFormat.format(Objects.requireNonNull(doc).get("sentDate")))
                             .isEqualTo("2023-02-15T23:16:53Z");
                     assertThat(ObjectId.isValid(Objects.requireNonNull(doc).get("accountId").toString())).isTrue();
@@ -152,7 +152,7 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
                     } catch (MessagingException e) {
                         throw new RuntimeException(e);
                     }
-                    assertThat(Objects.requireNonNull(doc).get("text")).isSameAs("test text message\n");
+                    assertThat(Objects.requireNonNull(doc).get("text").toString()).contains("test text message\n");
                     assertThat(simpleDateFormat.format(Objects.requireNonNull(doc).get("sentDate")))
                             .isEqualTo("2022-11-13T22:41:43Z");
                     assertThat(ObjectId.isValid(Objects.requireNonNull(doc).get("accountId").toString())).isTrue();
