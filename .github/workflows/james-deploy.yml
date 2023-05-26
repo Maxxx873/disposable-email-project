@@ -1,4 +1,4 @@
-name: Apache James extensions deployment
+name: James extensions deploy
 
 on:
   push:
