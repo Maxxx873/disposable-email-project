@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="Disposable_email_Admin" id="00000000000000">
+        <createTable tableName="email_accounts">
+            <column name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="email_accounts_pkey"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="last_modified_date" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="address" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="domain" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Disposable_email_Admin" id="00000000000001">
+        <createTable tableName="customers">
+            <column name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="customers_pkey"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="last_modified_date" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="bot_state" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="chat_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="Disposable_email_Admin" id="00000000000002">
+        <addUniqueConstraint columnNames="address"
+                             constraintName="ux_address"
+                             tableName="email_accounts"/>
+    </changeSet>
+    <changeSet author="Disposable_email_Admin" id="00000000000003">
+        <addUniqueConstraint columnNames="chat_id, name"
+                             constraintName="ux_chat_id_name"
+                             tableName="customers"/>
+    </changeSet>
+    <changeSet author="Disposable_email_Admin" id="00000000000004">
+        <createSequence cacheSize="1"
+                        cycle="false"
+                        dataType="bigint"
+                        incrementBy="1"
+                        maxValue="9223372036854775807"
+                        minValue="1"
+                        sequenceName="global_seq"
+                        startValue="100000"/>
+    </changeSet>
+    <changeSet author="Disposable_email_Admin" id="00000000000005">
+        <addForeignKeyConstraint baseColumnNames="customer_id"
+                                 baseTableName="email_accounts"
+                                 constraintName="fk_customer_id"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="id"
+                                 referencedTableName="customers"
+                                 validate="true"/>
+    </changeSet>
+</databaseChangeLog>

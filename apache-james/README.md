@@ -7,9 +7,10 @@ docker run --network host -d -p "25:25" -p "143:143" -p "127.0.0.1:8000:8000" -v
 
 #### Running **Distributed Apache James server**:
 
+
 Generating a keystore:
 ```bash
-keytool -genkey -alias james -keyalg RSA -keystore conf/keystore
+keytool -genkey -alias james -keyalg RSA -keystore conf-dev/keystore
 ```
 Creating network on docker for the **Apache James** environment:
 ```bash

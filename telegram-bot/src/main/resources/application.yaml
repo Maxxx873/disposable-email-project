@@ -20,9 +20,12 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
+
   liquibase:
-    enabled: false
+    enabled: true
+    default-schema: public
+    changeLog: "classpath:db/db.changelog-master.xml"
 
 telegram.bot:
   name: ${BOT_NAME}
