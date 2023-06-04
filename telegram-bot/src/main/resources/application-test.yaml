@@ -6,6 +6,10 @@ spring:
     ansi:
       enabled: always
 
+  security:
+    password: password
+    salt: e101efd1cf1f111d
+
   datasource:
     driver: org.h2.Driver
     url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
@@ -17,3 +21,10 @@ spring:
 
   liquibase:
     enabled: false
+
+telegram.bot:
+  name: bot
+  token: token
+
+disposableemail.api:
+  base-path: http://localhost:8088/api/v1/
