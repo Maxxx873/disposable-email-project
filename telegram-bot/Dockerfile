@@ -1,8 +1,8 @@
 FROM eclipse-temurin:17-jre-alpine as builder
 WORKDIR extracted
 ENV JAR_FILE=*.jar
-ADD target/${JAR_FILE} disposable-email-telegram-bot.jar
-RUN java -Djarmode=layertools -jar disposable-email-telegram-bot.jar extract
+ADD target/${JAR_FILE} disposable-email-bot.jar
+RUN java -Djarmode=layertools -jar --enable-preview disposable-email-bot.jar extract
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR usr/src/app

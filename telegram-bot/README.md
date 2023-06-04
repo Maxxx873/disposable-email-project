@@ -58,3 +58,14 @@ To generate a diff ChangeLog:
 ```
 mvn clean install liquibase:diff -DskipTests=true
 ```
+___
+### Pushing to dockerhub:
+```bash
+docker login
+```
+```bash
+sudo docker build -t maxxx873/dsp-eml-prj-bot:latest -f Dockerfile .
+```
+```bash
+docker push maxxx873/dsp-eml-prj-bot:latest
+```

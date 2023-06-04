@@ -29,13 +29,13 @@ jobs:
         uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
 
       - name: Copy Jar file
-        run: mv telegram-bot/target/*.jar disposable-telegram-bot.jar
+        run: mv telegram-bot/target/*.jar disposable-email-bot.jar
 
       - name: 📂 Upload external API
         uses: actions/upload-artifact@v3
         with:
-          name: disposable-telegram-bot
-          path: disposable-telegram-bot.jar
+          name: disposable-email-bot
+          path: disposable-email-bot.jar
 
   build-external-api-image:
 
@@ -49,11 +49,11 @@ jobs:
       - name: 📂 Download external API
         uses: actions/download-artifact@v3
         with:
-          name: disposable-telegram-bot
+          name: disposable-email-bot
           path: telegram-bot/target/
 
       - name: 🔍 Display structure of downloaded files
-        run: stat disposable-telegram-bot.jar
+        run: stat disposable-email-bot.jar
         working-directory: telegram-bot/target/
 
       - name: 🔧 Set up QEMU
@@ -74,4 +74,4 @@ jobs:
           context: ./telegram-bot
           file: telegram-bot/Dockerfile
           push: true
-          tags: maxxx873/dsp-eml-telegram-bot:latest
+          tags: maxxx873/dsp-eml-prj-bot:latest
