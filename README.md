@@ -18,6 +18,7 @@
 
 ![API Deploy](https://github.com/Maxxx873/disposable-email-project/actions/workflows/api-deploy.yml/badge.svg)
 ![James Deploy](https://github.com/Maxxx873/disposable-email-project/actions/workflows/james-deploy.yml/badge.svg)
+![Bot Deploy](https://github.com/Maxxx873/disposable-email-project/actions/workflows/bot-deploy.yml/badge.svg)
 </div>
 
 ## Project information

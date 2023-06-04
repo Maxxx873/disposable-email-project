@@ -55,6 +55,6 @@ mvn liquibase:generateChangeLog
 ```
 
 To generate a diff ChangeLog:
-````
+```
 mvn clean install liquibase:diff -DskipTests=true
 ```
