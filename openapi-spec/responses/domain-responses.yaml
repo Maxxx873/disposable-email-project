@@ -13,3 +13,27 @@ components:
         application/json:
           schema:
             $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
+    '202':
+      description: Domain resource created
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/Domain'
+      links:
+        GetAccountItem:
+          operationId: getDomainItem
+          parameters:
+            id: $response.body#/id
+          description: The `id` value returned in the response can be used as the `id` parameter in `GET /domains/{id}`.
+    '204':
+      description: Domain resource deleted
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/Domain'
+    '409':
+      description: Domain is already added
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'

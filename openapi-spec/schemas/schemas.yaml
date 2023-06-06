@@ -51,6 +51,17 @@ components:
         updatedAt:
           type: string
           format: date-time
+    DomainName:
+      type: object
+      properties:
+        name:
+          type: string
+          format: hostname
+          example: example.com
+        isActive:
+          type: boolean
+        isPrivate:
+          type: boolean
     Message:
       type: object
       description: ''

@@ -24,6 +24,7 @@
         <module>config</module>
         <module>jobs-app</module>
         <module>external-api-app</module>
+        <module>admin-api-app</module>
     </modules>
 
     <properties>

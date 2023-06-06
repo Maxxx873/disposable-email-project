@@ -2,15 +2,15 @@ openapi: 3.0.3
 components:
   responses:
     '200':
-      description: Domain collection
+      description: Account collection
       content:
         application/json:
           schema:
             type: array
             items:
-              $ref: '../schemas/schemas.yaml#/components/schemas/Domain'
+              $ref: '../schemas/schemas.yaml#/components/schemas/Account'
     '404':
-      description: Domains not found
+      description: Accounts not found
       content:
         application/json:
           schema:
