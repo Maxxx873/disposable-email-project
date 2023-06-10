@@ -77,9 +77,16 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     }
 
     private Response getKeycloakDeleteUserResponse(String id) {
-        var response = keycloak.realm(realm).users().delete(id);
+        var response = keycloak.realm(realm).users().delete(getKeycloakUserIdByName(id));
         log.info("Keycloak |  Deleting user: {} | Status: {} | Status Info: {}", id,
                 response.getStatus(), response.getStatusInfo());
         return response;
+    }
+
+    private String getKeycloakUserIdByName(String name) {
+        var representation = keycloak.realm(realm).users().search(name, true)
+                .stream()
+                .findFirst();
+        return representation.isPresent() ? representation.get().getId() : "";
     }
 }

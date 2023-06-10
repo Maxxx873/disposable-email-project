@@ -72,5 +72,4 @@ public class AccountEventRegistrationHandler {
     public void handleAccountQuotaInMailServiceUpdatingEvent(Credentials credentials) {
         accountService.setMailboxId(credentials);
     }
-
 }

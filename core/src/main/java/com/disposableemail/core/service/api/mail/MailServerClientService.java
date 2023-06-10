@@ -10,6 +10,10 @@ import javax.ws.rs.core.Response;
 
 public interface MailServerClientService {
 
+    Mono<Response> createDomain(String domain);
+
+    Mono<Response> deleteDomain(String domain);
+
     Flux<DomainEntity> getDomains();
 
     Mono<Response> createUser(Credentials credentials) throws JsonProcessingException;
@@ -25,5 +29,4 @@ public interface MailServerClientService {
     Mono<Response> updateQuotaSize(Credentials credentials);
 
     Mono<Integer> getUsedSize(String username);
-
 }

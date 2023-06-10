@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: disposable-email-project-Admin-API
+  profiles:
+    active: dev

@@ -51,10 +51,10 @@ components:
         updatedAt:
           type: string
           format: date-time
-    DomainName:
+    DomainItem:
       type: object
       properties:
-        name:
+        domain:
           type: string
           format: hostname
           example: example.com

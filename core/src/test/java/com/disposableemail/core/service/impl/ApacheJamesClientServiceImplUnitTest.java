@@ -130,7 +130,6 @@ class ApacheJamesClientServiceImplUnitTest {
         Mono<String> resultMailboxId = mailServerClientService.getMailboxId(credentials, mailboxName);
 
         StepVerifier.create(resultMailboxId).expectNext(expectedMailBoxId).expectComplete().verify();
-
     }
 
     @Test
@@ -148,7 +147,6 @@ class ApacheJamesClientServiceImplUnitTest {
 
         StepVerifier.create(resultMailboxId).expectErrorMatches(throwable ->
                 throwable instanceof MailboxNotFoundException && throwable.getMessage().equals("Mailbox not found"));
-
     }
 
     @Test
@@ -170,11 +168,10 @@ class ApacheJamesClientServiceImplUnitTest {
         Mono<Response> response = mailServerClientService.createUser(credentials);
 
         StepVerifier.create(response).expectComplete().verify();
-
     }
 
     @Test
-    void shouldDeleteUser() throws JsonProcessingException {
+    void shouldDeleteUser() {
 
         var credentials = new Credentials(USERNAME, PASSWORD);
         var uri = String.format("/users/%s", USERNAME);
@@ -187,11 +184,10 @@ class ApacheJamesClientServiceImplUnitTest {
         Mono<Response> response = mailServerClientService.deleteUser(credentials.getAddress());
 
         StepVerifier.create(response).expectComplete().verify();
-
     }
 
     @Test
-    void shouldCreateMailbox() throws JsonProcessingException {
+    void shouldCreateMailbox() {
 
         var mailboxName = "INBOX";
         var credentials = new Credentials(USERNAME, PASSWORD);
@@ -205,7 +201,38 @@ class ApacheJamesClientServiceImplUnitTest {
         Mono<Response> response = mailServerClientService.createMailbox(credentials);
 
         StepVerifier.create(response).expectComplete().verify();
+    }
 
+    @Test
+    void shouldCreateDomain() {
+
+        var domain = "example.com";
+        var uri = String.format("/domains/%s", domain);
+
+        when(webClientMock.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
+        when(requestBodySpec.exchangeToMono(ArgumentMatchers.<Function<ClientResponse, ? extends Mono<String>>>notNull()))
+                .thenReturn(Mono.empty());
+
+        Mono<Response> response = mailServerClientService.createDomain(domain);
+
+        StepVerifier.create(response).expectComplete().verify();
+    }
+
+    @Test
+    void shouldDeleteDomain() {
+
+        var domain = "example.com";
+        var uri = String.format("/domains/%s", domain);
+
+        when(webClientMock.delete()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(uri)).thenReturn(requestBodySpec);
+        when(requestBodySpec.exchangeToMono(ArgumentMatchers.<Function<ClientResponse, ? extends Mono<String>>>notNull()))
+                .thenReturn(Mono.empty());
+
+        Mono<Response> response = mailServerClientService.deleteDomain(domain);
+
+        StepVerifier.create(response).expectComplete().verify();
     }
 
     @Test
@@ -221,7 +248,6 @@ class ApacheJamesClientServiceImplUnitTest {
         Flux<DomainEntity> resultDomainsList = mailServerClientService.getDomains();
 
         StepVerifier.create(resultDomainsList).expectNextCount(domainsCount).expectComplete().verify();
-
     }
 
     @Test
@@ -240,7 +266,6 @@ class ApacheJamesClientServiceImplUnitTest {
         Mono<Response> response = mailServerClientService.updateQuotaSize(credentials);
 
         StepVerifier.create(response).expectComplete().verify();
-
     }
 
     @Test
@@ -274,6 +299,4 @@ class ApacheJamesClientServiceImplUnitTest {
 
         StepVerifier.create(usedSize).expectNext(expectedUsedSize).expectComplete().verify();
     }
-
-
 }

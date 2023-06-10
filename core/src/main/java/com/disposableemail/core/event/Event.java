@@ -22,7 +22,9 @@ public class Event<T> {
         MAILBOX_CREATED_IN_MAIL_SERVICE,
         QUOTA_SIZE_UPDATED_IN_MAIL_SERVICE,
         AUTH_DELETING_ACCOUNT,
-        MAIL_DELETING_ACCOUNT
+        MAIL_DELETING_ACCOUNT,
+        DOMAIN_CREATED,
+        DOMAIN_DELETED,
     }
 
     @Builder.Default

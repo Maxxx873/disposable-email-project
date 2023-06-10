@@ -27,8 +27,8 @@ paths:
           $ref: './responses/account-responses.yaml#/components/responses/422'
         '409':
           $ref: './responses/account-responses.yaml#/components/responses/409'
-      summary: Creates a Account resource.
-      description: Creates a Account resource.
+      summary: Creates an Account resource.
+      description: Creates an Account resource.
     parameters: []
   /accounts/{id}:
     get:
@@ -40,8 +40,8 @@ paths:
           $ref: './responses/account-responses.yaml#/components/responses/200'
         '404':
           $ref: './responses/account-responses.yaml#/components/responses/404'
-      summary: Retrieves a Account resource.
-      description: Retrieves a Account resource.
+      summary: Retrieves the Account resource.
+      description: Retrieves the Account resource.
       parameters:
         - $ref: './parameters/path/accountId.yaml'
       deprecated: false
@@ -54,8 +54,8 @@ paths:
           $ref: './responses/account-responses.yaml#/components/responses/204'
         '404':
           $ref: './responses/account-responses.yaml#/components/responses/404'
-      summary: Removes the Account resource.
-      description: Removes the Account resource.
+      summary: Removes an Account resource.
+      description: Removes an Account resource.
       parameters:
         - $ref: './parameters/path/accountId.yaml'
       deprecated: false

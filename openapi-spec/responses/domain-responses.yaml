@@ -7,12 +7,6 @@ components:
         application/json:
           schema:
             $ref: '../schemas/schemas.yaml#/components/schemas/Domain'
-    '404':
-      description: Domain not found
-      content:
-        application/json:
-          schema:
-            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
     '202':
       description: Domain resource created
       content:
@@ -31,6 +25,18 @@ components:
         application/json:
           schema:
             $ref: '../schemas/schemas.yaml#/components/schemas/Domain'
+    '400':
+      description: Domain bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
+    '404':
+      description: Domain not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schemas.yaml#/components/schemas/ErrorResponse'
     '409':
       description: Domain is already added
       content:

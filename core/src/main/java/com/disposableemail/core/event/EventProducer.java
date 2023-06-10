@@ -19,6 +19,9 @@ public class EventProducer {
     @Value("${exchanges.accounts}")
     private String accountsExchange;
 
+    @Value("${exchanges.domains}")
+    private String domainsExchange;
+
     @Value("${routing-keys.messages-getting}")
     private String messagesGettingRoutingKey;
 
@@ -43,6 +46,12 @@ public class EventProducer {
     @Value("${routing-keys.account-quota-in-mail-service-updating}")
     private String accountQuotaInMailServiceUpdatingRoutingKey;
 
+    @Value("${routing-keys.domain-creating}")
+    private String domainsCreatingRoutingKey;
+
+    @Value("${routing-keys.domain-deleting}")
+    private String domainsDeletingRoutingKey;
+
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -66,6 +75,10 @@ public class EventProducer {
                     rabbitTemplate.convertAndSend(accountsExchange, accountAuthDeletingRoutingKey, event.getData());
             case MAIL_DELETING_ACCOUNT ->
                     rabbitTemplate.convertAndSend(accountsExchange, accountMailDeletingRoutingKey, event.getData());
+            case DOMAIN_CREATED ->
+                    rabbitTemplate.convertAndSend(domainsExchange, domainsCreatingRoutingKey, event.getData());
+            case DOMAIN_DELETED ->
+                    rabbitTemplate.convertAndSend(domainsExchange, domainsDeletingRoutingKey, event.getData());
             default -> throw new UnsupportedOperationException();
         }
     }

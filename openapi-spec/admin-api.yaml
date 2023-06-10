@@ -17,12 +17,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '../schemas/schemas.yaml#/components/schemas/DomainName'
+              $ref: '../schemas/schemas.yaml#/components/schemas/DomainItem'
       responses:
         '202':
           $ref: './responses/domain-responses.yaml#/components/responses/202'
         '204':
-          $ref: './responses/domain-responses.yaml#/components/responses/202'
+          $ref: './responses/domain-responses.yaml#/components/responses/204'
+        '400':
+          $ref: './responses/domain-responses.yaml#/components/responses/400'
         '404':
           $ref: './responses/domain-responses.yaml#/components/responses/404'
         '409':
@@ -90,8 +92,8 @@ paths:
           $ref: './responses/account-responses.yaml#/components/responses/422'
         '409':
           $ref: './responses/account-responses.yaml#/components/responses/409'
-      summary: Creates a Account resource.
-      description: Creates a Account resource.
+      summary: Creates an Account resource.
+      description: Creates an Account resource.
     get:
       security:
         - bearerAuth: []
@@ -105,6 +107,7 @@ paths:
       description: Retrieves the collection of Account resources.
       parameters:
         - $ref: './parameters/query/accountsCollectionSize.yaml'
+        - $ref: './parameters/query/accountsCollectionOffset.yaml'
       deprecated: false
     parameters: []
   /accounts/{id}:

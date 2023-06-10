@@ -18,9 +18,11 @@ import com.disposableemail.core.util.EmailUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static com.disposableemail.core.dao.entity.AccountEntity.createAccountEntityFromCredentials;
@@ -130,10 +132,13 @@ public class AccountServiceImpl implements AccountService {
 
         return accountRepository.findById(id)
                 .switchIfEmpty(Mono.error(new AccountNotFoundException()))
-                .flatMap(accountEntity -> {
-                    log.info("Account {} is deleted", id);
-                    return accountRepository.delete(accountEntity).then(Mono.just(accountEntity));
-                });
+                .flatMap(accountEntity ->
+                        accountRepository.delete(accountEntity).then(Mono.just(accountEntity))
+                                .doOnSuccess(action -> {
+                                    log.info("Account {} is deleted", id);
+                                    eventProducer.send(new Event<>(AUTH_DELETING_ACCOUNT, accountEntity.getAddress()));
+                                    eventProducer.send(new Event<>(MAIL_DELETING_ACCOUNT, accountEntity.getAddress()));
+                                }));
     }
 
     @Override
@@ -146,17 +151,27 @@ public class AccountServiceImpl implements AccountService {
                 .flatMap(tuple2 -> {
                     var userCredentials = tuple2.getT2();
                     var accountEntity = tuple2.getT1();
-                    log.info("Get authorized Account | id: {}, subject: {}",
-                            accountEntity.getId(), userCredentials.getSub());
+                    log.info("Get authorized Account | address: {}, subject: {}",
+                            userCredentials.getPreferredUsername(), userCredentials.getSub());
+                    if (!userCredentials.getPreferredUsername().equals(accountEntity.getAddress())) {
+                        throw new AccessDeniedException("Account unauthorized");
+                    }
                     accountEntity.setIsDeleted(true);
                     return accountRepository.save(accountEntity)
                             .doOnSuccess(action -> {
-                                eventProducer.send(new Event<>(AUTH_DELETING_ACCOUNT, userCredentials.getSub()));
+                                eventProducer.send(new Event<>(AUTH_DELETING_ACCOUNT, accountEntity.getAddress()));
                                 eventProducer.send(new Event<>(MAIL_DELETING_ACCOUNT, accountEntity.getAddress()));
                             });
                 });
         result.subscribe();
         return result;
+    }
+
+    @Override
+    public Flux<AccountEntity> getAccounts(int size, int offset) {
+        log.info("Getting an Accounts | limit: {}, offset: {}", size, offset);
+
+        return accountRepository.findByIdNotNullOrderByCreatedAtDesc().skip(offset).take(size);
     }
 
     private Credentials getEncryptCredentials(Credentials credentials) {

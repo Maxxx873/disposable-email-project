@@ -1,14 +1,13 @@
-name: size
+name: offset
 in: query
-description: The collection size
+description: The collection offset
 required: false
 deprecated: false
 allowEmptyValue: true
 schema:
   type: integer
-  default: 100
-  minimum: 1
-  maximum: 500
+  default: 0
+  minimum: 0
 style: form
 explode: false
 allowReserved: false
