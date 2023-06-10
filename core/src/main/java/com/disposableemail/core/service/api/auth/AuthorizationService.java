@@ -11,7 +11,7 @@ public interface AuthorizationService {
 
     CompletableFuture<Response> createUser(Credentials credentials);
 
-    CompletableFuture<Response> deleteUser(String username);
+    CompletableFuture<Response> deleteUserByName(String username);
 
     Token getToken(Credentials credentials);
 }

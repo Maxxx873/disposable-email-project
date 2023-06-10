@@ -3,6 +3,7 @@ package com.disposableemail.core.service.impl.auth;
 import com.disposableemail.core.event.Event;
 import com.disposableemail.core.event.EventProducer;
 import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredException;
+import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.model.Token;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static com.disposableemail.core.event.Event.Type.AUTH_REGISTER_CONFIRMATION;
@@ -48,8 +50,8 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    public CompletableFuture<Response> deleteUser(String id) {
-        return CompletableFuture.completedFuture(getKeycloakDeleteUserResponse(id));
+    public CompletableFuture<Response> deleteUserByName(String username) {
+        return CompletableFuture.completedFuture(getKeycloakDeleteUserResponse(username));
     }
 
     @Override
@@ -76,17 +78,22 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
         return response;
     }
 
-    private Response getKeycloakDeleteUserResponse(String id) {
-        var response = keycloak.realm(realm).users().delete(getKeycloakUserIdByName(id));
-        log.info("Keycloak |  Deleting user: {} | Status: {} | Status Info: {}", id,
-                response.getStatus(), response.getStatusInfo());
-        return response;
+    private Response getKeycloakDeleteUserResponse(String username) {
+        var userId = getKeycloakUserIdByName(username);
+        if (userId.isEmpty()) {
+            throw new AccountNotFoundException();
+        } else {
+            var response = keycloak.realm(realm).users().delete(userId.get());
+            log.info("Keycloak | Deleting user: {} | Status: {} | Status Info: {}", username,
+                    response.getStatus(), response.getStatusInfo());
+            return response;
+        }
     }
 
-    private String getKeycloakUserIdByName(String name) {
+    private Optional<String> getKeycloakUserIdByName(String name) {
         var representation = keycloak.realm(realm).users().search(name, true)
                 .stream()
                 .findFirst();
-        return representation.isPresent() ? representation.get().getId() : "";
+        return representation.map(UserRepresentation::getId);
     }
 }

@@ -26,7 +26,7 @@ public class AccountEventDeletionHandler {
             key = "${routing-keys.account-auth-deleting}"
     ))
     public void handleAuthServiceDeletingAccountEvent(String id) {
-        authorizationService.deleteUser(id);
+        authorizationService.deleteUserByName(id);
     }
 
     @Async

@@ -2,6 +2,7 @@ package com.disposableemail.keycloak;
 
 import com.disposableemail.config.TestConfig;
 import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredException;
+import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
@@ -100,35 +101,20 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
 
         authorizationService.createUser(getCredentialsEncrypted());
 
-        var futureKeycloakResponse = authorizationService.deleteUser(getUserId());
+        var futureKeycloakResponse = authorizationService.deleteUserByName(credentials.getAddress());
 
         assertThat(futureKeycloakResponse.get().getStatusInfo()).isEqualTo(Response.Status.NO_CONTENT);
     }
 
     @Test
-    void shouldNotFoundDeleteNonExistentUser() throws ExecutionException, InterruptedException {
+    void shouldThrowAccountNotFoundDeleteNonExistentUser() throws ExecutionException, InterruptedException {
         log.debug("shouldNotFoundDeleteNonExistentUser()");
 
         authorizationService.createUser(getCredentialsEncrypted());
 
-        var futureKeycloakResponse = authorizationService.deleteUser("nonExistentId");
-
-        assertThat(futureKeycloakResponse.get().getStatusInfo()).isEqualTo(Response.Status.NOT_FOUND);
-    }
-
-    @NotNull
-    private String getUserId() {
-        var ref = new Object() {
-            String userId = "";
-        };
-        getRealms().forEach(realmRepresentation -> {
-            getUsers(realmRepresentation).forEach(user -> {
-                if (user.getUsername().equals(credentials.getAddress())) {
-                    ref.userId = user.getId();
-                }
-            });
-        });
-        return ref.userId;
+        assertThatThrownBy(() -> authorizationService.deleteUserByName("nonExistentName"))
+                .isInstanceOf(AccountNotFoundException.class)
+                .hasMessageContaining("This Account not found");
     }
 
     private List<UserRepresentation> getUsers(RealmRepresentation realmRepresentation) {
