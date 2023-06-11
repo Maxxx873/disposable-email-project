@@ -1,4 +1,4 @@
-package com.disposableemail.keycloak;
+package com.disposableemail.core.service.impl.auth;
 
 import com.disposableemail.config.TestConfig;
 import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredException;

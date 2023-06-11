@@ -1,0 +1,48 @@
+authorization:
+  service: keycloak
+search:
+  service: none
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9080/realms/realm/protocol/openid-connect/certs
+          issuer-uri: http://localhost:9080/realms/realm
+    password: pass
+    salt: d525ddd5dd5d555d
+    cors:
+      allowed-origins: http://localhost:3000
+
+  data:
+    mongodb:
+      database: disposableemail
+      host: localhost
+      port: 0
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.21
+
+keycloak:
+  server:
+    url: http://localhost:9080
+    realm: master
+    username: admin
+    password: admin
+    client: admin-cli
+
+mail-server:
+  name: server
+  mailbox: inbox
+  base-url: http://localhost:8000
+  defaultUserSizeQuota: 4000
+  quotaPath: /quota/users/
+
+logging:
+  level.root: info

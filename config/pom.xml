@@ -13,12 +13,4 @@
     <name>Disposable Email :: Config</name>
     <description>Jobs application</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.disposableemail</groupId>
-            <artifactId>disposable-email-core</artifactId>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
-
 </project>

@@ -1,13 +1,15 @@
 package com.disposableemail.config;
 
-import com.disposableemail.core.model.Credentials;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.Data;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,5 +33,13 @@ public class RabbitMqConfig {
         classMapper.setTrustedPackages("*");
         classMapper.setIdClassMapping(idClassMapping);
         return classMapper;
+    }
+
+    @Data
+    private static class Credentials implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+        private String address;
+        private String password;
     }
 }

@@ -16,6 +16,13 @@
     <properties>
         <project-base-package>com.disposableemail.core</project-base-package>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.disposableemail</groupId>
+            <artifactId>disposable-email-config</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

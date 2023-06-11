@@ -1,4 +1,4 @@
-package com.disposableemail.mail;
+package com.disposableemail.core.service.impl.mail;
 
 import com.disposableemail.config.TestConfig;
 import jakarta.mail.MessagingException;
@@ -6,7 +6,6 @@ import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.ActiveProfiles;

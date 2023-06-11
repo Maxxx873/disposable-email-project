@@ -1,4 +1,4 @@
-package com.disposableemail.search;
+package com.disposableemail.core.service.impl.search;
 
 import com.disposableemail.config.TestConfig;
 import com.disposableemail.core.dao.entity.search.MessageElasticsearchEntity;

@@ -1,11 +1,10 @@
-package com.disposableemail.core.service.impl;
+package com.disposableemail.core.service.impl.mail;
 
 import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.event.EventProducer;
 import com.disposableemail.core.exception.custom.MailboxNotFoundException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.mail.MailServerClientService;
-import com.disposableemail.core.service.impl.mail.ApacheJamesClientServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
