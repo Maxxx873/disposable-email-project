@@ -1,5 +1,6 @@
 package com.disposableemail.core.event;
 
+import com.disposableemail.core.model.Credentials;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,4 +35,15 @@ public class Event<T> {
 
     @Builder.Default
     private Instant eventCreatedAt = Instant.now();
+
+    public String getLogString() {
+        if (this.getData() instanceof Credentials) {
+            return String.join(", ",
+                    "Event(id=" + this.getId(),
+                    "type=" + this.getType(),
+                    "data=class Credentials {address=" + ((Credentials) this.getData()).getAddress() + "}",
+                    "eventCreatedAt=" + this.getEventCreatedAt() + ")");
+        }
+        return this.toString();
+    }
 }

@@ -56,7 +56,8 @@ public class EventProducer {
     private final RabbitTemplate rabbitTemplate;
 
     public void send(Event<?> event) {
-        log.info("Event sent | {}", event.toString());
+
+        log.info("Event sent | {}", event.getLogString());
 
         switch (event.getType()) {
             case GETTING_MESSAGES ->
