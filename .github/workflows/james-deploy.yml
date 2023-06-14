@@ -78,4 +78,4 @@ jobs:
           context: ./apache-james
           file: apache-james/Dockerfile
           push: true
-          tags: maxxx873/dsp-eml-prj-james:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dsp-eml-prj-james:latest

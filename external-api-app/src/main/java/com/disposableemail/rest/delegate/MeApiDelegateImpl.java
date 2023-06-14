@@ -4,7 +4,7 @@ import com.disposableemail.api.MeApiDelegate;
 import com.disposableemail.core.dao.mapper.AccountMapper;
 import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.model.Account;
-import com.disposableemail.core.service.api.AccountService;
+import com.disposableemail.core.service.impl.AccountHelperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,13 +21,13 @@ import reactor.core.publisher.Mono;
 @PreAuthorize("isAuthenticated()")
 public class MeApiDelegateImpl implements MeApiDelegate {
 
-    private final AccountService accountService;
+    private final AccountHelperService accountService;
     private final AccountMapper accountMapper;
 
     @Override
     public Mono<ResponseEntity<Account>> getMeAccountItem(ServerWebExchange exchange) {
 
-        return accountService.getAuthorizedAccountWithUsedSize(exchange)
+        return accountService.getAuthorizedAccountWithUsedSize()
                 .map(accountMapper::accountEntityToAccount)
                 .map(account -> {
                     log.info("Extracted authenticated Account: {}", account.toString());

@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-external-api-artifact:
+  build-api-artifacts:
 
     runs-on: ubuntu-latest
 
@@ -26,7 +26,7 @@ jobs:
       - name: 📊 Update dependency graph
         uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
 
-      - name: Copy Jar file
+      - name: Copy external API Jar file
         run: mv external-api-app/target/*.jar disposable-email-external-api.jar
 
       - name: 📂 Upload external API
@@ -35,10 +35,19 @@ jobs:
           name: disposable-email-external-api
           path: disposable-email-external-api.jar
 
+      - name: Copy admin API Jar file
+        run: mv admin-api-app/target/*.jar disposable-email-admin-api.jar
+
+      - name: 📂 Upload admin API
+        uses: actions/upload-artifact@v3
+        with:
+          name: disposable-email-admin-api
+          path: disposable-email-admin-api.jar
+
   build-external-api-image:
 
     runs-on: ubuntu-latest
-    needs: build-external-api-artifact
+    needs: build-api-artifacts
     
     steps:
 
@@ -72,4 +81,43 @@ jobs:
           context: ./external-api-app
           file: external-api-app/Dockerfile
           push: true
-          tags: maxxx873/dsp-eml-prj-rest:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dsp-eml-prj-rest:latest
+
+  build-admin-api-image:
+
+    runs-on: ubuntu-latest
+    needs: build-api-artifacts
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: 📂 Download admin API
+        uses: actions/download-artifact@v3
+        with:
+          name: disposable-email-admin-api
+          path: admin-api-app/target/
+
+      - name: 🔍 Display structure of downloaded files
+        run: stat disposable-email-admin-api.jar
+        working-directory: admin-api-app/target/
+
+      - name: 🔧 Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: 🔧 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🐋 Build and push image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./admin-api-app
+          file: admin-api-app/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dsp-eml-prj-rest:latest

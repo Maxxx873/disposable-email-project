@@ -29,7 +29,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     @PreAuthorize("isAuthenticated()")
     public Mono<ResponseEntity<Account>> deleteAccountItem(String id, ServerWebExchange exchange) {
 
-        return accountService.softDeleteAccount(id, exchange)
+        return accountService.softDeleteAccount(id)
                 .map(accountMapper::accountEntityToAccount)
                 .map(account -> ResponseEntity.status(HttpStatus.NO_CONTENT)
                         .contentType(MediaType.APPLICATION_JSON)

@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,5 +46,4 @@ public class MessageEntity extends Auditable {
     private Boolean hasAttachment;
     private List<AttachmentEntity> attachments;
     private Integer size;
-
 }

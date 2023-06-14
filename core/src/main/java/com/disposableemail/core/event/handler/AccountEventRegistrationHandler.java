@@ -1,9 +1,9 @@
 package com.disposableemail.core.event.handler;
 
 import com.disposableemail.core.model.Credentials;
-import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
 import com.disposableemail.core.service.api.mail.MailServerClientService;
+import com.disposableemail.core.service.impl.AccountHelperService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -21,7 +21,8 @@ public class AccountEventRegistrationHandler {
 
     private final AuthorizationService authorizationService;
     private final MailServerClientService mailServerClientService;
-    private final AccountService accountService;
+    private final AccountHelperService accountHelper;
+
 
     @Async
     @RabbitListener(bindings = @QueueBinding(
@@ -70,6 +71,6 @@ public class AccountEventRegistrationHandler {
             key = "${routing-keys.account-quota-in-mail-service-updating}"
     ))
     public void handleAccountQuotaInMailServiceUpdatingEvent(Credentials credentials) {
-        accountService.setMailboxId(credentials);
+        accountHelper.setMailboxId(credentials);
     }
 }

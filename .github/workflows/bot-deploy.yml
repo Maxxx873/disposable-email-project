@@ -74,4 +74,4 @@ jobs:
           context: ./telegram-bot
           file: telegram-bot/Dockerfile
           push: true
-          tags: maxxx873/dsp-eml-prj-bot:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dsp-eml-prj-bot:latest
