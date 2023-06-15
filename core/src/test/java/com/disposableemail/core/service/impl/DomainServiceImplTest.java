@@ -1,41 +1,23 @@
 package com.disposableemail.core.service.impl;
 
-import com.disposableemail.config.TestConfig;
+import com.disposableemail.AbstractSpringIntegrationTest;
 import com.disposableemail.core.dao.entity.DomainEntity;
-import com.disposableemail.core.dao.repository.DomainRepository;
 import com.disposableemail.core.model.DomainItem;
-import com.disposableemail.core.service.api.DomainService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@ContextConfiguration(classes = TestConfig.class)
-class DomainServiceImplTest {
-
-    @Autowired
-    private DomainService domainService;
-    @Autowired
-    private DomainRepository domainRepository;
+class DomainServiceImplTest extends AbstractSpringIntegrationTest {
 
     private final DomainEntity domain1 = new DomainEntity("1", "example.com", true, false);
     private final DomainEntity domain2 = new DomainEntity("2", "example.org", true, true);
-
     private final DomainEntity localhostDomain = new DomainEntity("3", "localhost", true, true);
-
     private final DomainItem domainItem = new DomainItem("example.xyz", true, true);
-
-
 
     @BeforeEach
     public void setUp() {
@@ -49,7 +31,7 @@ class DomainServiceImplTest {
         domainRepository.deleteAll().block();
     }
 
-     @Test
+    @Test
     void shouldFindAllDomains() {
         var domains = domainService.getDomains();
 
@@ -149,7 +131,6 @@ class DomainServiceImplTest {
                 .expectComplete()
                 .verify();
     }
-
 
 
 }
