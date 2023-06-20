@@ -25,7 +25,8 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     private final AccountMapper accountMapper;
 
     @Override
-    public Mono<ResponseEntity<Flux<Account>>> getAccountCollection(Integer size, Integer offset, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<Account>>> getAccountCollection(Integer size, Integer offset,
+                                                                    ServerWebExchange exchange) {
 
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)

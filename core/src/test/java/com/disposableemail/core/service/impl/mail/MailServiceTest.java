@@ -44,7 +44,7 @@ class MailServiceTest {
         helper.setFrom("t6@example.com");
         helper.setTo("test6@example.com");
         helper.setSubject("Hello Java Mail");
-        helper.setText("<html> <body><h1>Hello </h1> </body></html>",true);
+        helper.setText("<html> <body><h1>Hello </h1> </body></html>", true);
         String htmlContent = """
                 <html>
                   <head>
@@ -86,7 +86,7 @@ class MailServiceTest {
                   </body>
                 </html>
                 """;
-     //   helper.setText(htmlContent, true);
+        //   helper.setText(htmlContent, true);
         mailSender.send(mailMessage);
         assertThat(mailSender).isNotNull();
     }

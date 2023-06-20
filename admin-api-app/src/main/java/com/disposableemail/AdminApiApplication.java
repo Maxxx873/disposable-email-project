@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @SpringBootApplication
 @ComponentScan(excludeFilters =
-@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MessagesEventHandler.class))
+    @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MessagesEventHandler.class))
 public class AdminApiApplication {
 
     public static void main(String[] args) {

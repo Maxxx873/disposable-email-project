@@ -54,6 +54,7 @@
         <reactor-test.version>3.5.0</reactor-test.version>
         <testcontainers.elasticsearch.version>1.17.6</testcontainers.elasticsearch.version>
         <de.flapdoodle.embed.mongo.spring30x.version>4.5.2</de.flapdoodle.embed.mongo.spring30x.version>
+        <spring-addons-oauth2-test.version>6.1.13</spring-addons-oauth2-test.version>
         <!-- plugin versions -->
         <spring-boot-maven-plugin.version>3.0.2</spring-boot-maven-plugin.version>
         <versions-maven-plugin.version>2.13.0</versions-maven-plugin.version>
@@ -219,6 +220,12 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.c4-soft.springaddons</groupId>
+            <artifactId>spring-addons-oauth2-test</artifactId>
+            <version>${spring-addons-oauth2-test.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
