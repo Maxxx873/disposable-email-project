@@ -41,6 +41,8 @@
         <keycloak-admin-client.version>21.0.2</keycloak-admin-client.version>
         <!-- retry -->
         <resilience4j-spring-boot3.version>2.0.1</resilience4j-spring-boot3.version>
+        <!-- mail -->
+        <simple-java-mail.version>8.1.2</simple-java-mail.version>
         <!-- openapi -->
         <jakarta.json.bind-api.version>3.0.0</jakarta.json.bind-api.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>
@@ -100,6 +102,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -138,6 +146,14 @@
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
             <version>${keycloak-admin-client.version}</version>
+        </dependency>
+
+        <!-- mail -->
+
+        <dependency>
+            <groupId>org.simplejavamail</groupId>
+            <artifactId>simple-java-mail</artifactId>
+            <version>${simple-java-mail.version}</version>
         </dependency>
 
         <!-- retry -->

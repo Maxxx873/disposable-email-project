@@ -1,0 +1,70 @@
+Date: Sun, 28 May 2023 22:24:21 +0300
+From: postmaster@example.org
+Reply-To: test6@example.com
+To: test6@example.com
+In-Reply-To: <3cccc489-5e62-7e21-7d6f-715dc8a443d8@example.com>
+Subject: Re: test mail
+MIME-Version: 1.0
+Message-ID: <1976018613.1.1685302342282@james.local>
+Content-Type: multipart/report;
+	boundary="----=_Part_0_780285411.1685302342275";
+	report-type=delivery-status
+
+------=_Part_0_780285411.1685302342275
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi. This is the James mail server at james.local.
+I'm afraid I wasn't able to deliver your message to the following addresses.
+This is a permanent error; I've given up. Sorry it didn't work out.  Below
+I include the list of recipients and the reason why I was unable to deliver
+your message.
+
+Original email subject: test mail
+
+Failed recipient(s):
+534@example.com
+
+Error message:
+Too many retries failure. Bouncing after 3 retries.
+
+
+------=_Part_0_780285411.1685302342275
+Content-Type: message/delivery-status; name=first.dat
+Content-Transfer-Encoding: 7bit
+Content-Description: Delivery Status Notification
+Content-Disposition: attachment; filename=first.dat
+
+Reporting-MTA: dns; james-distributed.apache-james_james.
+Received-From-MTA: dns; 172.18.0.1
+
+Final-Recipient: rfc822; 534@example.com
+Action: failed
+Status: Too many retries failure. Bouncing after 3 retries.
+Diagnostic-Code: X-James; Too many retries failure. Bouncing after 3 retries.
+Last-Attempt-Date: Sun, 28 May 2023 19:30:22 +0000
+
+------=_Part_0_780285411.1685302342275
+Content-Type: message/rfc822; name=second.dat
+Content-Disposition: Attachment; filename=second.dat
+
+Received: from 172.18.0.1 (EHLO [127.0.0.1]) ([172.18.0.1])
+          by james.local (JAMES SMTP Server ) with ESMTPA ID 732600747
+          for <534@examole.com>;
+          Sun, 28 May 2023 19:24:21 +0000 (UTC)
+Message-ID: <3cccc489-5e62-7e21-7d6f-715dc8a443d8@example.com>
+Date: Sun, 28 May 2023 22:24:21 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Content-Language: en-US
+To: 534@examole.com
+From: "test6@example.com" <test6@example.com>
+Subject: wwd
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+test
+
+
+------=_Part_0_780285411.1685302342275--

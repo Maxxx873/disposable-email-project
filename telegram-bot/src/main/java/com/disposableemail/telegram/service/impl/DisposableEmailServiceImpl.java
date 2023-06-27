@@ -16,7 +16,6 @@ public class DisposableEmailServiceImpl implements EmailService {
 
     private final DefaultApi api;
 
-
     @Override
     public Flux<Domain> getDomains(Integer size) {
         return api.getDomainCollection(size);

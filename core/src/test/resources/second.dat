@@ -1,0 +1,18 @@
+Received: from 172.18.0.1 (EHLO [127.0.0.1]) ([172.18.0.1])
+          by james.local (JAMES SMTP Server ) with ESMTPA ID 732600747
+          for <534@examole.com>;
+          Sun, 28 May 2023 19:24:21 +0000 (UTC)
+Message-ID: <3cccc489-5e62-7e21-7d6f-715dc8a443d8@example.com>
+Date: Sun, 28 May 2023 22:24:21 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Content-Language: en-US
+To: 534@examole.com
+From: "test6@example.com" <test6@example.com>
+Subject: wwd
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+test
+

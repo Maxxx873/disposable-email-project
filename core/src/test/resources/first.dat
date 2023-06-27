@@ -1,0 +1,8 @@
+Reporting-MTA: dns; james-distributed.apache-james_james.
+Received-From-MTA: dns; 172.18.0.1
+
+Final-Recipient: rfc822; 534@example.com
+Action: failed
+Status: Too many retries failure. Bouncing after 3 retries.
+Diagnostic-Code: X-James; Too many retries failure. Bouncing after 3 retries.
+Last-Attempt-Date: Sun, 28 May 2023 19:30:22 +0000

@@ -3,8 +3,10 @@ package com.disposableemail;
 import com.disposableemail.config.TestConfig;
 import com.disposableemail.core.dao.repository.AccountRepository;
 import com.disposableemail.core.dao.repository.DomainRepository;
+import com.disposableemail.core.dao.repository.SourceRepository;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.DomainService;
+import com.disposableemail.core.service.api.SourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,4 +25,8 @@ public abstract class AbstractSpringIntegrationTest {
     protected AccountService accountService;
     @Autowired
     protected AccountRepository accountRepository;
+    @Autowired
+    protected SourceRepository sourceRepository;
+    @Autowired
+    protected SourceService sourceService;
 }

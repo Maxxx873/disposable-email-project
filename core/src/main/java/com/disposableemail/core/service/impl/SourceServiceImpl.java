@@ -4,19 +4,20 @@ import com.disposableemail.core.dao.entity.AttachmentEntity;
 import com.disposableemail.core.dao.entity.SourceEntity;
 import com.disposableemail.core.dao.repository.SourceRepository;
 import com.disposableemail.core.exception.custom.AttachmentNotFoundException;
+import com.disposableemail.core.exception.custom.DownloadAttachmentException;
 import com.disposableemail.core.exception.custom.MessageNotFoundException;
 import com.disposableemail.core.exception.custom.SourceNotFoundException;
 import com.disposableemail.core.service.api.SourceService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.internet.MimeBodyPart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.simplejavamail.converter.EmailConverter;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,32 +36,38 @@ public class SourceServiceImpl implements SourceService {
     public Mono<SourceEntity> getSourceByMsgId(String msgid) {
         log.info("Getting a Source | msgid: {}", msgid);
 
-        return sourceRepository.findByMsgid(msgid);
+        return sourceRepository
+                .findByMsgid(msgid)
+                .switchIfEmpty(Mono.error(new SourceNotFoundException()));
     }
 
     @Override
     public Mono<byte[]> downloadSource(String msgid) {
         log.info("Getting a Source as ByteArrayInputStream | msgid: {}", msgid);
 
-        return sourceRepository.findByMsgid(msgid).map(sourceEntity ->
-        {
-            try {
-                return IOUtils.toByteArray(new ByteArrayInputStream(sourceEntity.getData().getBytes()));
-            } catch (IOException e) {
-                throw new SourceNotFoundException();
-            }
-        });
+        return sourceRepository.findByMsgid(msgid)
+                .switchIfEmpty(Mono.error(new SourceNotFoundException()))
+                .map(sourceEntity ->
+                {
+                    try {
+                        return IOUtils.toByteArray(new ByteArrayInputStream(sourceEntity.getData().getBytes()));
+                    } catch (IOException e) {
+                        throw new SourceNotFoundException();
+                    }
+                });
     }
 
     @Override
     public Mono<String> getAttachmentName(String attachmentId) {
         log.info("Getting Attachment name | attachmentId: {}", attachmentId);
 
-        return sourceRepository.findByAttachmentId(attachmentId).map(sourceEntity ->
+        return sourceRepository.findByAttachmentId(attachmentId)
+                .map(sourceEntity ->
                         sourceEntity.getAttachments().stream().filter(attachmentEntity ->
                                         Objects.equals(attachmentEntity.getId(), attachmentId)).findFirst()
                                 .orElseThrow(AttachmentNotFoundException::new))
                 .map(AttachmentEntity::getFilename)
+                .switchIfEmpty(Mono.error(new AttachmentNotFoundException()))
                 .doOnSuccess(filename -> log.info("Received attachment | filename: {}", filename))
                 .doOnError(e -> log.error("Attachment name not found | attachmentId: {}", attachmentId));
     }
@@ -83,19 +90,20 @@ public class SourceServiceImpl implements SourceService {
         return sourceRepository.findByMsgid(msgid).map(sourceEntity ->
         {
             try {
-                var attachment = sourceEntity.getAttachments().stream().filter(attachmentEntity ->
-                        Objects.equals(attachmentEntity.getId(), attachmentId)).findFirst();
-                var mimeMessage = new MimeMessage(null, new ByteArrayInputStream(sourceEntity.getData().getBytes()));
-                var content = mimeMessage.getContent();
-                if (content instanceof Multipart multiPart) {
-                    var part = (MimeBodyPart) multiPart
-                            .getBodyPart(attachment.orElseThrow(MessageNotFoundException::new)
-                            .getPartId());
+                var partId = sourceEntity.getAttachments()
+                        .stream()
+                        .filter(attachmentEntity -> Objects.equals(attachmentEntity.getId(), attachmentId))
+                        .findFirst()
+                        .orElseThrow(MessageNotFoundException::new)
+                        .getPartId();
+                var mimeMessage = EmailConverter.emlToMimeMessage(sourceEntity.getData());
+                if (mimeMessage.getContent() instanceof Multipart multiPart) {
+                    var part = (MimeBodyPart) multiPart.getBodyPart(partId);
                     return IOUtils.toByteArray(new ByteArrayInputStream(part.getInputStream().readAllBytes()));
                 }
                 return IOUtils.toByteArray(new ByteArrayInputStream(sourceEntity.getData().getBytes()));
             } catch (IOException | MessagingException e) {
-                throw new RuntimeException(e);
+                throw new DownloadAttachmentException(e.getMessage());
             }
         });
     }
