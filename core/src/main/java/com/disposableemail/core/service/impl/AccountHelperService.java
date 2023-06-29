@@ -37,23 +37,17 @@ public class AccountHelperService {
     }
 
     public Mono<AccountEntity> getAuthorizedAccountWithUsedSize() {
-
-        var accountEntity = getCredentialsFromJwt()
+        return getCredentialsFromJwt()
                 .switchIfEmpty(Mono.error(new AccessDeniedException("Access denied")))
                 .map(UserCredentials::getPreferredUsername)
-                .flatMap(accountService::getAccountByAddress);
-        var usedSize = accountEntity.flatMap(account -> mailServerClientService.getUsedSize(account.getAddress()));
-        var result = accountEntity.zipWith(usedSize)
-                .map(tuple2 -> {
-                    log.info("Get used size for Account | address: {}, used size: {}",
-                            tuple2.getT1().getAddress(), tuple2.getT2());
-                    var account = tuple2.getT1();
-                    account.setUsed(tuple2.getT2());
-                    return account;
-                })
+                .flatMap(accountService::getAccountByAddress)
+                .flatMap(account -> mailServerClientService.getUsedSize(account.getAddress())
+                        .map(usedSize -> {
+                            log.info("Get used size for Account | address: {}, used size: {}", account.getAddress(), usedSize);
+                            account.setUsed(usedSize);
+                            return account;
+                        }))
                 .flatMap(accountRepository::save);
-        result.subscribe();
-        return result;
     }
 
     public Mono<AccountEntity> setMailboxId(Credentials credentials) {
