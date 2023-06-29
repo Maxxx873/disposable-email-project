@@ -1,6 +1,7 @@
 package com.disposableemail.core.service.impl;
 
 import com.disposableemail.core.dao.entity.AccountEntity;
+import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.dao.repository.AccountRepository;
 import com.disposableemail.core.dao.repository.DomainRepository;
 import com.disposableemail.core.event.Event;
@@ -45,8 +46,7 @@ public class AccountServiceImpl implements AccountService {
                 .doOnError(throwable -> log.error("Trying to find a Domain", throwable))
                 .map(domainEntity -> {
                     log.info("Using a Domain: {}", domainEntity.toString());
-                    if (Boolean.TRUE.equals(domainEntity.getIsActive()) &&
-                            Boolean.FALSE.equals(domainEntity.getIsPrivate())) {
+                    if (isAvailable(domainEntity)) {
                         return accountRepository.findByAddress(credentials.getAddress().toLowerCase())
                                 .flatMap(accountEntity -> Mono.error(AccountAlreadyRegisteredException::new))
                                 .then(accountRepository.save(createAccountEntityFromCredentials(credentials, quotaSize)))
@@ -127,5 +127,10 @@ public class AccountServiceImpl implements AccountService {
                 .address(credentials.getAddress())
                 .password(encryptor.encrypt(credentials.getPassword()))
                 .build();
+    }
+
+    private static boolean isAvailable(DomainEntity domainEntity) {
+        return Boolean.TRUE.equals(domainEntity.getIsActive()) &&
+                Boolean.FALSE.equals(domainEntity.getIsPrivate());
     }
 }

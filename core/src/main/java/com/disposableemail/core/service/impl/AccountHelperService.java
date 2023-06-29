@@ -11,6 +11,7 @@ import com.disposableemail.core.service.api.mail.MailServerClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -37,7 +38,10 @@ public class AccountHelperService {
 
     public Mono<AccountEntity> getAuthorizedAccountWithUsedSize() {
 
-        var accountEntity = getCredentialsFromJwt().map(UserCredentials::getPreferredUsername).flatMap(accountService::getAccountByAddress);
+        var accountEntity = getCredentialsFromJwt()
+                .switchIfEmpty(Mono.error(new AccessDeniedException("Access denied")))
+                .map(UserCredentials::getPreferredUsername)
+                .flatMap(accountService::getAccountByAddress);
         var usedSize = accountEntity.flatMap(account -> mailServerClientService.getUsedSize(account.getAddress()));
         var result = accountEntity.zipWith(usedSize)
                 .map(tuple2 -> {
