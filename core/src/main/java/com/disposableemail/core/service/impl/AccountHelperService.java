@@ -47,23 +47,25 @@ public class AccountHelperService {
                             account.setUsed(usedSize);
                             return account;
                         }))
-                .flatMap(accountRepository::save);
+                .flatMap(accountRepository::save)
+                .doOnSuccess(result -> log.info("Used size received successfully"))
+                .doOnError(err -> log.error("Error getting Used size", err));
     }
 
     public Mono<AccountEntity> setMailboxId(Credentials credentials) {
         log.info("Setting a mailbox id for an Account {} | ", credentials.getAddress());
 
-        var result = mailServerClientService.getMailboxId(credentials, inbox)
+        return mailServerClientService.getMailboxId(credentials, inbox)
                 .zipWith(accountRepository.findByAddress(credentials.getAddress()))
-                .flatMap(tuple2 -> {
-                    log.info("Set Mailbox id for Account | address: {}, mailbox: {}",
-                            credentials.getAddress(), tuple2.getT1());
-                    var accountEntity = tuple2.getT2();
-                    accountEntity.setMailboxId(tuple2.getT1());
+                .flatMap(tuple -> {
+                    var mailboxId = tuple.getT1();
+                    var accountEntity = tuple.getT2();
+                    log.info("Set Mailbox id for Account | address: {}, mailbox: {}", credentials.getAddress(), mailboxId);
+                    accountEntity.setMailboxId(mailboxId);
                     return accountRepository.save(accountEntity);
-                });
-        result.subscribe();
-        return result;
+                })
+                .doOnSuccess(result -> log.info("Mailbox id saved successfully"))
+                .doOnError(err -> log.error("Error saving mailbox id", err));
     }
 
 }

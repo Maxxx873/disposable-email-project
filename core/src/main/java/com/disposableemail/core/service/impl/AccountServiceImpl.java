@@ -42,9 +42,10 @@ public class AccountServiceImpl implements AccountService {
     public Mono<AccountEntity> createAccount(Credentials credentials) {
         log.info("Creating an Account | ({})", credentials.getAddress());
 
-        return domainRepository.findByDomain(EmailUtils.getDomainFromEmailAddress(credentials.getAddress()))
-                .doOnError(throwable -> log.error("Trying to find a Domain", throwable))
-                .map(domainEntity -> {
+        var domain = EmailUtils.getDomainFromEmailAddress(credentials.getAddress());
+
+        return domainRepository.findByDomain(domain)
+                .flatMap(domainEntity -> {
                     log.info("Using a Domain: {}", domainEntity.toString());
                     if (isAvailable(domainEntity)) {
                         return accountRepository.findByAddress(credentials.getAddress().toLowerCase())
@@ -56,7 +57,6 @@ public class AccountServiceImpl implements AccountService {
                         return Mono.just(new AccountEntity());
                     }
                 })
-                .flatMap(accountEntity -> accountEntity)
                 .switchIfEmpty(Mono.error(DomainNotAvailableException::new));
     }
 

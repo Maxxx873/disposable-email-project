@@ -10,7 +10,6 @@ import com.disposableemail.core.exception.custom.SourceNotFoundException;
 import com.disposableemail.core.service.api.SourceService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
-import jakarta.mail.internet.MimeBodyPart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -47,15 +46,10 @@ public class SourceServiceImpl implements SourceService {
 
         return sourceRepository.findByMsgid(msgid)
                 .switchIfEmpty(Mono.error(new SourceNotFoundException()))
-                .map(sourceEntity ->
-                {
-                    try {
-                        return IOUtils.toByteArray(new ByteArrayInputStream(sourceEntity.getData().getBytes()));
-                    } catch (IOException e) {
-                        throw new SourceNotFoundException();
-                    }
-                });
+                .flatMap(sourceEntity -> Mono.fromCallable(() -> IOUtils.toByteArray(new ByteArrayInputStream(sourceEntity.getData().getBytes()))))
+                .onErrorMap(IOException.class, e -> new SourceNotFoundException());
     }
+
 
     @Override
     public Mono<String> getAttachmentName(String attachmentId) {
@@ -87,24 +81,24 @@ public class SourceServiceImpl implements SourceService {
     public Mono<byte[]> downloadAttachment(String msgid, String attachmentId) {
         log.info("Getting an Attachment as ByteArrayInputStream | msgid: {}, attachmentId: {}", msgid, attachmentId);
 
-        return sourceRepository.findByMsgid(msgid).map(sourceEntity ->
-        {
-            try {
-                var partId = sourceEntity.getAttachments()
-                        .stream()
-                        .filter(attachmentEntity -> Objects.equals(attachmentEntity.getId(), attachmentId))
-                        .findFirst()
-                        .orElseThrow(MessageNotFoundException::new)
-                        .getPartId();
-                var mimeMessage = EmailConverter.emlToMimeMessage(sourceEntity.getData());
-                if (mimeMessage.getContent() instanceof Multipart multiPart) {
-                    var part = (MimeBodyPart) multiPart.getBodyPart(partId);
-                    return IOUtils.toByteArray(new ByteArrayInputStream(part.getInputStream().readAllBytes()));
-                }
-                return IOUtils.toByteArray(new ByteArrayInputStream(sourceEntity.getData().getBytes()));
-            } catch (IOException | MessagingException e) {
-                throw new DownloadAttachmentException(e.getMessage());
-            }
-        });
+        return sourceRepository.findByMsgid(msgid)
+                .flatMap(sourceEntity -> {
+                    try {
+                        var attachment = sourceEntity.getAttachments()
+                                .stream()
+                                .filter(attachmentEntity -> attachmentEntity.getId().equals(attachmentId))
+                                .findFirst()
+                                .orElseThrow(MessageNotFoundException::new);
+                        var mimeMessage = EmailConverter.emlToMimeMessage(sourceEntity.getData());
+                        if (mimeMessage.getContent() instanceof Multipart multiPart) {
+                            var part = multiPart.getBodyPart(attachment.getPartId());
+                            return Mono.fromCallable(() -> IOUtils.toByteArray(part.getInputStream()));
+                        } else {
+                            return Mono.fromCallable(() -> sourceEntity.getData().getBytes());
+                        }
+                    } catch (IOException | MessagingException e) {
+                        return Mono.error(new DownloadAttachmentException(e.getMessage()));
+                    }
+                });
     }
 }
