@@ -3,9 +3,11 @@ package com.disposableemail;
 import com.disposableemail.config.TestConfig;
 import com.disposableemail.core.dao.repository.AccountRepository;
 import com.disposableemail.core.dao.repository.DomainRepository;
+import com.disposableemail.core.dao.repository.MessageRepository;
 import com.disposableemail.core.dao.repository.SourceRepository;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.DomainService;
+import com.disposableemail.core.service.api.MessageService;
 import com.disposableemail.core.service.api.SourceService;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
 import com.disposableemail.core.service.api.mail.MailServerClientService;
@@ -36,6 +38,10 @@ public abstract class AbstractSpringIntegrationTest {
     protected SourceRepository sourceRepository;
     @Autowired
     protected SourceService sourceService;
+    @Autowired
+    protected MessageService messageService;
+    @Autowired
+    protected MessageRepository messageRepository;
     @Autowired
     protected AccountHelperService accountHelperService;
     @MockBean

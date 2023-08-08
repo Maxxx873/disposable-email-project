@@ -33,7 +33,7 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
 
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(messageService.getMessagesByAccountId(PageRequest.of(page, size), exchange)
+                        .body(messageService.getMessagesForAuthorizedAccount(PageRequest.of(page, size))
                                 .map(messageMapper::messageEntityToMessages)))
                 .switchIfEmpty(Mono.error(new MessagesNotFoundException()));
     }
@@ -41,7 +41,7 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
     @Override
     public Mono<ResponseEntity<Void>> deleteMessageItem(String id, ServerWebExchange exchange) {
 
-        return messageService.softDeleteMessage(id, exchange)
+        return messageService.softDeleteMessage(id)
                 .switchIfEmpty(Mono.error(new MessageNotFoundException()))
                 .map(value -> ResponseEntity.noContent().build());
     }
@@ -50,7 +50,7 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
     public Mono<ResponseEntity<Message>> patchMessageItem(String id, Mono<Message> message, ServerWebExchange exchange) {
 
         return messageMapper.messageToMessageEntity(message).flatMap(messageEntity ->
-                        messageService.updateMessage(id, messageEntity, exchange))
+                        messageService.updateMessage(id, messageEntity))
                 .switchIfEmpty(Mono.error(new MessageNotFoundException()))
                 .map(messageEntity -> ResponseEntity.status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -60,7 +60,7 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
     @Override
     public Mono<ResponseEntity<Message>> getMessageItem(String id, ServerWebExchange exchange) {
 
-        return messageService.getMessage(id, exchange)
+        return messageService.getMessage(id)
                 .map(messageEntity -> {
                     log.info("Retrieved Message | message: {}", messageEntity.toString());
                     return ResponseEntity.status(HttpStatus.OK)
