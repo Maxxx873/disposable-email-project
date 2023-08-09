@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
@@ -35,10 +34,10 @@ public class SourceDownloadController {
     private final DataBufferFactory dataBufferFactory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
 
     @GetMapping(value = "/messages/{id}/download", produces = APPLICATION_OCTET_STREAM_VALUE)
-    public Mono<ResponseEntity<Mono<DataBuffer>>> downloadSource(@PathVariable String id, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Mono<DataBuffer>>> downloadSource(@PathVariable String id) {
 
         return Mono.fromCallable(() -> {
-            var body = messageService.getMessage(id, exchange)
+            var body = messageService.getMessage(id)
                     .flatMap(messageEntity -> {
                         log.info("Retrieved Message: {}", messageEntity.toString());
                         return sourceService.getSourceByMsgId(messageEntity.getMsgid());

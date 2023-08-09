@@ -28,7 +28,7 @@ public class SourceApiDelegateImpl implements SourcesApiDelegate {
 
     @Override
     public Mono<ResponseEntity<Source>> getSourceItem(String id, ServerWebExchange exchange) {
-        return messageService.getMessage(id, exchange)
+        return messageService.getMessage(id)
                 .flatMap(messageEntity -> {
                     log.info("Retrieved Message: {}", messageEntity.toString());
                     return sourceService.getSourceByMsgId(messageEntity.getMsgid());

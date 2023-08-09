@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
@@ -36,8 +35,7 @@ public class AttachmentDownloadController {
 
     @GetMapping(value = "/messages/{messageId}/attachment/{attachmentId}", produces = APPLICATION_OCTET_STREAM_VALUE)
     public Mono<ResponseEntity<Mono<DataBuffer>>> downloadAttachment(@PathVariable String messageId,
-                                                                     @PathVariable String attachmentId,
-                                                                     ServerWebExchange exchange) {
+                                                                     @PathVariable String attachmentId) {
 
         log.info("Attachment from message download start | MessageId {} | AttachmentId: {}", messageId, attachmentId);
 
@@ -46,7 +44,7 @@ public class AttachmentDownloadController {
                         ResponseEntity.ok()
                                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename))
                 .map(bodyBuilder ->
-                        bodyBuilder.body(messageService.getMessage(messageId, exchange)
+                        bodyBuilder.body(messageService.getMessage(messageId)
                                 .flatMap(messageEntity -> {
                                     log.info("Retrieved Message | {}", messageEntity.toString());
                                     return sourceService.getSourceByMsgId(messageEntity.getMsgid());
