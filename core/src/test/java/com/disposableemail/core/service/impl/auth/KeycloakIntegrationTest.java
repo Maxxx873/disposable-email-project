@@ -5,6 +5,8 @@ import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredExcepti
 import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -19,8 +21,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 

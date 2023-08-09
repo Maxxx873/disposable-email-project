@@ -3,10 +3,10 @@ package com.disposableemail.core.service.api.mail;
 import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.model.Credentials;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.ws.rs.core.Response;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.ws.rs.core.Response;
 
 public interface MailServerClientService {
 

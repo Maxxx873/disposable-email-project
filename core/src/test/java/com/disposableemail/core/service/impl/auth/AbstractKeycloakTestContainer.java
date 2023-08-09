@@ -14,7 +14,7 @@ import java.time.Duration;
 public abstract class AbstractKeycloakTestContainer {
 
     @Container
-    private static final GenericContainer<?> keycloakContainer = new GenericContainer<>(DockerImageName.parse("quay.io/keycloak/keycloak:20.0.1"))
+    private static final GenericContainer<?> keycloakContainer = new GenericContainer<>(DockerImageName.parse("quay.io/keycloak/keycloak:22.0.1"))
             .withExposedPorts(8080)
             .withEnv("KEYCLOAK_ADMIN", "admin")
             .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin")

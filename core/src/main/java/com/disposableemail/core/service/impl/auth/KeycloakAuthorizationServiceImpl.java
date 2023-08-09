@@ -7,6 +7,7 @@ import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.model.Token;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

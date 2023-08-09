@@ -38,7 +38,7 @@
         <projectlombok.version>1.18.26</projectlombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <!-- authorization -->
-        <keycloak-admin-client.version>21.0.2</keycloak-admin-client.version>
+        <keycloak-admin-client.version>22.0.1</keycloak-admin-client.version>
         <!-- retry -->
         <resilience4j-spring-boot3.version>2.0.1</resilience4j-spring-boot3.version>
         <!-- mail -->
