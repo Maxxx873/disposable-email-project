@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-external-api-artifact:
+  build-bot-artifact:
 
     runs-on: ubuntu-latest
 
@@ -31,22 +31,22 @@ jobs:
       - name: Copy Jar file
         run: mv telegram-bot/target/*.jar disposable-email-bot.jar
 
-      - name: 📂 Upload external API
+      - name: 📂 Upload bot
         uses: actions/upload-artifact@v3
         with:
           name: disposable-email-bot
           path: disposable-email-bot.jar
 
-  build-external-api-image:
+  build-bot-image:
 
     runs-on: ubuntu-latest
-    needs: build-external-api-artifact
+    needs: build-bot-artifact
     
     steps:
 
       - uses: actions/checkout@v3
 
-      - name: 📂 Download external API
+      - name: 📂 Download bot
         uses: actions/download-artifact@v3
         with:
           name: disposable-email-bot
