@@ -48,11 +48,14 @@ public class BotCallbackQueryHandler {
         }
 
         if (customer.isPresent()) {
-            return switch (callbackData.get().getData()) {
-                case AccountEntity account -> choiceAccountAnswer(callbackQuery.getMessage(), account);
-                case Domain domain -> botAccountService.createAccount(chatId, domain);
-                default -> throw new IllegalStateException("Unexpected value: " + callbackData.get().getData());
-            };
+            var data = callbackData.get().getData();
+            if (data instanceof AccountEntity account) {
+                return choiceAccountAnswer(callbackQuery.getMessage(), account);
+            } else if (data instanceof Domain domain) {
+                return botAccountService.createAccount(chatId, domain);
+            } else {
+                throw new IllegalStateException("Unexpected value: " + data);
+            }
         }
         return Mono.empty();
     }

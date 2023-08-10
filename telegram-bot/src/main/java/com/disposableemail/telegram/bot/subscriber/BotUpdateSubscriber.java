@@ -45,11 +45,14 @@ public class BotUpdateSubscriber<T> implements Subscriber<T> {
 
     private void executeMessage(Object message) {
         try {
-            switch (message) {
-                case SendMessage sendMessage -> telegramBot.execute(sendMessage);
-                case SendDocument sendDocument -> telegramBot.execute(sendDocument);
-                case EditMessageText editMessageText -> telegramBot.execute(editMessageText);
-                default -> throw new IllegalStateException("Unexpected value: " + message);
+            if (message instanceof SendMessage sendMessage) {
+                telegramBot.execute(sendMessage);
+            } else if (message instanceof SendDocument sendDocument) {
+                telegramBot.execute(sendDocument);
+            } else if (message instanceof EditMessageText editMessageText) {
+                telegramBot.execute(editMessageText);
+            } else {
+                throw new IllegalStateException("Unexpected value: " + message);
             }
         } catch (TelegramApiException e) {
             log.error(e.getLocalizedMessage());

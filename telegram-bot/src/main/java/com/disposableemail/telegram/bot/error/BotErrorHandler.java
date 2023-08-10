@@ -57,12 +57,13 @@ public class BotErrorHandler {
     }
 
     private String getErrorText(Throwable throwable) {
-        return switch (throwable) {
-            case WebClientRequestException e -> "<i>Mail server connection refused! Please, try again later.</i>";
-            case WebClientResponseException.Unauthorized e ->  "<i>Unauthorized! Your password is incorrect.</i>";
-            case WebClientResponseException.Conflict e -> "<i>This account is already registered on the mail server!.</i>";
-            default -> "<i>Something wrong!</i>";
-        };
+        return throwable instanceof WebClientRequestException
+                ? "<i>Mail server connection refused! Please, try again later.</i>"
+                : throwable instanceof WebClientResponseException.Unauthorized
+                ? "<i>Unauthorized! Your password is incorrect.</i>"
+                : throwable instanceof WebClientResponseException.Conflict
+                ? "<i>This account is already registered on the mail server!.</i>"
+                : "<i>Something wrong!</i>";
     }
 
 }
