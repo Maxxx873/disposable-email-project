@@ -26,16 +26,16 @@ public class WebSecurityConfig {
     @Bean
     SecurityWebFilterChain apiHttpSecurity(ServerHttpSecurity http) {
         http
-                .csrf().disable()
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(ServerHttpSecurity.CorsSpec::disable)
                 .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/**"))
                 .authorizeExchange(exchanges ->
-                        exchanges.anyExchange().permitAll()
-                );
-        http.oauth2ResourceServer()
-                .jwt()
-                .jwtDecoder(jwtDecoder());
-        http.cors().and().csrf().disable();
+                        exchanges.anyExchange().permitAll());
+        http
+                .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.jwtDecoder(jwtDecoder())));
         return http.build();
+
     }
 
     @Bean
