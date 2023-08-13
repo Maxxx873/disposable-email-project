@@ -1,5 +1,6 @@
 package com.disposableemail.config;
 
+import com.disposableemail.core.event.ApplicationEventListener;
 import com.disposableemail.core.event.EventProducer;
 import com.github.fridujo.rabbitmq.mock.compatibility.MockConnectionFactoryFactory;
 import com.rabbitmq.client.Channel;
@@ -19,7 +20,8 @@ import org.springframework.test.context.ActiveProfiles;
 @MockBeans({
         @MockBean(ReactiveJwtDecoder.class),
         @MockBean(EventProducer.class),
-        @MockBean(Channel.class)
+        @MockBean(Channel.class),
+        @MockBean(ApplicationEventListener.class)
 })
 public class TestConfig {
 

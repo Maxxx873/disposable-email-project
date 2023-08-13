@@ -46,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
 
         return domainRepository.findByDomain(domain)
                 .flatMap(domainEntity -> {
-                    log.info("Using a Domain: {}", domainEntity.toString());
+                    log.info("Using a Domain: {}", domainEntity.getDomain());
                     if (isAvailable(domainEntity)) {
                         return accountRepository.findByAddress(credentials.getAddress().toLowerCase())
                                 .flatMap(accountEntity -> Mono.error(AccountAlreadyRegisteredException::new))

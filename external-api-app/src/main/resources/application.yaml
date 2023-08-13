@@ -73,13 +73,20 @@ mail-server:
 logging:
   level.root: info
 
-resilience4j.retry:
-  instances:
-    retryAuthorizationService:
-      maxAttempts: 15
-      waitDuration: 5s
-      retryExceptions:
-        - org.springframework.web.client.HttpServerErrorException
-    retryMailService:
-      maxAttempts: 15
-      waitDuration: 3s
+resilience4j:
+  retry:
+    instances:
+      retryAuthorizationService:
+        maxAttempts: 15
+        waitDuration: 5s
+        retryExceptions:
+          - org.springframework.web.client.HttpServerErrorException
+      retryMailService:
+        maxAttempts: 15
+        waitDuration: 3s
+  ratelimiter:
+    instances:
+      ratelimiterAccountRegistration:
+        limitForPeriod: 1
+        limitRefreshPeriod: 1m
+        timeoutDuration: 2s

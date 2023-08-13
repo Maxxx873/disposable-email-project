@@ -1,6 +1,3 @@
-server:
-  port: ${PORT:8088}
-
 authorization:
   service: keycloak
 search:
@@ -45,3 +42,11 @@ mail-server:
 
 logging:
   level.root: debug
+
+resilience4j:
+  ratelimiter:
+    instances:
+      ratelimiterAccountRegistration:
+        limitForPeriod: 5
+        limitRefreshPeriod: 1m
+        timeoutDuration: 2s

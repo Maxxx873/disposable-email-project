@@ -34,6 +34,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(AccountToManyRequestsException.class)
+    public final ResponseEntity<Object> handleAccountToManyRequestException(AccountToManyRequestsException ex) {
+        log.error(EXCEPTION_LOG, ex.getMessage());
+        var error = new ErrorResponse(String.valueOf(HttpStatus.TOO_MANY_REQUESTS.value()), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.TOO_MANY_REQUESTS);
+    }
+
 
     @ExceptionHandler({AccountAlreadyRegisteredException.class, MongoWriteException.class})
     public final ResponseEntity<ErrorResponse> handleAccountAlreadyRegisteredException(AccountAlreadyRegisteredException ex) {

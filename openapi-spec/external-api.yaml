@@ -23,10 +23,12 @@ paths:
           $ref: './responses/account-responses.yaml#/components/responses/400'
         '401':
           $ref: './responses/account-responses.yaml#/components/responses/401'
-        '422':
-          $ref: './responses/account-responses.yaml#/components/responses/422'
         '409':
           $ref: './responses/account-responses.yaml#/components/responses/409'
+        '422':
+          $ref: './responses/account-responses.yaml#/components/responses/422'
+        '429':
+          $ref: './responses/account-responses.yaml#/components/responses/429'
       summary: Creates an Account resource.
       description: Creates an Account resource.
     parameters: []
