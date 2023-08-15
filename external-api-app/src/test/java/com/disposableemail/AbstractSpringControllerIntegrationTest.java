@@ -1,10 +1,11 @@
 package com.disposableemail;
 
 import com.disposableemail.config.TestConfig;
-import com.disposableemail.core.dao.mapper.AccountMapper;
+import com.disposableemail.core.dao.entity.AccountEntity;
+import com.disposableemail.core.model.Account;
 import com.disposableemail.core.service.api.AccountService;
+import com.disposableemail.core.service.impl.AccountHelperService;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,7 +27,26 @@ public abstract class AbstractSpringControllerIntegrationTest {
     @MockBean
     protected AccountService accountService;
 
-    @Autowired
-    protected AccountMapper accountMapper;
+    @MockBean
+    protected AccountHelperService accountHelperService;
+
+    protected final AccountEntity testAccountEntity = AccountEntity.builder()
+            .id("1")
+            .address("account1@example.com")
+            .quota(40000)
+            .used(4000)
+            .mailboxId("mailboxId1")
+            .isDeleted(false)
+            .isDisabled(true)
+            .build();
+
+    protected final Account testAccount = Account.builder()
+            .id("1")
+            .address("account1@example.com")
+            .quota(40000)
+            .used(4000)
+            .isDeleted(false)
+            .isDisabled(true)
+            .build();
 
 }

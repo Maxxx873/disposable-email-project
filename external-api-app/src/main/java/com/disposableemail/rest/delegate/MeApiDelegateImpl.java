@@ -21,13 +21,13 @@ import reactor.core.publisher.Mono;
 @PreAuthorize("isAuthenticated()")
 public class MeApiDelegateImpl implements MeApiDelegate {
 
-    private final AccountHelperService accountService;
+    private final AccountHelperService accountHelperService;
     private final AccountMapper accountMapper;
 
     @Override
     public Mono<ResponseEntity<Account>> getMeAccountItem(ServerWebExchange exchange) {
 
-        return accountService.getAuthorizedAccountWithUsedSize()
+        return accountHelperService.getAuthorizedAccountWithUsedSize()
                 .map(accountMapper::accountEntityToAccount)
                 .map(account -> {
                     log.info("Extracted authenticated Account: {}", account.toString());

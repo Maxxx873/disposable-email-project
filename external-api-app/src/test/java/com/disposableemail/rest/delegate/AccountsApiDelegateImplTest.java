@@ -16,21 +16,11 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 class AccountsApiDelegateImplTest extends AbstractSpringControllerIntegrationTest {
-
-    private final AccountEntity testAccount = AccountEntity.builder()
-            .id("1")
-            .address("account1@example.com")
-            .quota(40000)
-            .used(4000)
-            .mailboxId("mailboxId1")
-            .isDeleted(false)
-            .isDisabled(true)
-            .build();
 
     @Test
     void shouldCreateAccountItemWithRateLimiter() {
@@ -38,7 +28,6 @@ class AccountsApiDelegateImplTest extends AbstractSpringControllerIntegrationTes
         var limitForPeriod = rateLimiterRegistry.getAllRateLimiters()
                 .stream().toList().get(0).getRateLimiterConfig().getLimitForPeriod();
         Map<Integer, Integer> responseStatusCount = new ConcurrentHashMap<>();
-
         when(accountService.createAccount(any())).thenReturn(Mono.just(new AccountEntity()));
 
         IntStream.rangeClosed(1, limitForPeriod + 1)
@@ -61,48 +50,93 @@ class AccountsApiDelegateImplTest extends AbstractSpringControllerIntegrationTes
                 .hasSize(2)
                 .containsKeys(TOO_MANY_REQUESTS.value(), ACCEPTED.value());
 
+        verify(accountService, times(limitForPeriod)).createAccount(any());
+
     }
 
     @Test
     @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldReturnAccountItem() {
-        when(accountService.getAccountById(testAccount.getId())).thenReturn(Mono.just(testAccount));
+        when(accountService.getAccountById(testAccountEntity.getId())).thenReturn(Mono.just(testAccountEntity));
 
         webTestClient.get()
-                .uri("/api/v1/accounts/{id}", testAccount.getId())
+                .uri("/api/v1/accounts/{id}", testAccountEntity.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody(Account.class)
-                .isEqualTo(accountMapper.accountEntityToAccount(testAccount));
+                .isEqualTo(testAccount);
+
+        verify(accountService, times(1)).getAccountById(testAccountEntity.getId());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenGetAccountUnauthorized() {
+
+        webTestClient.get()
+                .uri("/api/v1/accounts/{id}", testAccountEntity.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+
+        verify(accountService, times(0)).getAccountById(any());
+    }
+
+    @Test
+    @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
+            claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
+    void shouldThrowExceptionWhenAccountNotFound() {
+        when(accountService.getAccountById(testAccountEntity.getId())).thenReturn(Mono.empty());
+
+        webTestClient.get()
+                .uri("/api/v1/accounts/{id}", testAccountEntity.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+
+        verify(accountService, times(1)).getAccountById(any());
     }
 
     @Test
     @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldDeleteAccountItem() {
-        when(accountService.softDeleteAccount(testAccount.getId())).thenReturn(Mono.just(testAccount));
+        when(accountService.softDeleteAccount(testAccountEntity.getId())).thenReturn(Mono.just(testAccountEntity));
 
         webTestClient.delete()
-                .uri("/api/v1/accounts/{id}",testAccount.getId())
+                .uri("/api/v1/accounts/{id}", testAccountEntity.getId())
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody().isEmpty();
+
+        verify(accountService, times(1)).softDeleteAccount(any());
+    }
+
+    @Test
+    void shouldDeleteAccountItemThrowExceptionIfNotAuthorized() {
+
+        webTestClient.delete()
+                .uri("/api/v1/accounts/{id}", testAccountEntity.getId())
+                .exchange()
+                .expectStatus().isUnauthorized();
+
+        verify(accountService, times(0)).softDeleteAccount(any());
     }
 
     @Test
     @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void testDeleteAccountItemNotFound() {
-        when(accountService.softDeleteAccount(testAccount.getId())).thenReturn(Mono.empty());
+        when(accountService.softDeleteAccount(testAccountEntity.getId())).thenReturn(Mono.empty());
 
         webTestClient.delete()
-                .uri("/api/v1/accounts/{id}", testAccount.getId())
+                .uri("/api/v1/accounts/{id}", testAccountEntity.getId())
                 .exchange()
                 .expectStatus().isNotFound();
-    }
 
+        verify(accountService, times(1)).softDeleteAccount(any());
+    }
 
 }
