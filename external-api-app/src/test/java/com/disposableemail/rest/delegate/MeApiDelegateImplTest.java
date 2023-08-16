@@ -27,7 +27,7 @@ class MeApiDelegateImplTest extends AbstractSpringControllerIntegrationTest {
     }
 
     @Test
-    void shouldGetMeAccountItemWithUnauthorizedAccount() {
+    void shouldNotGetMeAccountItemWithUnauthorizedAccount() {
         when(accountHelperService.getAuthorizedAccountWithUsedSize()).thenReturn(Mono.empty());
 
         webTestClient.get().uri("/api/v1/me")

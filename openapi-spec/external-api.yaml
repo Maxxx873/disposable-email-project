@@ -186,7 +186,7 @@ paths:
       summary: Retrieves a Source resource.
       description: Retrieves a Source resource.
       parameters:
-        - $ref: './parameters/path/sourceId.yaml'
+        - $ref: './parameters/path/messageId.yaml'
       deprecated: false
     parameters: []
   /token:
