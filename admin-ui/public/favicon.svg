@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
-<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" height="44px" viewBox="0 0 477 477" width="44px" xmlns="http://www.w3.org/2000/svg">
+<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" height="24px" viewBox="0 0 477 477" width="24px" xmlns="http://www.w3.org/2000/svg">
 <path d="m216.5-0.5h43c18.116 1.9568 35.782 5.9568 53 12-3.667-0.6667-7.333-1.3333-11-2-6.211-0.9178-12.211-2.2511-18-4-3.474-1.025-7.14-1.6916-11-2h-2c-6.105-1.4965-12.438-2.1632-19-2-13.746-0.31466-27.412 0.01868-41 1-5.745-0.44594-11.079 0.55406-16 3h-5-5c10.555-2.6479 21.222-4.6479 32-6z" fill="#e8dcc2" opacity=".992"/>
 <path d="m251.5 1.5v1c-17.766-0.52399-35.433 0.47601-53 3l12-3c13.588-0.98132 27.254-1.3147 41-1z" fill="#dea94c"/>
 <path d="m251.5 2.5v-1c6.562-0.16315 12.895 0.50352 19 2-6.329-0.39953-12.662-0.73286-19-1z" fill="#e4c082"/>

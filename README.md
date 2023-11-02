@@ -16,6 +16,8 @@
 ![Helm](https://img.shields.io/badge/Helm-2F3134?style=for-the-badge&logo=helm)
 ![Telegram](https://img.shields.io/badge/Telegram-2F3134?style=for-the-badge&logo=telegram)
 
+![TypeScript](https://img.shields.io/badge/typescript-%2320232a.svg?style=for-the-badge&logo=typescript&logoColor=%2361DAFB)
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 
 ![API Deploy](https://github.com/Maxxx873/disposable-email-project/actions/workflows/api-deploy.yml/badge.svg)
 ![James Deploy](https://github.com/Maxxx873/disposable-email-project/actions/workflows/james-deploy.yml/badge.svg)
