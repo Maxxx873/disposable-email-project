@@ -30,6 +30,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
                         "com.disposableemail.core.service",
                         "com.disposableemail.core.event",
                         "com.disposableemail.core.dao.mapper",
+                        "com.disposableemail.core.security",
                 },
         useDefaultFilters = false,
         includeFilters =
