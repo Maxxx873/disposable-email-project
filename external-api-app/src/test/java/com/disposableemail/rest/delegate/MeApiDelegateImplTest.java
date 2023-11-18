@@ -12,7 +12,7 @@ import static org.mockito.Mockito.*;
 class MeApiDelegateImplTest extends AbstractSpringControllerIntegrationTest {
 
     @Test
-    @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
+    @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldGetMeAccountItem() {
         when(accountHelperService.getAuthorizedAccountWithUsedSize()).thenReturn(Mono.just(testAccountEntity));
@@ -36,7 +36,7 @@ class MeApiDelegateImplTest extends AbstractSpringControllerIntegrationTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
+    @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldGetMeAccountItemWithError() {
         when(accountHelperService.getAuthorizedAccountWithUsedSize()).thenReturn(Mono.empty());

@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole(@environment.getProperty('spring.security.role.user'))")
 public class MessagesApiDelegateImpl implements MessagesApiDelegate {
 
     private final MessageMapper messageMapper;

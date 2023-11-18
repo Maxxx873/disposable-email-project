@@ -44,6 +44,10 @@ spring:
     salt: ${CRYPTO_SALT:e707efd5cf9f191d}
     cors:
       allowed-origins: http://localhost:3000
+    role:
+      user: USER
+      admin: ADMIN
+      customer: CUSTOMER
 
 jwt:
   auth:
@@ -56,12 +60,14 @@ elasticsearch:
   socket-timeout: "10s"
 
 keycloak:
+  enabled: true
   server:
     url: ${KEYCLOAK_SERVER_URL}
     realm: ${KEYCLOAK_SERVER_REALM}
     username: ${KEYCLOAK_SERVER_USERNAME}
     password: ${KEYCLOAK_SERVER_PASSWORD}
     client: ${KEYCLOAK_SERVER_CLIENT:admin-cli}
+    use-resource-role-mappings: true
 
 mail-server:
   name: ${MAIL_SERVER_NAME:Apache James}
@@ -71,7 +77,9 @@ mail-server:
   quotaPath: ${QUOTA_PATH:/quota/users/}
 
 logging:
-  level.root: info
+  level:
+    root: info
+    org.springframework.security: DEBUG
 
 resilience4j:
   retry:

@@ -13,7 +13,7 @@ import static org.mockito.Mockito.*;
 class SourceApiDelegateImplTest extends AbstractSpringControllerIntegrationTest {
 
     @Test
-    @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
+    @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldGetSourceItem() {
         var messageId = testMessageEntity.getId();
@@ -34,7 +34,7 @@ class SourceApiDelegateImplTest extends AbstractSpringControllerIntegrationTest 
     }
 
     @Test
-    @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
+    @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldGetMeSourceItemWithError() {
         var messageId = testMessageEntity.getId();

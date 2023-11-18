@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole(@environment.getProperty('spring.security.role.user'))")
 public class MeApiDelegateImpl implements MeApiDelegate {
 
     private final AccountHelperService accountHelperService;

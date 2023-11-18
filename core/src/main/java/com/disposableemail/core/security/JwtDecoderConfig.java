@@ -1,4 +1,4 @@
-package com.disposableemail.config;
+package com.disposableemail.core.security;
 
 import io.github.resilience4j.retry.RetryRegistry;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -33,11 +34,12 @@ public class JwtDecoderConfig {
     public ReactiveJwtDecoder getReactiveJwtDecoder(String issuerUri) {
         log.info("Getting issuerUri | connect to AuthorizationService {}", issuerUri);
         var httpStatus = WebClient.builder().baseUrl(issuerUri).build()
-                .get().exchangeToMono(response -> Mono.just(response.statusCode()))
+                .get()
+                .exchangeToMono(response -> Mono.just(response.statusCode()))
                 .block();
         var statusCode = Objects.requireNonNull(httpStatus).value();
         if (statusCode != HttpURLConnection.HTTP_OK) {
-            throw new org.springframework.web.client.HttpServerErrorException(httpStatus);
+            throw new HttpServerErrorException(httpStatus);
         }
         return ReactiveJwtDecoders.fromOidcIssuerLocation(issuerUri);
     }

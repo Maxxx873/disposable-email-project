@@ -12,6 +12,10 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:9080/realms/realm/protocol/openid-connect/certs
           issuer-uri: http://localhost:9080/realms/realm
+    role:
+      user: USER
+      admin: ADMIN
+      customer: CUSTOMER
 
   data:
     mongodb:
@@ -32,6 +36,7 @@ keycloak:
     username: admin
     password: admin
     client: admin-cli
+    use-resource-role-mappings: true
 
 mail-server:
   name: server

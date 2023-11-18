@@ -55,7 +55,7 @@ class AccountsApiDelegateImplTest extends AbstractSpringControllerIntegrationTes
     }
 
     @Test
-    @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
+    @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldReturnAccountItem() {
         when(accountService.getAccountById(testAccountEntity.getId())).thenReturn(Mono.just(testAccountEntity));
@@ -85,7 +85,7 @@ class AccountsApiDelegateImplTest extends AbstractSpringControllerIntegrationTes
     }
 
     @Test
-    @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
+    @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldThrowExceptionWhenAccountNotFound() {
         when(accountService.getAccountById(testAccountEntity.getId())).thenReturn(Mono.empty());
@@ -100,7 +100,7 @@ class AccountsApiDelegateImplTest extends AbstractSpringControllerIntegrationTes
     }
 
     @Test
-    @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
+    @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldDeleteAccountItem() {
         when(accountService.softDeleteAccount(testAccountEntity.getId())).thenReturn(Mono.just(testAccountEntity));
@@ -126,7 +126,7 @@ class AccountsApiDelegateImplTest extends AbstractSpringControllerIntegrationTes
     }
 
     @Test
-    @WithMockJwtAuth(authorities = { "account1@example.com", "ROLE_USER" },
+    @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void testDeleteAccountItemNotFound() {
         when(accountService.softDeleteAccount(testAccountEntity.getId())).thenReturn(Mono.empty());

@@ -1,4 +1,4 @@
-package com.disposableemail.config;
+package com.disposableemail.core.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.disposableemail.config;
+package com.disposableemail.core.security;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -20,7 +20,6 @@ public class KeycloakClientConfig {
     private String password;
     @Value("${keycloak.server.client}")
     private String client;
-
     @Value("${keycloak.server.url}")
     private String serverUrl;
 

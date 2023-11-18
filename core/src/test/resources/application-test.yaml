@@ -16,6 +16,11 @@ spring:
     salt: d525ddd5dd5d555d
     cors:
       allowed-origins: http://localhost:3000
+    role:
+      user: USER
+      admin: ADMIN
+      customer: CUSTOMER
+
 
   data:
     mongodb:
@@ -36,6 +41,7 @@ keycloak:
     username: admin
     password: admin
     client: admin-cli
+    use-resource-role-mappings: true
 
 mail-server:
   name: server

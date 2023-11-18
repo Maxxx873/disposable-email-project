@@ -29,7 +29,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     private final AccountMapper accountMapper;
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole(@environment.getProperty('spring.security.role.user'))")
     public Mono<ResponseEntity<Account>> deleteAccountItem(String id, ServerWebExchange exchange) {
 
         return accountService.softDeleteAccount(id)
@@ -41,7 +41,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole(@environment.getProperty('spring.security.role.user'))")
     public Mono<ResponseEntity<Account>> getAccountItem(String id, ServerWebExchange exchange) {
 
         return accountService.getAccountById(id)

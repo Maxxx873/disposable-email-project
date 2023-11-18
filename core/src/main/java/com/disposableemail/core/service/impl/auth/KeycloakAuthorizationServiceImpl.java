@@ -12,12 +12,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,6 +38,9 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     private String serverUrl;
     @Value("${keycloak.server.client}")
     private String client;
+    @Value("${spring.security.role.user}")
+    private String userRoleName;
+
     private final Keycloak keycloak;
     private final UserRepresentation userRepresentation;
     private final CredentialRepresentation credentialRepresentation;
@@ -71,6 +77,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
             throw new AccountAlreadyRegisteredException();
         }
         if (response.getStatusInfo().equals(Response.Status.CREATED)) {
+            addRealmRoleToUser(credentials.getAddress(), userRoleName);
             eventProducer.send(new Event<>(AUTH_REGISTER_CONFIRMATION, credentials));
         }
         log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
@@ -95,5 +102,25 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
                 .stream()
                 .findFirst();
         return representation.map(UserRepresentation::getId);
+    }
+
+    private void addRealmRoleToUser(String username, String userRoleName) {
+        var userId = getKeycloakUserIdByName(username);
+        userId.ifPresent(id -> {
+            var user = keycloak.realm(realm).users().get(id);
+            if (isRoleContains(userRoleName)) {
+                List<RoleRepresentation> roleToAdd = new ArrayList<>();
+                roleToAdd.add(keycloak.realm(realm).roles().get(userRoleName).toRepresentation());
+                user.roles().realmLevel().add(roleToAdd);
+                log.info("Keycloak |  User: {} | Added role: {}", userRepresentation.getUsername(), userRoleName);
+            }
+        });
+    }
+
+    private boolean isRoleContains(String userRoleName) {
+        return keycloak.realm(realm).roles().list().stream()
+                .map(RoleRepresentation::getName)
+                .toList()
+                .contains(userRoleName);
     }
 }
