@@ -1,6 +1,5 @@
 package com.disposableemail.job.config;
 
-import com.disposableemail.core.dao.repository.search.MessageElasticsearchRepository;
 import com.disposableemail.core.event.EventProducer;
 import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
 import com.rabbitmq.client.Channel;
@@ -17,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 @TestConfiguration
 @ActiveProfiles("test")
 @MockBeans({
-        @MockBean(MessageElasticsearchRepository.class),
         @MockBean(ReactiveJwtDecoder.class),
         @MockBean(EventProducer.class),
         @MockBean(Channel.class)})
