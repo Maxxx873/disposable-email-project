@@ -5,7 +5,6 @@ import com.disposableemail.config.RabbitMqConfig;
 import com.disposableemail.config.WebClientConfig;
 import com.disposableemail.core.dao.mapper.search.MessageElasticsearchMapper;
 import com.disposableemail.core.event.EventProducer;
-import com.disposableemail.core.event.handler.MessagesEventHandler;
 import com.disposableemail.core.security.KeycloakClientConfig;
 import com.disposableemail.core.security.TextEncryptorConfig;
 import com.disposableemail.core.service.api.AccountService;
@@ -30,7 +29,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
                 {
                         "com.disposableemail.core.service",
                         "com.disposableemail.core.event",
-                        "com.disposableemail.core.dao.mapper"
+                        "com.disposableemail.core.dao.mapper",
                 },
         useDefaultFilters = false,
         includeFilters =
@@ -45,14 +44,13 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
                         AuthorizationService.class,
                         MailServerClientService.class,
                         MessageElasticsearchMapper.class,
-                        MessagesEventHandler.class
                 }))
 @Import({
         WebClientConfig.class,
         TextEncryptorConfig.class,
         MongoDbConfig.class,
         RabbitMqConfig.class,
-        KeycloakClientConfig.class
+        KeycloakClientConfig.class,
 })
 @EnableReactiveMongoRepositories(basePackages = "com.disposableemail.core.dao.repository")
 @EnableReactiveElasticsearchRepositories(basePackages = "com.disposableemail.core.dao.repository")
