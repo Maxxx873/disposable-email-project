@@ -57,10 +57,17 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(DomainNotAvailableException.class)
-    public final ResponseEntity<ErrorResponse> handleDomainNotFoundException(DomainNotAvailableException ex) {
+    public final ResponseEntity<ErrorResponse> handleDomainNotAvailableException(DomainNotAvailableException ex) {
         log.error(EXCEPTION_LOG, ex.getMessage());
         var error = new ErrorResponse(String.valueOf(HttpStatus.UNPROCESSABLE_ENTITY.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(DomainNotFoundException.class)
+    public final ResponseEntity<ErrorResponse> handleDomainNotFoundException(DomainNotFoundException ex) {
+        log.error(EXCEPTION_LOG, ex.getMessage());
+        var error = new ErrorResponse(String.valueOf(HttpStatus.NOT_FOUND.value()), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

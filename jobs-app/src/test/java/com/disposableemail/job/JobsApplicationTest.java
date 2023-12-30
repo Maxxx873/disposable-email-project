@@ -23,6 +23,7 @@ class JobsApplicationTest {
     @Test
     void contextLoads() {
         assertThat(applicationContext).isNotNull();
+        var a = new Object();
     }
 
 }

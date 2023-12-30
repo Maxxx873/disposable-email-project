@@ -2,12 +2,16 @@ package com.disposableemail;
 
 import com.disposableemail.config.TestConfig;
 import com.disposableemail.core.dao.entity.AccountEntity;
+import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.dao.entity.MessageEntity;
 import com.disposableemail.core.dao.entity.SourceEntity;
+import com.disposableemail.core.dao.mapper.DomainMapper;
 import com.disposableemail.core.model.Account;
 import com.disposableemail.core.model.Address;
+import com.disposableemail.core.model.Domain;
 import com.disposableemail.core.model.Source;
 import com.disposableemail.core.service.api.AccountService;
+import com.disposableemail.core.service.api.DomainService;
 import com.disposableemail.core.service.api.MessageService;
 import com.disposableemail.core.service.api.SourceService;
 import com.disposableemail.core.service.impl.AccountHelperService;
@@ -33,8 +37,14 @@ public abstract class AbstractSpringControllerIntegrationTest {
     @Autowired
     protected WebTestClient webTestClient;
 
+    @Autowired
+    protected DomainMapper domainMapper;
+
     @MockBean
     protected AccountService accountService;
+
+    @MockBean
+    protected DomainService domainService;
 
     @MockBean
     protected AccountHelperService accountHelperService;
@@ -54,6 +64,21 @@ public abstract class AbstractSpringControllerIntegrationTest {
             .isDeleted(false)
             .isDisabled(true)
             .build();
+
+    protected final List<DomainEntity> testDomainEntities = List.of(
+            DomainEntity.builder()
+                    .id("1")
+                    .domain("example.com")
+                    .isActive(true)
+                    .isPrivate(false)
+                    .build(),
+            DomainEntity.builder()
+                    .id("2")
+                    .domain("example.org")
+                    .isActive(false)
+                    .isPrivate(true)
+                    .build()
+    );
 
     protected final Account testAccount = Account.builder()
             .id("1")
