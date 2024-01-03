@@ -3,6 +3,7 @@ package com.disposableemail.rest.delegate;
 import com.disposableemail.api.DomainsApiDelegate;
 import com.disposableemail.core.dao.mapper.DomainMapper;
 import com.disposableemail.core.exception.custom.DomainNotFoundException;
+import com.disposableemail.core.exception.custom.DomainsNotFoundException;
 import com.disposableemail.core.model.Domain;
 import com.disposableemail.core.service.api.DomainService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,8 @@ public class DomainApiDelegateImpl implements DomainsApiDelegate {
 
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(domainService.getDomainsExcludingLocalhost(size).map(domainMapper::domainEntityToDomain)));
+                .body(domainService.getDomainsExcludingLocalhost(size).map(domainMapper::domainEntityToDomain)
+                        .switchIfEmpty(Mono.error(new DomainsNotFoundException()))));
     }
 
     @Override

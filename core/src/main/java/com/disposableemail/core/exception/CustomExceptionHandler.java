@@ -21,26 +21,25 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String EXCEPTION_LOG = "Exception: {}";
 
     @ExceptionHandler(NotAuthorizedException.class)
-    public final ResponseEntity<Object> handleNotAuthorizedException(NotAuthorizedException ex) {
+    public final ResponseEntity<ErrorResponse> handleNotAuthorizedException(NotAuthorizedException ex) {
         log.error(EXCEPTION_LOG, ex.getMessage());
         var error = new ErrorResponse(String.valueOf(HttpStatus.UNAUTHORIZED.value()), "Not registered Account");
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public final ResponseEntity<Object> handleNotAuthorizedException(AccessDeniedException ex) {
+    public final ResponseEntity<ErrorResponse> handleNotAuthorizedException(AccessDeniedException ex) {
         log.error(EXCEPTION_LOG, ex.getMessage());
         var error = new ErrorResponse(String.valueOf(HttpStatus.UNAUTHORIZED.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AccountToManyRequestsException.class)
-    public final ResponseEntity<Object> handleAccountToManyRequestException(AccountToManyRequestsException ex) {
+    public final ResponseEntity<ErrorResponse> handleAccountToManyRequestException(AccountToManyRequestsException ex) {
         log.error(EXCEPTION_LOG, ex.getMessage());
         var error = new ErrorResponse(String.valueOf(HttpStatus.TOO_MANY_REQUESTS.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.TOO_MANY_REQUESTS);
     }
-
 
     @ExceptionHandler({AccountAlreadyRegisteredException.class, MongoWriteException.class})
     public final ResponseEntity<ErrorResponse> handleAccountAlreadyRegisteredException(AccountAlreadyRegisteredException ex) {
@@ -49,8 +48,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler({AccountNotFoundException.class, MessageNotFoundException.class, SourceNotFoundException.class})
-    public final ResponseEntity<Object> handleAccountNotFoundException(Exception ex) {
+    @ExceptionHandler({AccountNotFoundException.class, MessageNotFoundException.class, SourceNotFoundException.class,
+            MessagesNotFoundException.class, DomainsNotFoundException.class, DomainNotFoundException.class})
+    public final ResponseEntity<ErrorResponse> handleAccountNotFoundException(Exception ex) {
         log.error(EXCEPTION_LOG, ex.getMessage());
         var error = new ErrorResponse(String.valueOf(HttpStatus.NOT_FOUND.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
@@ -61,13 +61,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(EXCEPTION_LOG, ex.getMessage());
         var error = new ErrorResponse(String.valueOf(HttpStatus.UNPROCESSABLE_ENTITY.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    @ExceptionHandler(DomainNotFoundException.class)
-    public final ResponseEntity<ErrorResponse> handleDomainNotFoundException(DomainNotFoundException ex) {
-        log.error(EXCEPTION_LOG, ex.getMessage());
-        var error = new ErrorResponse(String.valueOf(HttpStatus.NOT_FOUND.value()), ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

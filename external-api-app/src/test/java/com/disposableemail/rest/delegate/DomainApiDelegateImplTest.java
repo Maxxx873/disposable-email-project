@@ -33,6 +33,21 @@ class DomainApiDelegateImplTest extends AbstractSpringControllerIntegrationTest 
     }
 
     @Test
+    void shouldThrowExceptionWhenDomainCollectionNotFound() {
+        int defaultCollectionSize = 1;
+        when(domainService.getDomainsExcludingLocalhost(defaultCollectionSize)).thenReturn(Flux.empty());
+
+        webTestClient.get()
+                .uri("/api/v1/domains")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+
+        verify(domainService, times(1)).getDomainsExcludingLocalhost(defaultCollectionSize);
+    }
+
+
+    @Test
     void shouldGetDomainCollectionWithDefaultSize() {
         int defaultCollectionSize = 1;
         when(domainService.getDomainsExcludingLocalhost(defaultCollectionSize)).thenReturn(Flux.just(testDomainEntities.get(0)));

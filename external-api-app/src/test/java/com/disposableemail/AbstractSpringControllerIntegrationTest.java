@@ -6,9 +6,9 @@ import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.dao.entity.MessageEntity;
 import com.disposableemail.core.dao.entity.SourceEntity;
 import com.disposableemail.core.dao.mapper.DomainMapper;
+import com.disposableemail.core.dao.mapper.MessageMapper;
 import com.disposableemail.core.model.Account;
 import com.disposableemail.core.model.Address;
-import com.disposableemail.core.model.Domain;
 import com.disposableemail.core.model.Source;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.DomainService;
@@ -39,6 +39,9 @@ public abstract class AbstractSpringControllerIntegrationTest {
 
     @Autowired
     protected DomainMapper domainMapper;
+
+    @Autowired
+    protected MessageMapper messageMapper;
 
     @MockBean
     protected AccountService accountService;

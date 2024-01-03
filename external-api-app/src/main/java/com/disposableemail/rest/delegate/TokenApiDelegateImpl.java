@@ -18,12 +18,12 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class TokenApiDelegateImpl implements TokenApiDelegate {
 
-    private final AccountHelperService accountService;
+    private final AccountHelperService accountHelperService;
 
     @Override
     public Mono<ResponseEntity<Token>> postCredentialsItem(Mono<Credentials> credentials, ServerWebExchange exchange) {
 
-        return credentials.flatMap(accountService::getTokenFromAuthorizationService)
+        return credentials.flatMap(accountHelperService::getTokenFromAuthorizationService)
                 .map(token -> ResponseEntity.status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(token));

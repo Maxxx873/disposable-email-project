@@ -26,7 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${openapi.disposableEmailProject.base-path:/api/v1}")
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole(@environment.getProperty('spring.security.role.user'))")
 public class AttachmentDownloadController {
 
     private final SourceService sourceService;

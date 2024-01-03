@@ -32,10 +32,10 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
     public Mono<ResponseEntity<Flux<Messages>>> getMessageCollection(Integer page, Integer size, ServerWebExchange exchange) {
 
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(messageService.getMessagesForAuthorizedAccount(PageRequest.of(page, size))
-                                .map(messageMapper::messageEntityToMessages)))
-                .switchIfEmpty(Mono.error(new MessagesNotFoundException()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(messageService.getMessagesForAuthorizedAccount(PageRequest.of(page, size))
+                        .map(messageMapper::messageEntityToMessages)
+                        .switchIfEmpty(Mono.error(new MessagesNotFoundException()))));
     }
 
     @Override
@@ -49,8 +49,8 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
     @Override
     public Mono<ResponseEntity<Message>> patchMessageItem(String id, Mono<Message> message, ServerWebExchange exchange) {
 
-        return messageMapper.messageToMessageEntity(message).flatMap(messageEntity ->
-                        messageService.updateMessage(id, messageEntity))
+        return messageMapper.messageToMessageEntity(message)
+                .flatMap(messageEntity -> messageService.updateMessage(id, messageEntity))
                 .switchIfEmpty(Mono.error(new MessageNotFoundException()))
                 .map(messageEntity -> ResponseEntity.status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
