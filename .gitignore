@@ -44,6 +44,9 @@ target/
 # production
 /build
 
+# generated
+/admin-ui/src/admin-axios-client
+
 # misc
 .DS_Store
 .env.local

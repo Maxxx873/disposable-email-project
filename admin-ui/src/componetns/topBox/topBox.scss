@@ -1,0 +1,41 @@
+@import "../../styles/responsive.scss";
+
+.topBox {
+  h1 {
+    margin-bottom: 20px;
+
+    @include xxl {
+      font-size: 24px;
+    }
+  }
+
+  .list {
+    .listItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+
+      .domain {
+        display: flex;
+        gap: 20px;
+
+        .topDomains {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+
+          .domainName {
+            font-size: 14px;
+            font-weight: 500;
+          }
+
+        }
+      }
+
+      .amount {
+        font-weight: 500;
+      }
+    }
+  }
+}
