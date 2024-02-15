@@ -48,16 +48,6 @@ const Domains = () => {
   const [open, setOpen] = useState(false);
   const [domains, setDomains] = useState<Domain[]>([]);
 
-/*   useEffect(() => {
-    adminAPI.getDomainCollection()
-      .then((response) => {
-        setDomains(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []); */
-  
   useEffect(() => {
     adminAPI.getDomainCollection()
       .then((response) => {

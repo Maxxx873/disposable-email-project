@@ -47,8 +47,8 @@ export const menu = [
         },
         {
           id: 2,
-          title: "Docs",
-          url: "/",
+          title: "API docs",
+          url: "/docs",
           icon: "docs.svg",
         },
         {

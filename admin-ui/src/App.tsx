@@ -13,6 +13,7 @@ import Login from "./pages/login/Login";
 import "./styles/global.scss"
 import Domain from "./pages/domain/Domain";
 import Account from "./pages/account/Account";
+import Docs from "./pages/docs/Docs";
 
 function App() {
 
@@ -57,6 +58,10 @@ function App() {
         {
           path: "/domains/:id",
           element: <Domain />,
+        },
+        {
+          path: "/docs/",
+          element: <Docs />,
         }
       ]
     },
