@@ -22,6 +22,13 @@ public interface DomainService {
     Flux<DomainEntity> getDomainsExcludingLocalhost(@Min(1) Integer size);
 
     /**
+     * Retrieves a list of all domains.
+     *
+     * @return a flux of domain entities
+     */
+    Flux<DomainEntity> getAllDomains();
+
+    /**
      * Retrieves a domain by its ID.
      *
      * @param id the ID of the domain to retrieve

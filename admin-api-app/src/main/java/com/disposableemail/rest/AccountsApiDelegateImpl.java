@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@PreAuthorize("hasRole(@environment.getProperty('spring.security.role.admin'))")
+//@PreAuthorize("hasRole(@environment.getProperty('spring.security.role.admin'))")
 public class AccountsApiDelegateImpl implements AccountsApiDelegate {
 
     private final AccountService accountService;

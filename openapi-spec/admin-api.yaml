@@ -4,8 +4,10 @@ info:
   description: 'Disposable Email Project Admin API'
   version: 0.0.1
 servers:
-  - url: /api/v1
-    description: ''
+  - url: http://localhost:8089/api/v1
+    description: 'Development server'
+  - url: https://api.production-server.com/api/v1
+    description: 'Production server'
 paths:
   /domains:
     post:
@@ -41,7 +43,7 @@ paths:
       summary: Retrieves the collection of Domain resources.
       description: Retrieves the collection of Domain resources.
       parameters:
-        - $ref: './parameters/query/domainsCollectionSize.yaml'
+        - $ref: './parameters/query/domainsAllCollectionSize.yaml'
       deprecated: false
     parameters: []
   /domains/{id}:
@@ -138,5 +140,24 @@ paths:
       description: Removes the Account resource.
       parameters:
         - $ref: './parameters/path/accountId.yaml'
+      deprecated: false
+  /token:
+    post:
+      operationId: postCredentialsItem
+      responses:
+        '200':
+          $ref: './responses/token-responses.yaml#/components/responses/200'
+        '401':
+          $ref: './responses/token-responses.yaml#/components/responses/401'
+      summary: Get JWT token to login.
+      description: ''
+      parameters: []
+      requestBody:
+        description: Generate new JWT Token
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/schemas.yaml#/components/schemas/Credentials'
+        required: false
       deprecated: false
     parameters: []

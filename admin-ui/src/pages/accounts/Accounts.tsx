@@ -1,17 +1,21 @@
+import { useEffect, useState } from "react"
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../componetns/dataTable/DataTable"
 import "./accounts.scss"
-import { accountRows } from "../../data";
-import { useState } from "react";
+import { DefaultApi } from "../../admin-axios-client"
+import { Account } from "../../admin-axios-client/models/account"
 import Add from "../../componetns/add/Add";
+import moment from 'moment'
+
+const adminAPI = new DefaultApi();
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 90 },
+  { field: "id", headerName: "ID", width: 250 },
   {
     field: "address",
     type: "string",
     headerName: "Address",
-    width: 150,
+    width: 200,
   },
   {
     field: "quota",
@@ -23,12 +27,12 @@ const columns: GridColDef[] = [
     field: "used",
     type: "string",
     headerName: "Used",
-    width: 150,
+    width: 100,
   },
   {
     field: "isDeleted",
     type: "boolean",
-    headerName: "Disabled",
+    headerName: "Deleted",
     width: 200,
   },
   {
@@ -53,6 +57,24 @@ const columns: GridColDef[] = [
 
 const Accounts = () => {
   const [open, setOpen] = useState(false)
+  const [accountRows, setAccounts] = useState<Account[]>([]);
+
+  useEffect(() => {
+    adminAPI.getAccountCollection()
+      .then((response) => {
+        const rawItems = response.data as Array<Account>;
+        const parsedData = rawItems.map((account) => ({
+          ...account,
+          createdAt: moment.utc(account.createdAt!).local().format('YYYY-MM-DD HH:mm'),
+          updatedAt: moment.utc(account.updatedAt!).local().format('YYYY-MM-DD HH:mm')
+        }))
+        setAccounts(parsedData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
   return (
     <div className="accounts">
       <div className="info">

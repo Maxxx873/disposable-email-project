@@ -35,6 +35,13 @@ public class DomainServiceImpl implements DomainService {
     }
 
     @Override
+    public Flux<DomainEntity> getAllDomains() {
+        log.info("Getting all Domains");
+
+        return domainRepository.findAll();
+    }
+
+    @Override
     public Mono<DomainEntity> getDomain(String id) {
         log.info("Getting a Domain {}", id);
 

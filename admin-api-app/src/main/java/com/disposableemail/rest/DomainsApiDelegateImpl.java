@@ -1,6 +1,7 @@
 package com.disposableemail.rest;
 
 import com.disposableemail.api.DomainsApiDelegate;
+import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.dao.mapper.DomainMapper;
 import com.disposableemail.core.exception.custom.DomainNotAvailableException;
 import com.disposableemail.core.model.Domain;
@@ -11,16 +12,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@PreAuthorize("hasRole(@environment.getProperty('spring.security.role.admin'))")
+//@PreAuthorize("hasRole(@environment.getProperty('spring.security.role.admin'))")
 public class DomainsApiDelegateImpl implements DomainsApiDelegate {
 
     private final DomainMapper domainMapper;
@@ -48,7 +50,7 @@ public class DomainsApiDelegateImpl implements DomainsApiDelegate {
     public Mono<ResponseEntity<Flux<Domain>>> getDomainCollection(Integer size, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(domainService.getDomainsExcludingLocalhost(size).map(domainMapper::domainEntityToDomain)));
+                .body(getDomainCollection(size).map(domainMapper::domainEntityToDomain)));
     }
 
     @Override
@@ -62,4 +64,12 @@ public class DomainsApiDelegateImpl implements DomainsApiDelegate {
                 })
                 .switchIfEmpty(Mono.error(new DomainNotAvailableException()));
     }
+
+    private Flux<DomainEntity> getDomainCollection(Integer size) {
+        if (!Objects.equals(size, null)) {
+            return domainService.getDomainsExcludingLocalhost(size);
+        }
+        return domainService.getAllDomains();
+    }
+
 }

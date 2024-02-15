@@ -108,8 +108,11 @@
                         </goals>
                         <configuration>
                             <typeMappings>
-                                <typeMapping>OffsetDateTime=java.time.LocalDateTime</typeMapping>
+                                <typeMapping>OffsetDateTime=Instant</typeMapping>
                             </typeMappings>
+                            <importMappings>
+                                <importMapping>Instant=java.time.Instant</importMapping>
+                            </importMappings>
                             <inputSpec>${project.parent.basedir}/openapi-spec/external-api.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>${project-base-package}.api</apiPackage>
