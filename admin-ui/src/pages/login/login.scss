@@ -1,2 +1,43 @@
-.login{
+.mainContainer {
+    flex-direction: column;
+    font-family: "Inter", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(#141e30, #293f58);
+    color: white;
+}
+
+.titleContainer {
+    display: flex;
+    flex-direction: column;
+    font-size: 40px;
+    font-weight: bolder;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+}
+
+.buttonContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 130px;
+}
+
+input[type='button'] {
+    border: none;
+    background: cornflowerblue;
+    color: white;
+    padding: 12px 24px;
+    margin: 8px;
+    font-size: 24px;
+    cursor: pointer;
 }

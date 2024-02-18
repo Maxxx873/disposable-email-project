@@ -5,7 +5,7 @@ const Navbar = () => {
         <div className="navbar">
             <div className="logo">
                 <img src="logo.svg" alt="logo" />
-                <span>Disposable Email Dashboard</span>
+                <span>Disposable Email</span>
             </div>
             <div className="icons">
                 <img src="search.svg" alt="search" className="icon" />

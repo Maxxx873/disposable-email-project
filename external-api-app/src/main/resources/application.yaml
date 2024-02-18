@@ -43,7 +43,7 @@ spring:
     password: ${CRYPTO_PASSWORD:pass}
     salt: ${CRYPTO_SALT:e707efd5cf9f191d}
     cors:
-      allowed-origins: http://localhost:3000
+      allowed-origins: http://localhost:5173
     role:
       user: USER
       admin: ADMIN

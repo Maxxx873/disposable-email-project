@@ -14,8 +14,26 @@ import "./styles/global.scss"
 import Domain from "./pages/domain/Domain";
 import Account from "./pages/account/Account";
 import Docs from "./pages/docs/Docs";
+import { useAuth } from "react-oidc-context";
+import { useEffect, useState } from 'react';
 
 function App() {
+  const auth = useAuth();
+
+  switch (auth.activeNavigator) {
+    case 'signinSilent':
+      return <div>Signing you in...</div>;
+    case 'signoutRedirect':
+      return <div>Signing you out...</div>;
+  }
+
+  if (auth.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (auth.error) {
+    return <div>Error: {auth.error.message}</div>;
+  }
 
   const Layout = () => {
     return (
@@ -70,7 +88,11 @@ function App() {
       element: <Login />,
     }
   ]);
-  return <RouterProvider router={router} />;
+
+  return (
+    <>
+      {auth.isAuthenticated ? <RouterProvider router={router} /> : <Login />}
+    </>);
 }
 
 export default App
