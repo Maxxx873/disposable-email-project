@@ -3,6 +3,7 @@ import { useAuth } from "react-oidc-context";
 
 const Login = () => {
     const auth = useAuth();
+    console.log("user:", auth.user?.profile);
     const onButtonClick = () => {
         auth.signinRedirect();
     }
@@ -21,7 +22,7 @@ const Login = () => {
                     onClick={onButtonClick}
                     value={auth.isAuthenticated ? 'Log out' : 'Log in'}
                 />
-                {auth.isAuthenticated ? <div>You logged as {auth.user?.profile.name}</div> : <div />}
+                {auth.isAuthenticated ? <div>You logged as {auth.user?.profile.preferred_username}</div> : <div />}
             </div>
         </div>
     )

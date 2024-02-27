@@ -15,7 +15,6 @@ import Domain from "./pages/domain/Domain";
 import Account from "./pages/account/Account";
 import Docs from "./pages/docs/Docs";
 import { useAuth } from "react-oidc-context";
-import { useEffect, useState } from 'react';
 
 function App() {
   const auth = useAuth();

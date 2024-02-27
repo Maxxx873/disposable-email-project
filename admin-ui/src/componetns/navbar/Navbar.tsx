@@ -1,6 +1,8 @@
 import "./navbar.scss"
+import { useAuth } from "react-oidc-context";
 
 const Navbar = () => {
+    const auth = useAuth();
     return (
         <div className="navbar">
             <div className="logo">
@@ -17,7 +19,7 @@ const Navbar = () => {
                 </div>
                 <div className="user">
                     <img src="user.png" alt="user" className="icon" />
-                    <span>Admin</span>
+                    {<span>{auth.user?.profile.preferred_username}</span>}
                 </div>
                 <img src="settings.svg" alt="settings" className="icon" />
             </div>
