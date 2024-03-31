@@ -34,6 +34,8 @@
         <reactor-test.version>3.5.0</reactor-test.version>
         <slf4j.version>2.0.1</slf4j.version>
         <jsoup.version>1.15.4</jsoup.version>
+        <jmh-core.version>1.37</jmh-core.version>
+        <testcontainers.version>1.19.7</testcontainers.version>
         <!-- plugin versions -->
         <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
@@ -132,6 +134,25 @@
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
             <version>${de.flapdoodle.embed.mongo.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--benchmark-->
+
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>${jmh-core.version}</version>
         </dependency>
 
     </dependencies>

@@ -66,3 +66,6 @@ docker compose -f apache-james/docker-compose.yml up
 
 ## Using Kubernetes
 [Deploying K8S](k8s/README.md)
+
+## Mailets
+[Description & Performance](apache-james/extensions/mailets/README.md) 
