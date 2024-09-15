@@ -30,6 +30,11 @@ spring:
 telegram.bot:
   name: ${BOT_NAME}
   token: ${BOT_TOKEN}
+  commands:
+    start: start using disposable email
+    new: add new email account
+    list: my list of accounts
+    help: info how to use disposable email bot
 
 disposableemail.api:
   base-path: ${API_PATH}

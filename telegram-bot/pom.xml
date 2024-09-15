@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.2</version>
+        <version>3.3.3</version>
         <relativePath/>
     </parent>
     <groupId>com.disposableemail</groupId>
@@ -17,7 +17,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <spring-boot.version>3.1.2</spring-boot.version>
+        <spring-boot.version>3.3.3</spring-boot.version>
         <spring.boot.mainclass>com.disposableemail.TelegramBotApp</spring.boot.mainclass>
         <default.package>com.disposableemail.telegram</default.package>
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
@@ -29,6 +29,8 @@
         <!-- telegram -->
         <telegrambots.version>6.5.0</telegrambots.version>
         <emoji-java.version>5.1.1</emoji-java.version>
+        <disposable-email-telegram-spring-boot-starter.version>0.0.1-SNAPSHOT
+        </disposable-email-telegram-spring-boot-starter.version>
         <!-- openapi -->
         <swagger-annotations.version>2.2.8</swagger-annotations.version>
         <jackson-databind-nullable.version>0.2.4</jackson-databind-nullable.version>
@@ -43,6 +45,7 @@
         <liquibase-hibernate6.version>4.22.0</liquibase-hibernate6.version>
         <validation-api.version>3.0.2</validation-api.version>
         <liquibase-maven-plugin.version>4.22.0</liquibase-maven-plugin.version>
+
     </properties>
     <dependencies>
 
@@ -78,6 +81,11 @@
 
         <!-- telegram -->
 
+        <dependency>
+            <groupId>com.disposableemail</groupId>
+            <artifactId>disposable-email-telegram-spring-boot-starter</artifactId>
+            <version>${disposable-email-telegram-spring-boot-starter.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-spring-boot-starter</artifactId>

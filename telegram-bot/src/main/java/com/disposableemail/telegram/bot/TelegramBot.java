@@ -1,8 +1,8 @@
 package com.disposableemail.telegram.bot;
 
-import com.disposableemail.telegram.bot.config.BotConfig;
 import com.disposableemail.telegram.bot.handler.BotHandler;
 import com.disposableemail.telegram.bot.subscriber.BotUpdateSubscriber;
+import com.disposableemail.telegram.starter.BotConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

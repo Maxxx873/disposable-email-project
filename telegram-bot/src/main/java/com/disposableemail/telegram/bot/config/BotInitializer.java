@@ -1,6 +1,7 @@
 package com.disposableemail.telegram.bot.config;
 
 import com.disposableemail.telegram.bot.TelegramBot;
+import com.disposableemail.telegram.starter.BotConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -28,7 +29,7 @@ public class BotInitializer {
             bot.execute(new SetMyCommands(config.getListOfCommands(), new BotCommandScopeDefault(), null));
         }
         catch (TelegramApiException e) {
-            log.error("Error occurred: " + e.getMessage());
+            log.error("Error occurred: {}", e.getMessage());
         }
     }
 }
