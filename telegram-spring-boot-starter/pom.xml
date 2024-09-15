@@ -12,7 +12,7 @@
 	<artifactId>disposable-email-telegram-spring-boot-starter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>Disposable Email :: Telegram bot tarter</name>
+	<name>Disposable Email :: Telegram bot starter</name>
 	<description>Telegram bot starter for using the Disposable Email Project</description>
 
 	<properties>
@@ -51,14 +51,5 @@
 		</dependency>
 
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>

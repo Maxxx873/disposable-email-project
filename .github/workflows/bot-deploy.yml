@@ -20,6 +20,10 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: 📦 Build telegram spring boot starter with Maven
+        run: mvn -B package --file pom.xml
+        working-directory: telegram-spring-boot-starter
+
       - name: 📦 Build with Maven
         run: mvn -B package --file pom.xml
         working-directory: telegram-bot
