@@ -23,7 +23,6 @@ public class AccountEventRegistrationHandler {
     private final MailServerClientService mailServerClientService;
     private final AccountHelperService accountHelper;
 
-
     @Async
     @RabbitListener(bindings = @QueueBinding(
             exchange = @Exchange(name = "${exchanges.accounts}", type = TOPIC),

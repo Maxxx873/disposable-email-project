@@ -24,6 +24,7 @@ public class Event<T> {
         QUOTA_SIZE_UPDATED_IN_MAIL_SERVICE,
         AUTH_DELETING_ACCOUNT,
         MAIL_DELETING_ACCOUNT,
+        DELETING_ACCOUNT,
         DOMAIN_CREATED,
         DOMAIN_DELETED,
     }

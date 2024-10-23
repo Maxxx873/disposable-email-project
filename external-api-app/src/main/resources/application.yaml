@@ -95,6 +95,6 @@ resilience4j:
   ratelimiter:
     instances:
       ratelimiterAccountRegistration:
-        limitForPeriod: 1
+        limitForPeriod: 500
         limitRefreshPeriod: 1m
         timeoutDuration: 2s

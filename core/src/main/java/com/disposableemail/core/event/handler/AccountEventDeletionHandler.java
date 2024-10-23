@@ -1,5 +1,6 @@
 package com.disposableemail.core.event.handler;
 
+import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
 import com.disposableemail.core.service.api.mail.MailServerClientService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class AccountEventDeletionHandler {
 
     private final AuthorizationService authorizationService;
     private final MailServerClientService mailServerClientService;
+    private final AccountService accountService;
 
     @Async
     @RabbitListener(bindings = @QueueBinding(
@@ -32,11 +34,21 @@ public class AccountEventDeletionHandler {
     @Async
     @RabbitListener(bindings = @QueueBinding(
             exchange = @Exchange(name = "${exchanges.accounts}", type = TOPIC),
+            value = @Queue(name = "${queues.account-deleting}"),
+            key = "${routing-keys.account-deleting}"
+    ))
+    public void handleAccountServiceDeletingAccountEvent(String id) {
+        accountService.deleteAccount(id);
+    }
+
+    @Async
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(name = "${exchanges.accounts}", type = TOPIC),
             value = @Queue(name = "${queues.account-mail-deleting}"),
             key = "${routing-keys.account-mail-deleting}"
     ))
-    public void handleMAilServerDeletingAccountEvent(String username) {
-        mailServerClientService.deleteUser(username);
+    public void handleMailServerDeletingAccountEvent(String username) {
+        mailServerClientService.deleteUser(username).subscribe();
     }
 
 }

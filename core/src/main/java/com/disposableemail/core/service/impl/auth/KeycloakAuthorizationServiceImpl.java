@@ -7,6 +7,7 @@ import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.model.Token;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
+import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static com.disposableemail.core.event.Event.Type.AUTH_REGISTER_CONFIRMATION;
+import static com.disposableemail.core.event.Event.Type.*;
 
 
 @Slf4j
@@ -70,19 +71,25 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     }
 
     private Response getKeycloakCreateUserResponse(Credentials credentials) {
-        var response = keycloak.realm(realm).users().create(userRepresentation);
-        if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {
-            log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
+        try {
+            var response = keycloak.realm(realm).users().create(userRepresentation);
+            if (response.getStatusInfo().equals(Response.Status.CONFLICT)) {
+                log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
+                        response.getStatus(), response.getStatusInfo());
+                throw new AccountAlreadyRegisteredException();
+            }
+            if (response.getStatusInfo().equals(Response.Status.CREATED)) {
+                addRealmRoleToUser(credentials.getAddress(), userRoleName);
+                eventProducer.send(new Event<>(AUTH_REGISTER_CONFIRMATION, credentials));
+            }
+            log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
                     response.getStatus(), response.getStatusInfo());
-            throw new AccountAlreadyRegisteredException();
+            return response;
+        } catch (ProcessingException e) {
+            eventProducer.send(new Event<>(DELETING_ACCOUNT, credentials));
+            log.error("Keycloak error | {}", e.getMessage());
         }
-        if (response.getStatusInfo().equals(Response.Status.CREATED)) {
-            addRealmRoleToUser(credentials.getAddress(), userRoleName);
-            eventProducer.send(new Event<>(AUTH_REGISTER_CONFIRMATION, credentials));
-        }
-        log.info("Keycloak |  User: {} | Status: {} | Status Info: {}", userRepresentation.getUsername(),
-                response.getStatus(), response.getStatusInfo());
-        return response;
+        return Response.noContent().build();
     }
 
     private Response getKeycloakDeleteUserResponse(String username) {

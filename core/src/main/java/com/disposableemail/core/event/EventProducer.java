@@ -34,6 +34,9 @@ public class EventProducer {
     @Value("${routing-keys.account-mail-deleting}")
     private String accountMailDeletingRoutingKey;
 
+    @Value("${routing-keys.account-deleting}")
+    private String accountDeletingRoutingKey;
+
     @Value("${routing-keys.account-auth-confirmation}")
     private String accountAuthConfirmRoutingKey;
 
@@ -76,6 +79,8 @@ public class EventProducer {
                     rabbitTemplate.convertAndSend(accountsExchange, accountAuthDeletingRoutingKey, event.getData());
             case MAIL_DELETING_ACCOUNT ->
                     rabbitTemplate.convertAndSend(accountsExchange, accountMailDeletingRoutingKey, event.getData());
+            case DELETING_ACCOUNT ->
+                    rabbitTemplate.convertAndSend(accountsExchange, accountDeletingRoutingKey, event.getData());
             case DOMAIN_CREATED ->
                     rabbitTemplate.convertAndSend(domainsExchange, domainsCreatingRoutingKey, event.getData());
             case DOMAIN_DELETED ->

@@ -102,7 +102,7 @@ public class AccountServiceImpl implements AccountService {
                     log.info("Get authorized Account | address: {}, subject: {}",
                             userCredentials.getPreferredUsername(), userCredentials.getSub());
                     if (!userCredentials.getPreferredUsername().equals(accountEntity.getAddress())) {
-                        throw new AccessDeniedException("Account unauthorized");
+                        return Mono.error(new AccessDeniedException("Account unauthorized"));
                     }
                     accountEntity.setIsDeleted(true);
                     return accountRepository.save(accountEntity)
