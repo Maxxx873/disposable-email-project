@@ -1,5 +1,6 @@
 package com.disposableemail.core.event.handler;
 
+import com.disposableemail.core.dao.entity.AccountEntity;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
 import com.disposableemail.core.service.api.mail.MailServerClientService;
@@ -37,8 +38,10 @@ public class AccountEventDeletionHandler {
             value = @Queue(name = "${queues.account-deleting}"),
             key = "${routing-keys.account-deleting}"
     ))
-    public void handleAccountServiceDeletingAccountEvent(String id) {
-        accountService.deleteAccount(id);
+    public void handleAccountServiceDeletingAccountEvent(String address) {
+        accountService.getAccountByAddress(address).map(AccountEntity::getId)
+                .flatMap(accountService::deleteAccount)
+                .subscribe();
     }
 
     @Async

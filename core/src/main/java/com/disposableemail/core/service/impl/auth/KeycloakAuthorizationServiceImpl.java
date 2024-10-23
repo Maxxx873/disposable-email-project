@@ -86,7 +86,7 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
                     response.getStatus(), response.getStatusInfo());
             return response;
         } catch (ProcessingException e) {
-            eventProducer.send(new Event<>(DELETING_ACCOUNT, credentials));
+            eventProducer.send(new Event<>(DELETING_ACCOUNT, credentials.getAddress()));
             log.error("Keycloak error | {}", e.getMessage());
         }
         return Response.noContent().build();
