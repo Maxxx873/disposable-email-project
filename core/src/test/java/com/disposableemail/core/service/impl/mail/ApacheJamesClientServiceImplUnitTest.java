@@ -1,7 +1,7 @@
 package com.disposableemail.core.service.impl.mail;
 
 import com.disposableemail.core.dao.entity.DomainEntity;
-import com.disposableemail.core.event.EventProducer;
+import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.exception.custom.MailboxNotFoundException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.mail.MailServerClientService;

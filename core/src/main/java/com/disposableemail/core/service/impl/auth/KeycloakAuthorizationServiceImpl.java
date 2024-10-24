@@ -1,9 +1,8 @@
 package com.disposableemail.core.service.impl.auth;
 
 import com.disposableemail.core.event.Event;
-import com.disposableemail.core.event.EventProducer;
+import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredException;
-import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.model.Token;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
@@ -25,7 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static com.disposableemail.core.event.Event.Type.*;
+import static com.disposableemail.core.event.Event.Type.AUTH_REGISTER_CONFIRMATION;
+import static com.disposableemail.core.event.Event.Type.DELETING_ACCOUNT;
 
 
 @Slf4j
@@ -78,6 +78,11 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
                         response.getStatus(), response.getStatusInfo());
                 throw new AccountAlreadyRegisteredException();
             }
+            if (response.getStatusInfo().equals(Response.Status.FORBIDDEN)) {
+                eventProducer.send(new Event<>(DELETING_ACCOUNT, credentials.getAddress()));
+                log.error("Keycloak |  User: {} | Status: {} | Status Info: {}", credentials.getAddress(),
+                        response.getStatus(), response.getStatusInfo());
+            }
             if (response.getStatusInfo().equals(Response.Status.CREATED)) {
                 addRealmRoleToUser(credentials.getAddress(), userRoleName);
                 eventProducer.send(new Event<>(AUTH_REGISTER_CONFIRMATION, credentials));
@@ -95,7 +100,8 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     private Response getKeycloakDeleteUserResponse(String username) {
         var userId = getKeycloakUserIdByName(username);
         if (userId.isEmpty()) {
-            throw new AccountNotFoundException();
+            log.error("Keycloak not found username | {}", username);
+            return Response.notModified().build();
         } else {
             var response = keycloak.realm(realm).users().delete(userId.get());
             log.info("Keycloak | Deleting user: {} | Status: {} | Status Info: {}", username,
@@ -105,10 +111,15 @@ public class KeycloakAuthorizationServiceImpl implements AuthorizationService {
     }
 
     private Optional<String> getKeycloakUserIdByName(String name) {
-        var representation = keycloak.realm(realm).users().search(name, true)
-                .stream()
-                .findFirst();
-        return representation.map(UserRepresentation::getId);
+        try {
+            var representation = keycloak.realm(realm).users().search(name, true)
+                    .stream()
+                    .findFirst();
+            return representation.map(UserRepresentation::getId);
+        } catch (ProcessingException e) {
+            log.error("Keycloak error | {}", e.getMessage());
+        }
+        return Optional.empty();
     }
 
     private void addRealmRoleToUser(String username, String userRoleName) {

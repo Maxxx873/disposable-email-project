@@ -2,7 +2,7 @@ package com.disposableemail.core.service.impl.mail;
 
 import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.event.Event;
-import com.disposableemail.core.event.EventProducer;
+import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.exception.custom.DomainNotAvailableException;
 import com.disposableemail.core.exception.custom.MailServerConnectException;
 import com.disposableemail.core.exception.custom.MailboxNotFoundException;
@@ -102,18 +102,18 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     public Flux<DomainEntity> getDomains() {
 
         return mailServerApiClient.get().uri("/domains").retrieve().bodyToMono(String.class).map(response -> {
-                    try {
-                        log.info("Getting domains from {} | {}", mailServerName, response);
-                        return mapper.readValue(response, new TypeReference<List<String>>() {
-                        });
-                    } catch (JsonProcessingException ex) {
-                        throw new DomainNotAvailableException();
-                    }
-                }).flatMapIterable(domains -> domains).map(domainName -> DomainEntity.builder()
-                        .domain(domainName)
-                        .isActive(true)
-                        .isPrivate(false)
-                        .build());
+            try {
+                log.info("Getting domains from {} | {}", mailServerName, response);
+                return mapper.readValue(response, new TypeReference<List<String>>() {
+                });
+            } catch (JsonProcessingException ex) {
+                throw new DomainNotAvailableException();
+            }
+        }).flatMapIterable(domains -> domains).map(domainName -> DomainEntity.builder()
+                .domain(domainName)
+                .isActive(true)
+                .isPrivate(false)
+                .build());
     }
 
     @Override
@@ -161,7 +161,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
 
         var password = mapper.createObjectNode();
         password.put(PASSWORD_FIELD, encryptor.decrypt(credentials.getPassword()));
-        var result = mailServerApiClient.put()
+        return mailServerApiClient.put()
                 .uri(USERS_PATH + credentials.getAddress())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(mapper.writeValueAsString(password))
@@ -178,12 +178,11 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                     log.error("Error creating user on {}: {}", mailServerName, ex.getMessage());
                     return Mono.error(ex);
                 })
-                .retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(5)))
+                .retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(1))
+                        .doAfterRetry(retrySignal -> eventProducer.send(new Event<>(Type.DELETING_ACCOUNT, credentials.getAddress()))))
                 .onErrorComplete(throwable -> {
                     throw new MailServerConnectException();
                 });
-        result.subscribe();
-        return result;
     }
 
     @Override

@@ -1,5 +1,7 @@
-package com.disposableemail.core.event;
+package com.disposableemail.core.event.producer.impl;
 
+import com.disposableemail.core.event.Event;
+import com.disposableemail.core.event.producer.EventProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @PropertySource("classpath:queues.properties")
-public class EventProducer {
+public class EventProducerRabbitMqImpl implements EventProducer {
 
     @Value("${exchanges.messages}")
     private String messagesExchange;
@@ -55,12 +57,9 @@ public class EventProducer {
     @Value("${routing-keys.domain-deleting}")
     private String domainsDeletingRoutingKey;
 
-
     private final RabbitTemplate rabbitTemplate;
 
     public void send(Event<?> event) {
-
-        log.info("Event sent | {}", event.getLogString());
 
         switch (event.getType()) {
             case GETTING_MESSAGES ->
@@ -87,5 +86,6 @@ public class EventProducer {
                     rabbitTemplate.convertAndSend(domainsExchange, domainsDeletingRoutingKey, event.getData());
             default -> throw new UnsupportedOperationException();
         }
+        log.info("Event sent | {}", event.getLogString());
     }
 }

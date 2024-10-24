@@ -5,7 +5,7 @@ import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.dao.repository.AccountRepository;
 import com.disposableemail.core.dao.repository.DomainRepository;
 import com.disposableemail.core.event.Event;
-import com.disposableemail.core.event.EventProducer;
+import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredException;
 import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.exception.custom.DomainNotAvailableException;
@@ -50,9 +50,9 @@ public class AccountServiceImpl implements AccountService {
                     if (isAvailable(domainEntity)) {
                         return accountRepository.findByAddress(credentials.getAddress().toLowerCase())
                                 .flatMap(accountEntity -> Mono.error(AccountAlreadyRegisteredException::new))
-                                .then(accountRepository.save(createAccountEntityFromCredentials(credentials, quotaSize)))
-                                .doOnSuccess(action -> eventProducer.send(new Event<>(START_CREATING_ACCOUNT,
-                                        getEncryptCredentials(credentials))));
+                                .then(accountRepository.save(createAccountEntityFromCredentials(credentials, quotaSize))
+                                        .doOnSuccess(action -> eventProducer.send(new Event<>(START_CREATING_ACCOUNT,
+                                                getEncryptCredentials(credentials)))));
                     } else {
                         return Mono.just(new AccountEntity());
                     }

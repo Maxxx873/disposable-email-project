@@ -1,6 +1,6 @@
 package com.disposableemail.job.config;
 
-import com.disposableemail.core.event.EventProducer;
+import com.disposableemail.core.event.producer.EventProducer;
 import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;

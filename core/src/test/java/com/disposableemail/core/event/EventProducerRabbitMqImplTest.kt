@@ -1,5 +1,7 @@
 package com.disposableemail.core.event
 
+import com.disposableemail.core.event.producer.EventProducer
+import com.disposableemail.core.event.producer.impl.EventProducerRabbitMqImpl
 import com.disposableemail.core.model.Credentials
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.BeforeEach
@@ -11,7 +13,7 @@ import org.mockito.Mockito
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.test.util.ReflectionTestUtils
 
-class EventProducerTest {
+class EventProducerRabbitMqImplTest {
 
     private var rabbitTemplateMock: RabbitTemplate? = null
     private var eventProducer: EventProducer? = null
@@ -19,7 +21,8 @@ class EventProducerTest {
     @BeforeEach
     fun setUp() {
         this.rabbitTemplateMock = Mockito.mock<RabbitTemplate>(RabbitTemplate::class.java)
-        this.eventProducer = EventProducer(this.rabbitTemplateMock)
+        this.eventProducer =
+            EventProducerRabbitMqImpl(this.rabbitTemplateMock)
         ReflectionTestUtils.setField(eventProducer!!, "messagesExchange", "DisposableEmail-exchange-messages")
         ReflectionTestUtils.setField(eventProducer!!, "accountsExchange", "DisposableEmail-exchange-accounts")
         ReflectionTestUtils.setField(eventProducer!!, "domainsExchange", "DisposableEmail-exchange-domains")

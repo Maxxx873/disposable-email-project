@@ -4,7 +4,7 @@ import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.dao.mapper.DomainMapper;
 import com.disposableemail.core.dao.repository.DomainRepository;
 import com.disposableemail.core.event.Event;
-import com.disposableemail.core.event.EventProducer;
+import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.exception.custom.DomainNotFoundException;
 import com.disposableemail.core.model.DomainItem;
 import com.disposableemail.core.service.api.DomainService;

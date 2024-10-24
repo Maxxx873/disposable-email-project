@@ -4,7 +4,7 @@ import com.disposableemail.core.dao.entity.AccountEntity;
 import com.disposableemail.core.dao.entity.search.MessageElasticsearchEntity;
 import com.disposableemail.core.dao.repository.search.MessageElasticsearchRepository;
 import com.disposableemail.core.event.Event;
-import com.disposableemail.core.event.EventProducer;
+import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.security.UserCredentials;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.search.MessageElasticsearchService;

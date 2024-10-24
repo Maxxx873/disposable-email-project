@@ -2,7 +2,6 @@ package com.disposableemail.core.service.impl.auth;
 
 import com.disposableemail.config.TestConfig;
 import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredException;
-import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.auth.AuthorizationService;
 import jakarta.ws.rs.NotAuthorizedException;
@@ -141,9 +140,9 @@ class KeycloakIntegrationTest extends AbstractKeycloakTestContainer {
 
         authorizationService.createUser(getCredentialsEncrypted());
 
-        assertThatThrownBy(() -> authorizationService.deleteUserByName("nonExistentName"))
-                .isInstanceOf(AccountNotFoundException.class)
-                .hasMessageContaining("This Account not found");
+        var futureKeycloakResponse = authorizationService.deleteUserByName("nonExistentName");
+
+        assertThat(futureKeycloakResponse.get().getStatusInfo()).isEqualTo(Response.Status.NOT_MODIFIED);
     }
 
     private List<UserRepresentation> getUsers(RealmRepresentation realmRepresentation) {

@@ -4,7 +4,7 @@ import com.disposableemail.config.MongoDbConfig;
 import com.disposableemail.config.RabbitMqConfig;
 import com.disposableemail.config.WebClientConfig;
 import com.disposableemail.core.dao.mapper.search.MessageElasticsearchMapper;
-import com.disposableemail.core.event.EventProducer;
+import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.security.KeycloakClientConfig;
 import com.disposableemail.core.security.TextEncryptorConfig;
 import com.disposableemail.core.service.api.AccountService;
