@@ -8,6 +8,7 @@ import com.disposableemail.core.exception.custom.AccountToManyRequestsException;
 import com.disposableemail.core.model.Account;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.AccountService;
+import com.disposableemail.core.service.facade.AccountFacade;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
 
     private final AccountService accountService;
     private final AccountMapper accountMapper;
+    private final AccountFacade accountFacade;
 
     @Override
     @PreAuthorize("hasRole(@environment.getProperty('spring.security.role.user'))")
@@ -58,13 +60,13 @@ public class AccountsApiDelegateImpl implements AccountsApiDelegate {
     @RateLimiter(name = "ratelimiterAccountRegistration", fallbackMethod = "toManyRequestsCreateAccount")
     public Mono<ResponseEntity<Account>> createAccountItem(Mono<Credentials> credentials, ServerWebExchange exchange) {
 
-        return credentials.flatMap(accountService::createAccount)
+        return credentials.flatMap(accountFacade::createAccount)
                 .map(accountEntity -> {
-                    log.info("Saved Account: {}", accountEntity.getAddress());
-                    return ResponseEntity.status(HttpStatus.ACCEPTED)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .body(accountMapper.accountEntityToAccount(accountEntity));
-                });
+            log.info("Saved Account: {}", accountEntity.getAddress());
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(accountMapper.accountEntityToAccount(accountEntity));
+        });
     }
 
     private Mono<ResponseEntity<Account>> toManyRequestsCreateAccount(Mono<Credentials> credentials, ServerWebExchange exchange,
