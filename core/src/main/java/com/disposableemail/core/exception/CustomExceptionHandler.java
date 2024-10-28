@@ -1,10 +1,13 @@
 package com.disposableemail.core.exception;
 
+import com.disposableemail.core.event.Event;
+import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.exception.custom.*;
 import com.disposableemail.core.model.ErrorResponse;
 import com.mongodb.MongoWriteException;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.NotAuthorizedException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +16,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
 
+import static com.disposableemail.core.event.Event.Type.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final String EXCEPTION_LOG = "Exception: {}";
+
+    private final EventProducer eventProducer;
 
     @ExceptionHandler(NotAuthorizedException.class)
     public final ResponseEntity<ErrorResponse> handleNotAuthorizedException(NotAuthorizedException ex) {
@@ -78,4 +85,21 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({AccountAuthServerRegistrationException.class})
+    public final ResponseEntity<ErrorResponse> handleAccountRegistrationException(AccountAuthServerRegistrationException ex) {
+        log.error(EXCEPTION_LOG, ex.getMessage());
+        ex.printStackTrace();
+        eventProducer.send(new Event<>(MAIL_DELETING_ACCOUNT, ex.getCredentials()));
+        var error = new ErrorResponse(String.valueOf(HttpStatus.SERVICE_UNAVAILABLE.value()), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler({AccountMailServerRegistrationException.class})
+    public final ResponseEntity<ErrorResponse> handleAccountRegistrationException(AccountMailServerRegistrationException ex) {
+        log.error(EXCEPTION_LOG, ex.getMessage());
+        ex.printStackTrace();
+        eventProducer.send(new Event<>(AUTH_DELETING_ACCOUNT, ex.getCredentials()));
+        var error = new ErrorResponse(String.valueOf(HttpStatus.SERVICE_UNAVAILABLE.value()), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
+    }
 }

@@ -149,7 +149,7 @@ class ApacheJamesClientServiceImplUnitTest {
     }
 
     @Test
-    void shouldCreateUser() throws JsonProcessingException {
+    void shouldCreateUserWithCredsDecrypt() throws JsonProcessingException {
 
         var credentials = new Credentials(USERNAME, PASSWORD);
         var requestBody = String.format("{\"password\":\"%s\"}", PASSWORD);
@@ -164,7 +164,7 @@ class ApacheJamesClientServiceImplUnitTest {
         when(requestHeadersSpec.exchangeToMono(ArgumentMatchers.<Function<ClientResponse, ? extends Mono<String>>>notNull()))
                 .thenReturn(Mono.empty());
 
-        Mono<Response> response = mailServerClientService.createUser(credentials);
+        Mono<Response> response = mailServerClientService.createUserWithCredsDecrypt(credentials);
 
         StepVerifier.create(response).expectComplete().verify();
     }

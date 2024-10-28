@@ -22,8 +22,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static com.disposableemail.core.dao.entity.AccountEntity.createAccountEntityFromCredentials;
-import static com.disposableemail.core.event.Event.Type.*;
+import static com.disposableemail.core.event.Event.Type.AUTH_DELETING_ACCOUNT;
+import static com.disposableemail.core.event.Event.Type.MAIL_DELETING_ACCOUNT;
 import static com.disposableemail.core.security.SecurityUtils.getCredentialsFromJwt;
+import static reactor.function.TupleUtils.function;
 
 @Slf4j
 @Service
@@ -50,9 +52,7 @@ public class AccountServiceImpl implements AccountService {
                     if (isAvailable(domainEntity)) {
                         return accountRepository.findByAddress(credentials.getAddress().toLowerCase())
                                 .flatMap(accountEntity -> Mono.error(AccountAlreadyRegisteredException::new))
-                                .then(accountRepository.save(createAccountEntityFromCredentials(credentials, quotaSize))
-                                        .doOnSuccess(action -> eventProducer.send(new Event<>(START_CREATING_ACCOUNT,
-                                                getEncryptCredentials(credentials)))));
+                                .then(accountRepository.save(createAccountEntityFromCredentials(credentials, quotaSize)));
                     } else {
                         return Mono.just(new AccountEntity());
                     }
@@ -129,7 +129,7 @@ public class AccountServiceImpl implements AccountService {
                 .build();
     }
 
-    private static boolean isAvailable(DomainEntity domainEntity) {
+    private boolean isAvailable(DomainEntity domainEntity) {
         return Boolean.TRUE.equals(domainEntity.getIsActive()) &&
                 Boolean.FALSE.equals(domainEntity.getIsPrivate());
     }

@@ -3,7 +3,9 @@ package com.disposableemail.core.service.api.mail;
 import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.model.Credentials;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.ws.rs.core.Response;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,9 +18,11 @@ public interface MailServerClientService {
 
     Flux<DomainEntity> getDomains();
 
-    Mono<Response> createUser(Credentials credentials) throws JsonProcessingException;
+    Mono<Response> createUserWithCredsDecrypt(Credentials credentials) throws JsonProcessingException;
 
     Mono<String> getMailboxId(Credentials credentials, String mailboxName);
+
+    WebClient.ResponseSpec createUser(Credentials credentials) throws JsonProcessingException;
 
     Mono<Response>  deleteUser(String username);
 

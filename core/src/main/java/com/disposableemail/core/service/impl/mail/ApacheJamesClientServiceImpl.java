@@ -156,7 +156,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
 
     @Override
     @Retry(name = "retryMailService")
-    public Mono<Response> createUser(Credentials credentials) throws JsonProcessingException {
+    public Mono<Response> createUserWithCredsDecrypt(Credentials credentials) throws JsonProcessingException {
         log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
 
         var password = mapper.createObjectNode();
@@ -183,6 +183,19 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                 .onErrorComplete(throwable -> {
                     throw new MailServerConnectException();
                 });
+    }
+
+    @Override
+    public WebClient.ResponseSpec createUser(Credentials credentials) throws JsonProcessingException {
+        log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
+
+        var password = mapper.createObjectNode();
+        password.put(PASSWORD_FIELD, credentials.getPassword());
+        return mailServerApiClient.put()
+                .uri(USERS_PATH + credentials.getAddress())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(mapper.writeValueAsString(password))
+                .retrieve();
     }
 
     @Override

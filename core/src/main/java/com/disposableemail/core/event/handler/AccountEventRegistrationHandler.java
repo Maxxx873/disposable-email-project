@@ -40,7 +40,7 @@ public class AccountEventRegistrationHandler {
             key = "${routing-keys.account-auth-confirmation}"
     ))
     public void handleKeycloakRegisterConfirmationEvent(Credentials credentials) throws JsonProcessingException {
-        mailServerClientService.createUser(credentials).subscribe();
+        mailServerClientService.createUserWithCredsDecrypt(credentials).subscribe();
     }
 
     @Async
