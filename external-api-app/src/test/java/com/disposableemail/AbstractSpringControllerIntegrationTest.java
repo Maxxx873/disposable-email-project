@@ -15,6 +15,7 @@ import com.disposableemail.core.service.api.DomainService;
 import com.disposableemail.core.service.api.MessageService;
 import com.disposableemail.core.service.api.SourceService;
 import com.disposableemail.core.service.impl.AccountHelperService;
+import com.disposableemail.facade.api.AccountFacade;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,6 +46,9 @@ public abstract class AbstractSpringControllerIntegrationTest {
 
     @MockBean
     protected AccountService accountService;
+
+    @MockBean
+    protected AccountFacade accountFacade;
 
     @MockBean
     protected DomainService domainService;

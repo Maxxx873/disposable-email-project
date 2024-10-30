@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -186,16 +187,16 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     }
 
     @Override
-    public WebClient.ResponseSpec createUser(Credentials credentials) throws JsonProcessingException {
+    public Mono<ResponseEntity<Void>> createUser(Credentials credentials) throws JsonProcessingException {
         log.info("Creating a User in Mail Server {} | User: {}", mailServerName, credentials.getAddress());
 
-        var password = mapper.createObjectNode();
-        password.put(PASSWORD_FIELD, credentials.getPassword());
+        var password = mapper.createObjectNode().put(PASSWORD_FIELD, credentials.getPassword());
         return mailServerApiClient.put()
                 .uri(USERS_PATH + credentials.getAddress())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(mapper.writeValueAsString(password))
-                .retrieve();
+                .retrieve()
+                .toBodilessEntity();
     }
 
     @Override
@@ -219,7 +220,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @Override
     @SneakyThrows
     @Retry(name = "retryMailService")
-    public Mono<Response> createMailbox(Credentials credentials) {
+    public Mono<Response> createMailboxOld(Credentials credentials) {
         log.info("Creating a Mailbox in Mail Server {} | User: {}, Mailbox: {}",
                 mailServerName, credentials.getAddress(), inbox);
 
@@ -239,36 +240,38 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     }
 
     @Override
+    @SneakyThrows
+    @Retry(name = "retryMailService")
+    public Mono<ResponseEntity<Void>> createMailbox(Credentials credentials) {
+        log.info("Creating a Mailbox in Mail Server {} | User: {}, Mailbox: {}",
+                mailServerName, credentials.getAddress(), inbox);
+
+        return mailServerApiClient.put()
+                .uri(USERS_PATH + credentials.getAddress() + "/mailboxes/" + inbox)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    @Override
     public Mono<Integer> getQuotaSize(String username) {
         log.info("Getting the quota size for a user | User: {}", username);
 
-        var result = mailServerApiClient.get()
+        return mailServerApiClient.get()
                 .uri(quotaPath + username + "/size")
                 .retrieve()
                 .bodyToMono(Integer.class)
                 .retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(DURATION_SECONDS)));
-        result.subscribe();
-        return result;
     }
 
     @Override
-    public Mono<Response> updateQuotaSize(Credentials credentials) {
+    public Mono<ResponseEntity<Void>> updateQuotaSize(Credentials credentials) {
         log.info("Updating the quota size for a user | User: {}", credentials.getAddress());
 
-        var result = mailServerApiClient.put()
+        return mailServerApiClient.put()
                 .uri(quotaPath + credentials.getAddress() + "/size")
                 .bodyValue(Integer.parseInt(quotaSize))
-                .exchangeToMono(response -> {
-                    if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
-                        log.info("Quota size updated in Mail Service | Status code: {} | Address: {}",
-                                response.statusCode(), credentials.getAddress());
-                        eventProducer.send(new Event<>(Type.QUOTA_SIZE_UPDATED_IN_MAIL_SERVICE, credentials));
-                        return response.bodyToMono(Response.class);
-                    }
-                    return Mono.empty();
-                }).retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(DURATION_SECONDS)));
-        result.subscribe();
-        return result;
+                .retrieve()
+                .toBodilessEntity();
     }
 
     @Override

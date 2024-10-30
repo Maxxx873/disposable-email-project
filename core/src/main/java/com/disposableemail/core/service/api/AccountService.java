@@ -20,6 +20,14 @@ public interface AccountService {
     Mono<AccountEntity> createAccount(Credentials credentials);
 
     /**
+     * Creates a new account with the given credentials.
+     *
+     * @param accountEntity the entity for the new account
+     * @return a Mono that emits the newly created account entity
+     */
+    Mono<AccountEntity> createAccount(AccountEntity accountEntity);
+
+    /**
      * Retrieves an account by its ID.
      *
      * @param id the ID of the account to retrieve

@@ -28,7 +28,7 @@ class AccountsApiDelegateImplTest extends AbstractSpringControllerIntegrationTes
         var limitForPeriod = rateLimiterRegistry.getAllRateLimiters()
                 .stream().toList().get(0).getRateLimiterConfig().getLimitForPeriod();
         Map<Integer, Integer> responseStatusCount = new ConcurrentHashMap<>();
-        when(accountService.createAccount(any())).thenReturn(Mono.just(new AccountEntity()));
+        when(accountFacade.createAccount(any())).thenReturn(Mono.just(new AccountEntity()));
 
         IntStream.rangeClosed(1, limitForPeriod + 1)
                 .parallel()
@@ -50,7 +50,7 @@ class AccountsApiDelegateImplTest extends AbstractSpringControllerIntegrationTes
                 .hasSize(2)
                 .containsKeys(TOO_MANY_REQUESTS.value(), ACCEPTED.value());
 
-        verify(accountService, times(limitForPeriod)).createAccount(any());
+        verify(accountFacade, times(limitForPeriod)).createAccount(any());
 
     }
 

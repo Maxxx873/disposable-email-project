@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import static com.disposableemail.core.security.SecurityUtils.getCredentialsFromJwt;
+import static reactor.function.TupleUtils.function;
 
 @Slf4j
 @Service
@@ -57,13 +58,11 @@ public class AccountHelperService {
 
         return mailServerClientService.getMailboxId(credentials, inbox)
                 .zipWith(accountRepository.findByAddress(credentials.getAddress()))
-                .flatMap(tuple -> {
-                    var mailboxId = tuple.getT1();
-                    var accountEntity = tuple.getT2();
+                .flatMap(function((mailboxId, accountEntity) -> {
                     log.info("Set Mailbox id for Account | address: {}, mailbox: {}", credentials.getAddress(), mailboxId);
                     accountEntity.setMailboxId(mailboxId);
                     return accountRepository.save(accountEntity);
-                })
+                }))
                 .doOnSuccess(result -> log.info("Mailbox id saved successfully"))
                 .doOnError(err -> log.error("Error saving mailbox id", err));
     }

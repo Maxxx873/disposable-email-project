@@ -61,6 +61,26 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Mono<AccountEntity> createAccount(AccountEntity accountEntity) {
+        log.info("Creating an Account | ({})", accountEntity.getAddress());
+
+        var domain = EmailUtils.getDomainFromEmailAddress(accountEntity.getAddress());
+
+        return domainRepository.findByDomain(domain)
+                .flatMap(domainEntity -> {
+                    log.info("Using a Domain: {}", domainEntity.getDomain());
+                    if (isAvailable(domainEntity)) {
+                        return accountRepository.findByAddress(accountEntity.getAddress().toLowerCase())
+                                .flatMap(account -> Mono.error(AccountAlreadyRegisteredException::new))
+                                .then(accountRepository.save(accountEntity));
+                    } else {
+                        return Mono.just(new AccountEntity());
+                    }
+                })
+                .switchIfEmpty(Mono.error(DomainNotAvailableException::new));
+    }
+
+    @Override
     public Mono<AccountEntity> getAccountById(String id) {
         log.info("Getting an Account by id {}", id);
 
@@ -96,9 +116,7 @@ public class AccountServiceImpl implements AccountService {
         var sIdMono = getCredentialsFromJwt();
         var accountEntityMono = accountRepository.findById(id);
         var result = accountEntityMono.zipWith(sIdMono)
-                .flatMap(tuple2 -> {
-                    var userCredentials = tuple2.getT2();
-                    var accountEntity = tuple2.getT1();
+                .flatMap(function((accountEntity, userCredentials) -> {
                     log.info("Get authorized Account | address: {}, subject: {}",
                             userCredentials.getPreferredUsername(), userCredentials.getSub());
                     if (!userCredentials.getPreferredUsername().equals(accountEntity.getAddress())) {
@@ -110,7 +128,7 @@ public class AccountServiceImpl implements AccountService {
                                 eventProducer.send(new Event<>(AUTH_DELETING_ACCOUNT, accountEntity.getAddress()));
                                 eventProducer.send(new Event<>(MAIL_DELETING_ACCOUNT, accountEntity.getAddress()));
                             });
-                });
+                }));
         result.subscribe();
         return result;
     }

@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -194,10 +195,10 @@ class ApacheJamesClientServiceImplUnitTest {
 
         when(webClientMock.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
-        when(requestBodySpec.exchangeToMono(ArgumentMatchers.<Function<ClientResponse, ? extends Mono<String>>>notNull()))
-                .thenReturn(Mono.empty());
+        when(requestBodySpec.retrieve()).thenReturn(response);
+        when(response.toBodilessEntity()).thenReturn(Mono.empty());
 
-        Mono<Response> response = mailServerClientService.createMailbox(credentials);
+        Mono<ResponseEntity<Void>> response = mailServerClientService.createMailbox(credentials);
 
         StepVerifier.create(response).expectComplete().verify();
     }
@@ -250,7 +251,7 @@ class ApacheJamesClientServiceImplUnitTest {
     }
 
     @Test
-    void shouldUpdateQuoteSizeForUSer() {
+    void shouldUpdateQuoteSizeForUSer() throws JsonProcessingException {
 
         var quotaSize = 40000;
         var credentials = new Credentials(USERNAME, PASSWORD);
@@ -259,10 +260,10 @@ class ApacheJamesClientServiceImplUnitTest {
         when(webClientMock.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
         when(requestBodySpec.bodyValue(quotaSize)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.exchangeToMono(ArgumentMatchers.<Function<ClientResponse, ? extends Mono<String>>>notNull()))
-                .thenReturn(Mono.empty());
+        when(requestHeadersSpec.retrieve()).thenReturn(response);
+        when(response.toBodilessEntity()).thenReturn(Mono.empty());
 
-        Mono<Response> response = mailServerClientService.updateQuotaSize(credentials);
+        Mono<ResponseEntity<Void>> response = mailServerClientService.updateQuotaSize(credentials);
 
         StepVerifier.create(response).expectComplete().verify();
     }

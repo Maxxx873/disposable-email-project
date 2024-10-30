@@ -3,9 +3,8 @@ package com.disposableemail.core.service.api.mail;
 import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.model.Credentials;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.ws.rs.core.Response;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,15 +21,17 @@ public interface MailServerClientService {
 
     Mono<String> getMailboxId(Credentials credentials, String mailboxName);
 
-    WebClient.ResponseSpec createUser(Credentials credentials) throws JsonProcessingException;
+    Mono<ResponseEntity<Void>> createUser(Credentials credentials) throws JsonProcessingException;
 
     Mono<Response>  deleteUser(String username);
 
-    Mono<Response> createMailbox(Credentials credentials);
+    Mono<ResponseEntity<Void>> createMailbox(Credentials credentials);
+
+    Mono<Response> createMailboxOld(Credentials credentials);
 
     Mono<Integer> getQuotaSize(String username);
 
-    Mono<Response> updateQuotaSize(Credentials credentials);
+    Mono<ResponseEntity<Void>> updateQuotaSize(Credentials credentials);
 
     Mono<Integer> getUsedSize(String username);
 }

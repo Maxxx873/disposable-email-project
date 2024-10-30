@@ -23,8 +23,9 @@
         <module>core</module>
         <module>config</module>
         <module>jobs-app</module>
-        <module>external-api-app</module>
         <module>admin-api-app</module>
+        <module>facade</module>
+        <module>external-api-app</module>
     </modules>
 
     <properties>
@@ -75,6 +76,12 @@
             <dependency>
                 <groupId>com.disposableemail</groupId>
                 <artifactId>disposable-email-config</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.disposableemail</groupId>
+                <artifactId>disposable-email-service-facades</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
@@ -343,25 +350,6 @@
                         <exclude>org.apache.commons:commons-collections4</exclude>
                     </excludes>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <configuration>
-                    <args>
-                        <arg>-Xjsr305=strict</arg>
-                    </args>
-                    <compilerPlugins>
-                        <plugin>spring</plugin>
-                    </compilerPlugins>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-allopen</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

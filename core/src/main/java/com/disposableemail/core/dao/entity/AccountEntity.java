@@ -41,4 +41,14 @@ public class AccountEntity extends Auditable {
                 .build();
     }
 
+    public static AccountEntity createDefault() {
+        return AccountEntity.builder()
+                .address("")
+                .isDeleted(false)
+                .isDisabled(false)
+                .used(0)
+                .quota(0)
+                .build();
+    }
+
 }

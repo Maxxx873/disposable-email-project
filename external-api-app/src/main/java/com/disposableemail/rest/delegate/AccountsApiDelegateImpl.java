@@ -8,7 +8,7 @@ import com.disposableemail.core.exception.custom.AccountToManyRequestsException;
 import com.disposableemail.core.model.Account;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.AccountService;
-import com.disposableemail.core.service.facade.AccountFacade;
+import com.disposableemail.facade.api.AccountFacade;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
