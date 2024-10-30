@@ -72,7 +72,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     @Retry(name = "retryMailService")
     public Mono<String> getMailboxId(Credentials credentials, String mailboxName) {
 
-        var result = mailServerApiClient.get().uri("/users/{username}/mailboxes", credentials.getAddress())
+        return mailServerApiClient.get().uri("/users/{username}/mailboxes", credentials.getAddress())
                 .retrieve()
                 .bodyToMono(String.class)
                 .retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(DURATION_SECONDS)))
@@ -80,22 +80,13 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                     try {
                         log.info("Getting mailboxes for user {} | {}", credentials.getAddress(), response);
                         return mapper.readValue(response, new TypeReference<List<Map<String, String>>>() {
-                        });
+                                }).stream()
+                                .filter(mailbox -> mailbox.containsValue(mailboxName) && mailbox.containsKey(MAILBOX_ID_KEY))
+                                .iterator().next().get(MAILBOX_ID_KEY);
                     } catch (JsonProcessingException ex) {
                         throw new MailboxNotFoundException();
                     }
-                })
-                .map(mailboxes ->
-                        mailboxes.stream().filter(mailbox ->
-                                        mailbox.containsValue(mailboxName) && mailbox.containsKey(MAILBOX_ID_KEY))
-                                .findFirst())
-                .map(optional -> {
-                    var mailboxId = optional.stream().iterator().next().get(MAILBOX_ID_KEY);
-                    log.info("Extracted mailboxId | {}", mailboxId);
-                    return mailboxId;
                 });
-        result.subscribe();
-        return result;
     }
 
     @Override
@@ -122,7 +113,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     public Mono<Response> createDomain(String domain) {
         log.info("Creating a Domain in Mail Server {} | Domain: {}", mailServerName, domain);
 
-        var result = mailServerApiClient.put()
+        return mailServerApiClient.put()
                 .uri("/domains/" + domain)
                 .exchangeToMono(response -> {
                     if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
@@ -132,8 +123,6 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                     }
                     return Mono.empty();
                 }).retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(DURATION_SECONDS)));
-        result.subscribe();
-        return result;
     }
 
     @Override
@@ -141,7 +130,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     public Mono<Response> deleteDomain(String domain) {
         log.info("Deleting a Domain in Mail Server {} | Domain: {}", mailServerName, domain);
 
-        var result = mailServerApiClient.delete()
+        return mailServerApiClient.delete()
                 .uri("/domains/" + domain)
                 .exchangeToMono(response -> {
                     if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
@@ -151,8 +140,6 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                     }
                     return Mono.empty();
                 }).retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(DURATION_SECONDS)));
-        result.subscribe();
-        return result;
     }
 
     @Override
@@ -203,7 +190,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     public Mono<Response> deleteUser(String username) {
         log.info("Deleting | User: {}", username);
 
-        var result = mailServerApiClient.delete()
+        return mailServerApiClient.delete()
                 .uri(USERS_PATH + username)
                 .exchangeToMono(response -> {
                     if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
@@ -213,8 +200,6 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                     }
                     return Mono.empty();
                 }).retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(2)));
-        result.subscribe();
-        return result;
     }
 
     @Override
@@ -224,7 +209,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
         log.info("Creating a Mailbox in Mail Server {} | User: {}, Mailbox: {}",
                 mailServerName, credentials.getAddress(), inbox);
 
-        var result = mailServerApiClient.put()
+        return mailServerApiClient.put()
                 .uri(USERS_PATH + credentials.getAddress() + "/mailboxes/" + inbox)
                 .exchangeToMono(response -> {
                     if (response.statusCode().equals(HttpStatus.NO_CONTENT)) {
@@ -235,8 +220,6 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                     }
                     return Mono.empty();
                 }).retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(2)));
-        result.subscribe();
-        return result;
     }
 
     @Override
@@ -278,7 +261,7 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
     public Mono<Integer> getUsedSize(String username) {
         log.info("Getting used size for a user | User: {}", username);
 
-        var result = mailServerApiClient.get()
+        return mailServerApiClient.get()
                 .uri(quotaPath + username)
                 .retrieve()
                 .bodyToMono(String.class)
@@ -292,8 +275,6 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                         throw new MailboxNotFoundException();
                     }
                 });
-        result.subscribe();
-        return result;
     }
 
 }
