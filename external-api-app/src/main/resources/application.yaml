@@ -7,6 +7,9 @@ authorization:
 search:
   service: ${SEARCH_SERVICE:none}
 
+cache:
+  service: redis
+
 spring:
   output:
     ansi:
@@ -22,6 +25,11 @@ spring:
       database: disposableemail
       host: ${MONGODB_HOST:localhost}
       port: ${MONGODB_PORT:27017}
+
+    redis:
+      connect-timeout: 2000
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
@@ -80,7 +88,7 @@ logging:
   level:
     root: info
     org.springframework.security: DEBUG
-
+    org.springframework.cache: TRACE
 resilience4j:
   retry:
     instances:

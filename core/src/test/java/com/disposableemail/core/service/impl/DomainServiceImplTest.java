@@ -33,7 +33,7 @@ class DomainServiceImplTest extends AbstractSpringIntegrationTest {
 
     @Test
     void shouldFindAllDomains() {
-        var domains = domainService.getDomains();
+        var domains = domainService.getAllDomains();
 
         StepVerifier
                 .create(domains)

@@ -3,7 +3,6 @@ package com.disposableemail.core.service.impl;
 import com.disposableemail.core.dao.entity.AccountEntity;
 import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.dao.repository.AccountRepository;
-import com.disposableemail.core.dao.repository.DomainRepository;
 import com.disposableemail.core.event.Event;
 import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredException;
@@ -11,6 +10,7 @@ import com.disposableemail.core.exception.custom.AccountNotFoundException;
 import com.disposableemail.core.exception.custom.DomainNotAvailableException;
 import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.AccountService;
+import com.disposableemail.core.service.api.DomainService;
 import com.disposableemail.core.util.EmailUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final EventProducer eventProducer;
     private final AccountRepository accountRepository;
-    private final DomainRepository domainRepository;
+    private final DomainService domainService;
     private final TextEncryptor encryptor;
 
     @Override
@@ -46,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
 
         var domain = EmailUtils.getDomainFromEmailAddress(credentials.getAddress());
 
-        return domainRepository.findByDomain(domain)
+        return domainService.getByDomain(domain)
                 .flatMap(domainEntity -> {
                     log.info("Using a Domain: {}", domainEntity.getDomain());
                     if (isAvailable(domainEntity)) {
@@ -66,7 +66,7 @@ public class AccountServiceImpl implements AccountService {
 
         var domain = EmailUtils.getDomainFromEmailAddress(accountEntity.getAddress());
 
-        return domainRepository.findByDomain(domain)
+        return domainService.getByDomain(domain)
                 .flatMap(domainEntity -> {
                     log.info("Using a Domain: {}", domainEntity.getDomain());
                     if (isAvailable(domainEntity)) {

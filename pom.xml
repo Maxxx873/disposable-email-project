@@ -60,6 +60,7 @@
         <testcontainers.elasticsearch.version>1.17.6</testcontainers.elasticsearch.version>
         <de.flapdoodle.embed.mongo.spring30x.version>4.5.2</de.flapdoodle.embed.mongo.spring30x.version>
         <spring-addons-oauth2-test.version>6.1.13</spring-addons-oauth2-test.version>
+        <embedded-redis.version>1.4.2</embedded-redis.version>
         <!-- plugin versions -->
         <spring-boot-maven-plugin.version>3.0.2</spring-boot-maven-plugin.version>
         <versions-maven-plugin.version>2.13.0</versions-maven-plugin.version>
@@ -160,6 +161,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
         <!-- security -->
@@ -326,6 +331,12 @@
             <groupId>com.github.fridujo</groupId>
             <artifactId>rabbitmq-mock</artifactId>
             <version>${rabbitmq-mock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.codemonstur</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>${embedded-redis.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

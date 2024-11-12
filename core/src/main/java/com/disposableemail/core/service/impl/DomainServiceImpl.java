@@ -1,5 +1,12 @@
 package com.disposableemail.core.service.impl;
 
+import static com.disposableemail.core.event.Event.Type.DOMAIN_CREATED;
+import static com.disposableemail.core.event.Event.Type.DOMAIN_DELETED;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
 import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.dao.mapper.DomainMapper;
 import com.disposableemail.core.dao.repository.DomainRepository;
@@ -8,19 +15,16 @@ import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.exception.custom.DomainNotFoundException;
 import com.disposableemail.core.model.DomainItem;
 import com.disposableemail.core.service.api.DomainService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import static com.disposableemail.core.event.Event.Type.DOMAIN_CREATED;
-import static com.disposableemail.core.event.Event.Type.DOMAIN_DELETED;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "cache.service", havingValue = "none", matchIfMissing = true)
 public class DomainServiceImpl implements DomainService {
 
     private final DomainRepository domainRepository;
@@ -46,6 +50,13 @@ public class DomainServiceImpl implements DomainService {
         log.info("Getting a Domain {}", id);
 
         return domainRepository.findById(id);
+    }
+
+    @Override
+    public Mono<DomainEntity> getByDomain(String domain) {
+        log.info("Getting a Domain {}", domain);
+
+        return domainRepository.findByDomain(domain);
     }
 
     @Override
@@ -77,10 +88,4 @@ public class DomainServiceImpl implements DomainService {
                                 }));
     }
 
-    @Override
-    public Flux<DomainEntity> getDomains() {
-        log.info("Getting a Domains collection");
-
-        return domainRepository.findAll();
-    }
 }

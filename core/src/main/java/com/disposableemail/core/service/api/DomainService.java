@@ -1,9 +1,12 @@
 package com.disposableemail.core.service.api;
 
+import jakarta.validation.constraints.Min;
+
+import org.springframework.validation.annotation.Validated;
+
 import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.model.DomainItem;
-import jakarta.validation.constraints.Min;
-import org.springframework.validation.annotation.Validated;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -37,6 +40,14 @@ public interface DomainService {
     Mono<DomainEntity> getDomain(String id);
 
     /**
+     * Retrieves a domain by its domain.
+     *
+     * @param domain the ID of the domain to retrieve
+     * @return a mono of domain entity
+     */
+    Mono<DomainEntity> getByDomain(String domain);
+
+    /**
      * Creates a new domain with the specified name.
      *
      * @param domainName the name of the domain to create
@@ -60,11 +71,5 @@ public interface DomainService {
      */
     Mono<DomainEntity> updateDomain(DomainEntity domainEntity);
 
-    /**
-     * Retrieves a list of all domains.
-     *
-     * @return a flux of domain entities
-     */
-    Flux<DomainEntity> getDomains();
 }
 
