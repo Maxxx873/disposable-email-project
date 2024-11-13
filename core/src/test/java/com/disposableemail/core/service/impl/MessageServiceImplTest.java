@@ -116,6 +116,8 @@ class MessageServiceImplTest extends AbstractSpringIntegrationTest {
             claims = @OpenIdClaims(preferredUsername = "recipient1@example.com"))
     void shouldGetMessage() {
         message1.setCreatedAt(Instant.now().minus(NUMBER_OF_DAYS, ChronoUnit.DAYS));
+        message1.setUpdatedAt(Instant.now().minus(NUMBER_OF_DAYS, ChronoUnit.DAYS));
+
         messageService.saveMessage(message1).block();
 
         StepVerifier
@@ -124,7 +126,6 @@ class MessageServiceImplTest extends AbstractSpringIntegrationTest {
                 .assertNext(msg -> compareMessages(message1, msg))
                 .expectComplete()
                 .verify();
-
     }
 
     @Test
@@ -147,7 +148,11 @@ class MessageServiceImplTest extends AbstractSpringIntegrationTest {
             claims = @OpenIdClaims(preferredUsername = "recipient1@example.com"))
     void shouldUpdateMessage() {
         message1.setCreatedAt(Instant.now().minus(NUMBER_OF_DAYS, ChronoUnit.DAYS));
+        message1.setUpdatedAt(Instant.now().minus(NUMBER_OF_DAYS, ChronoUnit.DAYS));
+
         message2.setCreatedAt(Instant.now());
+        message2.setUpdatedAt(Instant.now());
+
         messageService.saveMessage(message1).block();
 
         StepVerifier
@@ -180,7 +185,7 @@ class MessageServiceImplTest extends AbstractSpringIntegrationTest {
             claims = @OpenIdClaims(preferredUsername = "recipient1@example.com"))
     void shouldSoftDeleteMessage() {
         message1.setCreatedAt(Instant.now().minus(NUMBER_OF_DAYS, ChronoUnit.DAYS));
-        message1.setCreatedAt(Instant.now());
+        message1.setUpdatedAt(Instant.now());
         messageService.saveMessage(message1).block();
         message1.setIsDeleted(true);
 
@@ -286,7 +291,7 @@ class MessageServiceImplTest extends AbstractSpringIntegrationTest {
         assertEquals(expected.getAttachments(), actual.getAttachments());
         assertEquals(expected.getSize(), actual.getSize());
         assertEquals(getFormattedInstant(expected.getCreatedAt()), getFormattedInstant(actual.getCreatedAt()));
-        assertThat(expected.getUpdatedAt()).isAfterOrEqualTo(getFormattedInstant(actual.getCreatedAt()));
+        assertThat(expected.getUpdatedAt()).isAfterOrEqualTo(getFormattedInstant(actual.getUpdatedAt()));
     }
 
     private String getFormattedInstant(Instant instant) {

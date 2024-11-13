@@ -6,12 +6,15 @@ import com.disposableemail.core.dao.repository.MessageRepository;
 import com.disposableemail.core.security.UserCredentials;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.MessageService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -60,11 +63,8 @@ public class MessageServiceImpl implements MessageService {
         return getAccountEntityMono().map(AccountEntity::getId)
                 .flatMap(accountId -> messageRepository.findByIdAndAccountIdAndIsDeletedFalse(messageId, accountId))
                 .switchIfEmpty(Mono.error(new AccessDeniedException(ACCESS_DENIED_MESSAGE)))
-                .map(message -> {
-                    messageRepository.save(messageEntity).subscribe();
-                    log.info("Updated Message | Id: {}", messageEntity.getId());
-                    return messageEntity;
-                });
+                .flatMap(message -> messageRepository.save(messageEntity))
+                .doOnNext(message -> log.info("Updated Message | Id: {}", message.getId()));
     }
 
     @Override
@@ -75,21 +75,18 @@ public class MessageServiceImpl implements MessageService {
         return getAccountEntityMono().map(AccountEntity::getId)
                 .flatMap(accountId -> messageRepository.findByIdAndAccountIdAndIsDeletedFalse(messageId, accountId))
                 .switchIfEmpty(Mono.error(new AccessDeniedException(ACCESS_DENIED_MESSAGE)))
-                .map(messageEntity -> {
-                    messageEntity.setIsDeleted(true);
-                    messageRepository.save(messageEntity).subscribe();
-                    return messageEntity;
-                });
+                .map(this::markMessageEntityAsDeleted)
+                .flatMap(messageRepository::save)
+                .doOnNext(message -> log.info("Deleted Message | Id: {}", message.getId()));
     }
 
     @Override
     public Flux<MessageEntity> getMessagesForAuthorizedAccount(Pageable pageable) {
         return getAccountEntityMono()
                 .switchIfEmpty(Mono.error(new AccessDeniedException(ACCESS_DENIED_MESSAGE)))
-                .flatMapMany(accountEntity -> {
-                    log.info("Getting a Messages collection | mailboxId: {}", accountEntity.getMailboxId());
-                    return messageRepository.findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountEntity.getId(), pageable);
-                });
+                .doOnNext(accountEntity -> log.info("Getting a Messages collection | mailboxId: {}", accountEntity.getMailboxId()))
+                .flatMapMany(accountEntity ->
+                        messageRepository.findByAccountIdAndIsDeletedFalseOrderByCreatedAtDesc(accountEntity.getId(), pageable));
     }
 
     @Override
@@ -99,8 +96,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private Mono<AccountEntity> getAccountEntityMono() {
-        return getCredentialsFromJwt().map(UserCredentials::getPreferredUsername).map(accountService::getAccountByAddress)
-                .switchIfEmpty(Mono.error(new AccessDeniedException(ACCESS_DENIED_MESSAGE)))
-                .flatMap(accountEntityMono -> accountEntityMono);
+        return getCredentialsFromJwt().map(UserCredentials::getPreferredUsername)
+                .flatMap(accountService::getAccountByAddress)
+                .switchIfEmpty(Mono.error(new AccessDeniedException(ACCESS_DENIED_MESSAGE)));
+    }
+
+    private MessageEntity markMessageEntityAsDeleted(MessageEntity messageEntity) {
+        messageEntity.setIsDeleted(true);
+        return messageEntity;
     }
 }
