@@ -2,6 +2,9 @@ package com.disposableemail;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,6 +24,10 @@ import com.disposableemail.core.service.api.mail.MailServerClientService;
 import com.disposableemail.core.service.impl.AccountHelperService;
 
 @SpringBootTest
+@EnableAutoConfiguration(exclude = {
+        RedisAutoConfiguration.class,
+        RedisReactiveAutoConfiguration.class
+})
 @ActiveProfiles("test")
 @ContextConfiguration(classes = TestConfig.class)
 public abstract class AbstractSpringIntegrationTest {

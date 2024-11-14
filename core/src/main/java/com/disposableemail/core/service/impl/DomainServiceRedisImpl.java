@@ -33,13 +33,14 @@ public class DomainServiceRedisImpl implements DomainService {
     private final DomainRepository domainRepository;
     private final DomainMapper domainMapper;
     private final EventProducer eventProducer;
-    private final ReactiveRedisOperations<String, DomainEntity> redisOps;
+    private final ReactiveRedisOperations<String, Object> redisOps;
 
     @Override
     public Flux<DomainEntity> getDomainsExcludingLocalhost(Integer size) {
         log.info("Getting a Domains collection | Size {}", size);
 
         return redisOps.opsForList().range(DOMAIN_NAME_KEY_PREFIX + "*", 0, size)
+                .cast(DomainEntity.class)
                 .switchIfEmpty(domainRepository.findAllExcludingLocalhostOrderedByCreatedAtDesc(PageRequest.ofSize(size))
                         .flatMap(this::updateDomainInRedisCache));
     }
@@ -50,6 +51,7 @@ public class DomainServiceRedisImpl implements DomainService {
 
         return redisOps.keys(DOMAIN_NAME_KEY_PREFIX + "*")
                 .flatMap(redisOps.opsForValue()::get)
+                .cast(DomainEntity.class)
                 .switchIfEmpty(domainRepository.findAll()
                         .flatMap(this::updateDomainByIdInRedisCache));
     }
@@ -60,6 +62,7 @@ public class DomainServiceRedisImpl implements DomainService {
 
         return redisOps.opsForValue().get(id)
                 .switchIfEmpty(domainRepository.findById(id))
+                .cast(DomainEntity.class)
                 .flatMap(this::updateDomainByIdInRedisCache);
     }
 
@@ -69,6 +72,7 @@ public class DomainServiceRedisImpl implements DomainService {
 
         return redisOps.opsForValue().get(domain)
                 .switchIfEmpty(domainRepository.findByDomain(domain))
+                .cast(DomainEntity.class)
                 .flatMap(this::updateDomainInRedisCache);
     }
 
