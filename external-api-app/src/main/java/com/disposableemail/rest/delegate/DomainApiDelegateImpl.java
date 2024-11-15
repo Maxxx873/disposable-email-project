@@ -1,18 +1,19 @@
 package com.disposableemail.rest.delegate;
 
-import com.disposableemail.api.DomainsApiDelegate;
-import com.disposableemail.core.dao.mapper.DomainMapper;
-import com.disposableemail.core.exception.custom.DomainNotFoundException;
-import com.disposableemail.core.exception.custom.DomainsNotFoundException;
-import com.disposableemail.core.model.Domain;
-import com.disposableemail.core.service.api.DomainService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
+
+import com.disposableemail.api.DomainsApiDelegate;
+import com.disposableemail.core.dao.mapper.DomainMapper;
+import com.disposableemail.core.exception.custom.DomainsNotFoundException;
+import com.disposableemail.core.model.Domain;
+import com.disposableemail.core.service.api.DomainService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,7 +43,6 @@ public class DomainApiDelegateImpl implements DomainsApiDelegate {
                     return ResponseEntity.status(HttpStatus.OK)
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(domainMapper.domainEntityToDomain(domainEntity));
-                })
-                .switchIfEmpty(Mono.error(new DomainNotFoundException()));
+                });
     }
 }

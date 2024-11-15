@@ -68,8 +68,6 @@ paths:
       responses:
         '200':
           $ref: './responses/domains-responses.yaml#/components/responses/200'
-        '404':
-          $ref: './responses/domains-responses.yaml#/components/responses/404'
       summary: Retrieves the collection of Domain resources.
       description: Retrieves the collection of Domain resources.
       parameters:
@@ -113,8 +111,6 @@ paths:
       responses:
         '200':
           $ref: './responses/messages-responses.yaml#/components/responses/200'
-        '404':
-          $ref: './responses/messages-responses.yaml#/components/responses/404'
       summary: Retrieves the collection of Message resources.
       description: Retrieves the collection of Message resources.
       parameters:

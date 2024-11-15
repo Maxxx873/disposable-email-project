@@ -43,7 +43,7 @@ public class DomainsApiDelegateImpl implements DomainsApiDelegate {
     @Override
     public Mono<ResponseEntity<Void>> deleteDomainItem(String id, ServerWebExchange exchange) {
         return domainService.deleteDomain(id)
-                .map(value -> ResponseEntity.status(HttpStatus.NO_CONTENT).build());
+                .then(Mono.fromCallable(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).build()));
     }
 
     @Override

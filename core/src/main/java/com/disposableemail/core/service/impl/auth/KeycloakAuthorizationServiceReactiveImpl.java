@@ -19,6 +19,7 @@ public class KeycloakAuthorizationServiceReactiveImpl implements AuthorizationSe
     @Override
     public Mono<Response> createUser(Credentials credentials) {
         return Mono.fromCallable(() -> keycloakAdminUtils.getKeycloakCreateUserResponse(credentials))
+                .onErrorResume(Mono::error)
                 .subscribeOn(Schedulers.boundedElastic());
     }
 

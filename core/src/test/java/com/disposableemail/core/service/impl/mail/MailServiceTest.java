@@ -37,12 +37,12 @@ class MailServiceTest {
     }
 
     @Disabled
-    @RepeatedTest(1)
+    @RepeatedTest(500)
     void shouldSendMail() throws MessagingException {
         MimeMessage mailMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-        helper.setFrom("t6@example.com");
-        helper.setTo("test6@example.com");
+        helper.setFrom("194test@example.com");
+        helper.setTo("200test@example.com");
         helper.setSubject("Hello Java Mail");
         helper.setText("<html> <body><h1>Hello </h1> </body></html>", true);
         String htmlContent = """

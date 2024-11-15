@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
 
 import static com.disposableemail.core.event.Event.Type.*;
@@ -37,6 +38,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public final ResponseEntity<ErrorResponse> handleNotAuthorizedException(AccessDeniedException ex) {
         log.error(EXCEPTION_LOG, ex.getMessage());
+        ex.printStackTrace();
         var error = new ErrorResponse(String.valueOf(HttpStatus.UNAUTHORIZED.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
@@ -81,6 +83,17 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<ErrorResponse> handleException(Exception ex) {
         log.error(EXCEPTION_LOG, ex.getMessage());
         ex.printStackTrace();
+        var error = new ErrorResponse(String.valueOf(HttpStatus.BAD_REQUEST.value()), "Bad request, something wrong");
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(WebClientResponseException.class)
+    public final ResponseEntity<ErrorResponse> handleWebClientResponseExceptionException(WebClientResponseException ex) {
+        log.error(EXCEPTION_LOG, ex.getMessage());
+        if (ex.getStatusCode() == HttpStatus.CONFLICT) {
+            var error = new ErrorResponse(String.valueOf(HttpStatus.BAD_REQUEST.value()), "This account is already registered");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
         var error = new ErrorResponse(String.valueOf(HttpStatus.BAD_REQUEST.value()), "Bad request, something wrong");
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }

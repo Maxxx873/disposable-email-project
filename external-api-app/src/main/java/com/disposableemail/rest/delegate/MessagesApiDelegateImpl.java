@@ -1,14 +1,5 @@
 package com.disposableemail.rest.delegate;
 
-import com.disposableemail.api.MessagesApiDelegate;
-import com.disposableemail.core.dao.mapper.MessageMapper;
-import com.disposableemail.core.exception.custom.MessageNotFoundException;
-import com.disposableemail.core.exception.custom.MessagesNotFoundException;
-import com.disposableemail.core.model.Message;
-import com.disposableemail.core.model.Messages;
-import com.disposableemail.core.service.api.MessageService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +7,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
+
+import com.disposableemail.api.MessagesApiDelegate;
+import com.disposableemail.core.dao.mapper.MessageMapper;
+import com.disposableemail.core.exception.custom.MessageNotFoundException;
+import com.disposableemail.core.model.Message;
+import com.disposableemail.core.model.Messages;
+import com.disposableemail.core.service.api.MessageService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -34,8 +35,7 @@ public class MessagesApiDelegateImpl implements MessagesApiDelegate {
         return Mono.just(ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(messageService.getMessagesForAuthorizedAccount(PageRequest.of(page, size))
-                        .map(messageMapper::messageEntityToMessages)
-                        .switchIfEmpty(Mono.error(new MessagesNotFoundException()))));
+                        .map(messageMapper::messageEntityToMessages)));
     }
 
     @Override
