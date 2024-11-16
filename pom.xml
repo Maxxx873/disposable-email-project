@@ -26,6 +26,7 @@
         <module>admin-api-app</module>
         <module>facade</module>
         <module>external-api-app</module>
+        <module>event-bus</module>
     </modules>
 
     <properties>

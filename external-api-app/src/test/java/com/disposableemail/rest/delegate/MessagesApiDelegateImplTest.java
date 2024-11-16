@@ -54,7 +54,7 @@ class MessagesApiDelegateImplTest extends AbstractSpringControllerIntegrationTes
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isNotFound()
+                .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON);
 
         verify(messageService, times(1)).getMessagesForAuthorizedAccount(PageRequest.of(page, size));

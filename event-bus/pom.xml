@@ -9,13 +9,13 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>disposable-email-service-facades</artifactId>
+    <artifactId>disposable-email-event-bus</artifactId>
 
-    <name>Disposable Email :: Service Facades</name>
-    <description>Facades of services to call in controllers</description>
+    <name>Disposable Email :: Event Bus</name>
+    <description>API, implementations for the eventBus, Pub/Sub</description>
 
     <properties>
-        <project-base-package>com.disposableemail.facade</project-base-package>
+        <project-base-package>com.disposableemail.event</project-base-package>
     </properties>
 
     <dependencies>

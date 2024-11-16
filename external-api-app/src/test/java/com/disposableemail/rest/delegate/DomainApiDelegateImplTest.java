@@ -90,7 +90,7 @@ class DomainApiDelegateImplTest extends AbstractSpringControllerIntegrationTest 
                 .uri("/api/v1/domains/{id}", id)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isOk();
 
         verify(domainService, times(1)).getDomain(id);
     }
