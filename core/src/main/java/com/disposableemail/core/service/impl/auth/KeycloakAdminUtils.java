@@ -3,6 +3,7 @@ package com.disposableemail.core.service.impl.auth;
 import com.disposableemail.core.event.Event;
 import com.disposableemail.core.event.producer.EventProducer;
 import com.disposableemail.core.exception.custom.AccountAlreadyRegisteredException;
+import com.disposableemail.core.exception.custom.AccountAuthServerRegistrationException;
 import com.disposableemail.core.model.Credentials;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
@@ -65,8 +66,8 @@ public class KeycloakAdminUtils {
         } catch (ProcessingException e) {
             eventProducer.send(new Event<>(DELETING_ACCOUNT, credentials.getAddress()));
             log.error("Keycloak error | {}", e.getMessage());
+            throw new AccountAuthServerRegistrationException(credentials);
         }
-        return Response.noContent().build();
     }
 
     public Response getKeycloakCreateUserResponse(Credentials credentials) {
@@ -93,8 +94,8 @@ public class KeycloakAdminUtils {
         } catch (ProcessingException e) {
             eventProducer.send(new Event<>(DELETING_ACCOUNT, credentials.getAddress()));
             log.error("Keycloak error | {}", e.getMessage());
+            throw new AccountAuthServerRegistrationException(credentials);
         }
-        return Response.noContent().build();
     }
 
     private Optional<String> getKeycloakUserIdByName(String name) {

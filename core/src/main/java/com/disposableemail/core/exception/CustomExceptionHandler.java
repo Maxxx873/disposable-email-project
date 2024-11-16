@@ -101,8 +101,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({AccountAuthServerRegistrationException.class})
     public final ResponseEntity<ErrorResponse> handleAccountRegistrationException(AccountAuthServerRegistrationException ex) {
         log.error(EXCEPTION_LOG, ex.getMessage());
-        ex.printStackTrace();
-        eventProducer.send(new Event<>(MAIL_DELETING_ACCOUNT, ex.getCredentials()));
+        eventProducer.send(new Event<>(MAIL_DELETING_ACCOUNT, ex.getCredentials().getAddress()));
         var error = new ErrorResponse(String.valueOf(HttpStatus.SERVICE_UNAVAILABLE.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
     }
@@ -110,8 +109,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({AccountMailServerRegistrationException.class})
     public final ResponseEntity<ErrorResponse> handleAccountRegistrationException(AccountMailServerRegistrationException ex) {
         log.error(EXCEPTION_LOG, ex.getMessage());
-        ex.printStackTrace();
-        eventProducer.send(new Event<>(AUTH_DELETING_ACCOUNT, ex.getCredentials()));
+        eventProducer.send(new Event<>(AUTH_DELETING_ACCOUNT, ex.getCredentials().getAddress()));
         var error = new ErrorResponse(String.valueOf(HttpStatus.SERVICE_UNAVAILABLE.value()), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
     }

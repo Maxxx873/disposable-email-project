@@ -12,6 +12,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,18 +40,33 @@ class MailServiceTest {
     }
 
     @Disabled
-    @RepeatedTest(500)
-    void shouldSendMail() throws MessagingException {
+    @RepeatedTest(1)
+    void shouldSendMail() {
+        ExecutorService executorService = Executors.newFixedThreadPool(50);
+        for (int i = 0; i < 500; i++) {
+            executorService.submit(() -> sendMail());
+        }
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendMail() {
         MimeMessage mailMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-        helper.setFrom("194test@example.com");
-        helper.setTo("200test@example.com");
-        helper.setSubject("Hello Java Mail");
-        helper.setText("<html> <body><h1>Hello </h1> </body></html>", true);
-        String htmlContent = """
+        MimeMessageHelper helper = null;
+        try {
+            helper = new MimeMessageHelper(mailMessage, true);
+            helper.setFrom("21test@example.com");
+            helper.setTo("20test@example.com");
+            helper.setSubject("Hello Java Mail");
+            helper.setText("<html> <body><h1>Hello </h1> </body></html>", true);
+            String htmlContent = """
                 <html>
                   <head>
-                                
+                
                     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
                   </head>
                   <body>
@@ -86,8 +104,12 @@ class MailServiceTest {
                   </body>
                 </html>
                 """;
-        //   helper.setText(htmlContent, true);
-        mailSender.send(mailMessage);
-        assertThat(mailSender).isNotNull();
+            //   helper.setText(htmlContent, true);
+            mailSender.send(mailMessage);
+            assertThat(mailSender).isNotNull();
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
