@@ -1,19 +1,37 @@
 package com.disposableemail.apache.james.mailet.collector.subscriber;
 
-import com.disposableemail.apache.james.mailet.collector.pojo.Account;
-import com.disposableemail.apache.james.mailet.collector.pojo.MailMessage;
-import com.mongodb.reactivestreams.client.MongoCollection;
-import lombok.RequiredArgsConstructor;
+import static com.disposableemail.apache.james.mailet.collector.BasicMailCollector.getMailSource;
+import static com.mongodb.client.model.Filters.eq;
+
+import java.time.Instant;
+
+import javax.mail.internet.MimeMessage;
+
+import org.bson.Document;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.disposableemail.apache.james.mailet.collector.pojo.Account;
+import com.disposableemail.apache.james.mailet.collector.pojo.MailMessage;
+import com.disposableemail.apache.james.mailet.collector.pojo.Source;
+import com.mongodb.reactivestreams.client.MongoCollection;
+
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+
+@Builder
 @RequiredArgsConstructor
 public class MessageCollectorSubscriber implements Subscriber<Account> {
 
     private final MongoCollection<MailMessage> messageCollection;
+    private final MongoCollection<Account> accountCollection;
+    private final MongoCollection<Source> sourceCollection;
     private final MailMessage message;
+    private final MimeMessage mimeMessage;
+    private final long messageSize;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageCollectorSubscriber.class);
 
@@ -26,8 +44,20 @@ public class MessageCollectorSubscriber implements Subscriber<Account> {
     @Override
     public void onNext(final Account account) {
         LOGGER.info("Received Id for Account {} | Id: {}", account.getAddress(), account.getId());
-        message.setAccountId(account.getId().toString());
-        messageCollection.insertOne(message).subscribe(new SourceCollectorSubscriber<>());
+        long increasedSize = messageSize + account.getUsed();
+        if (increasedSize <= account.getQuota()) {
+            Document updateAccountDoc = new Document("$set", new Document()
+                    .append("used", increasedSize)
+                    .append("updatedAt", Instant.now()));
+            var updateAccount = accountCollection.updateOne(eq("address", account.getAddress()), updateAccountDoc);
+            message.setAccountId(account.getId().toString());
+            var insertMessage = messageCollection.insertOne(message);
+            var insertSource = sourceCollection.insertOne(getMailSource(mimeMessage));
+            Flux.merge(insertMessage, updateAccount, insertSource)
+                    .doOnNext(data -> LOGGER.info("Received data for Account {} | Id: {} | {}", account.getAddress(),
+                            account.getId(), data.toString()))
+                    .subscribe(new SourceCollectorSubscriber<>());
+        }
     }
 
     @Override

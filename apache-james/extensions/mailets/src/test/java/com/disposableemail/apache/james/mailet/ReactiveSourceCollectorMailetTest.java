@@ -1,29 +1,33 @@
 package com.disposableemail.apache.james.mailet;
 
-import com.disposableemail.apache.james.mailet.collector.ReactiveSourceCollector;
-import com.disposableemail.apache.james.mailet.collector.pojo.Account;
-import com.disposableemail.apache.james.mailet.collector.subscriber.SourceCollectorSubscriber;
-import com.mongodb.reactivestreams.client.MongoClients;
-import com.mongodb.reactivestreams.client.MongoDatabase;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Objects;
+
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.internet.MimeMessage;
+
 import org.apache.mailet.base.test.FakeMail;
 import org.awaitility.Durations;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.disposableemail.apache.james.mailet.collector.ReactiveSourceCollector;
+import com.disposableemail.apache.james.mailet.collector.pojo.Account;
+import com.disposableemail.apache.james.mailet.collector.subscriber.SourceCollectorSubscriber;
+import com.mongodb.reactivestreams.client.MongoClients;
+import com.mongodb.reactivestreams.client.MongoDatabase;
+
 import reactor.test.StepVerifier;
-
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.internet.MimeMessage;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.time.Duration;
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
 
@@ -63,11 +67,18 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
         var mimeMessage = new MimeMessage(null, new FileInputStream("src/test/resources/test_mail_html_no_attachments.eml"));
         var mail = FakeMail.defaultFakeMail();
         mail.setMessage(mimeMessage);
+        mail.setMessageSize(600);
         var sourceCollection = mongoDatabase.getCollection(SOURCE_COLLECTION_NAME);
         var messageCollection = mongoDatabase.getCollection(MESSAGE_COLLECTION_NAME);
         var accountCollection = mongoDatabase.getCollection(ACCOUNT_COLLECTION_NAME, Account.class).withCodecRegistry(pojoCodecRegistry);
 
+        long initUsed = 500;
+        long quota = 40000;
+        var updatedAt = Instant.now();
         account.setAddress("t3@example.com");
+        account.setUsed(initUsed);
+        account.setQuota(quota);
+        account.setUpdatedAt(updatedAt);
         accountCollection.insertOne(account).subscribe(new SourceCollectorSubscriber<>());
 
         await().pollDelay(Durations.ONE_SECOND).until(() -> true);
@@ -104,6 +115,17 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
                 })
                 .expectComplete()
                 .verify();
+
+        StepVerifier.create(accountCollection.find().first())
+                .expectSubscription()
+                .assertNext(acc -> {
+                    assertThat(acc.getUsed()).isEqualTo(mail.getMessageSize() + account.getUsed());
+                    assertThat(acc.getUpdatedAt()).isAfter(updatedAt);
+                    assertThat(acc.getQuota()).isEqualTo(quota);
+                })
+                .expectComplete()
+                .verify();
+
     }
 
     @Test
@@ -116,7 +138,13 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
         var messageCollection = mongoDatabase.getCollection(MESSAGE_COLLECTION_NAME);
         var accountCollection = mongoDatabase.getCollection(ACCOUNT_COLLECTION_NAME, Account.class).withCodecRegistry(pojoCodecRegistry);
 
+        long initUsed = 500;
+        long quota = 40000;
         account.setAddress("test6@example.com");
+        account.setUsed(initUsed);
+        account.setQuota(quota);
+        var updatedAt = Instant.now();
+        account.setUpdatedAt(Instant.now());
         accountCollection.insertOne(account).subscribe(new SourceCollectorSubscriber<>());
 
         await().pollDelay(Durations.ONE_SECOND).until(() -> true);
@@ -161,6 +189,16 @@ class ReactiveSourceCollectorMailetTest extends SourceCollectorTestHelper {
                     assertThat(getBoolean(doc, "isDeleted")).isFalse();
                     assertThat(getBoolean(doc, "hasAttachment")).isTrue();
                     assertThat(Integer.parseInt(Objects.requireNonNull(doc).get("size").toString())).isPositive();
+                })
+                .expectComplete()
+                .verify();
+
+        StepVerifier.create(accountCollection.find().first())
+                .expectSubscription()
+                .assertNext(acc -> {
+                    assertThat(acc.getUsed()).isEqualTo(mail.getMessageSize() + account.getUsed());
+                    assertThat(acc.getUpdatedAt()).isAfter(updatedAt);
+                    assertThat(acc.getQuota()).isEqualTo(quota);
                 })
                 .expectComplete()
                 .verify();

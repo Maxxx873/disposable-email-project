@@ -14,9 +14,8 @@ public class Account {
     private String mailboxId;
     private Boolean isDisabled;
     private Boolean isDeleted;
-    private Integer quota;
-    private Integer used;
+    private long quota;
+    private long used;
     private Instant createdAt;
     private Instant updatedAt;
-
 }

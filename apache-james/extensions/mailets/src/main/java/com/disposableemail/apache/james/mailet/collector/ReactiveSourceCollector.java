@@ -1,5 +1,15 @@
 package com.disposableemail.apache.james.mailet.collector;
 
+import static com.mongodb.client.model.Filters.eq;
+
+import java.util.function.Consumer;
+
+import javax.mail.MessagingException;
+
+import org.apache.mailet.Mail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.disposableemail.apache.james.mailet.collector.pojo.Account;
 import com.disposableemail.apache.james.mailet.collector.pojo.MailMessage;
 import com.disposableemail.apache.james.mailet.collector.pojo.Source;
@@ -8,15 +18,6 @@ import com.disposableemail.apache.james.mailet.collector.subscriber.SourceCollec
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.util.function.Consumer;
-
-import static com.mongodb.client.model.Filters.eq;
 
 public class ReactiveSourceCollector extends BasicMailCollector {
 
@@ -30,7 +31,7 @@ public class ReactiveSourceCollector extends BasicMailCollector {
 
     @Override
     public void init() {
-        LOGGER.info("{} Initializing...", this.getClass().getSimpleName());
+        LOGGER.info("{} Initializing..", this.getClass().getSimpleName());
         setupDatabase();
     }
 
@@ -44,21 +45,25 @@ public class ReactiveSourceCollector extends BasicMailCollector {
     }
 
     @Override
-    public Consumer<MimeMessage> processMimeMessage() {
-        return mimeMessage -> {
+    public Consumer<Mail> processMessage() {
+        return mail -> {
             try {
-                sourceCollection.insertOne(getMailSource(mimeMessage)).subscribe(new SourceCollectorSubscriber<>());
+                var mimeMessage = mail.getMessage();
+                long messageSize = mail.getMessageSize();
                 var message = getMailMessage(mimeMessage);
-
                 message.getTo().forEach(address ->
                         accountCollection.find(eq("address", address.getAddress()))
                                 .first()
-                                .subscribe(new MessageCollectorSubscriber(messageCollection, message)));
-
-                LOGGER.info("Added new data from message: {}", mimeMessage.getMessageID());
-
-            } catch (IOException | MessagingException e) {
-                throw new UnsupportedOperationException();
+                                .subscribe(MessageCollectorSubscriber.builder()
+                                        .messageCollection(messageCollection)
+                                        .accountCollection(accountCollection)
+                                        .sourceCollection(sourceCollection)
+                                        .message(message)
+                                        .messageSize(messageSize)
+                                        .mimeMessage(mimeMessage)
+                                        .build()));
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
             }
         };
     }

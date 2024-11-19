@@ -1,23 +1,25 @@
 package com.disposableemail.apache.james.mailet.collector;
 
 
+import static com.mongodb.client.model.Filters.eq;
+
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import javax.mail.MessagingException;
+
+import org.apache.mailet.Mail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.disposableemail.apache.james.mailet.collector.pojo.Account;
 import com.disposableemail.apache.james.mailet.collector.pojo.MailMessage;
 import com.disposableemail.apache.james.mailet.collector.pojo.Source;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.function.Consumer;
-
-import static com.mongodb.client.model.Filters.eq;
-
+@Deprecated
 public class SyncSourceCollector extends BasicMailCollector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SyncSourceCollector.class);
@@ -44,15 +46,16 @@ public class SyncSourceCollector extends BasicMailCollector {
     }
 
     @Override
-    public Consumer<MimeMessage> processMimeMessage() {
-        return mimeMessage -> {
+    public Consumer<Mail> processMessage() {
+        return mail -> {
             try {
+                var mimeMessage = mail.getMessage();
                 sourceCollection.insertOne(getMailSource(mimeMessage));
                 var message = getMailMessage(mimeMessage);
 
                 message.getTo().forEach(address -> {
                     var accountId = Optional.ofNullable(accountCollection
-                            .find(eq("address", address.getAddress())).first())
+                                    .find(eq("address", address.getAddress())).first())
                             .orElseThrow(IllegalArgumentException::new)
                             .getId();
                     message.setAccountId(accountId.toString());
@@ -60,7 +63,7 @@ public class SyncSourceCollector extends BasicMailCollector {
                 });
 
                 LOGGER.info("Added new data from message {}", mimeMessage.getMessageID());
-            } catch (IOException | MessagingException e) {
+            } catch (MessagingException e) {
                 throw new UnsupportedOperationException();
             }
         };

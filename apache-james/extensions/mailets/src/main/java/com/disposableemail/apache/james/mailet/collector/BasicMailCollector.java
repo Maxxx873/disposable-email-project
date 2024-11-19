@@ -1,16 +1,20 @@
 package com.disposableemail.apache.james.mailet.collector;
 
-import com.disposableemail.apache.james.mailet.collector.pojo.Address;
-import com.disposableemail.apache.james.mailet.collector.pojo.Attachment;
-import com.disposableemail.apache.james.mailet.collector.pojo.MailMessage;
-import com.disposableemail.apache.james.mailet.collector.pojo.Source;
-import com.mongodb.MongoClientSettings;
-import org.apache.mailet.Mail;
-import org.apache.mailet.base.GenericMailet;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
-import org.bson.types.ObjectId;
-import org.jsoup.Jsoup;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -20,16 +24,19 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+import org.apache.mailet.Mail;
+import org.apache.mailet.base.GenericMailet;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.types.ObjectId;
+import org.jsoup.Jsoup;
+
+import com.disposableemail.apache.james.mailet.collector.pojo.Address;
+import com.disposableemail.apache.james.mailet.collector.pojo.Attachment;
+import com.disposableemail.apache.james.mailet.collector.pojo.MailMessage;
+import com.disposableemail.apache.james.mailet.collector.pojo.Source;
+import com.mongodb.MongoClientSettings;
 
 public class BasicMailCollector extends GenericMailet {
 
@@ -43,19 +50,27 @@ public class BasicMailCollector extends GenericMailet {
     @Override
     public void service(Mail mail) throws MessagingException {
         long payloadDocumentMaxSize = 16777216;
-        if (mail.getMessageSize() < payloadDocumentMaxSize) {
-            var optionalMimeMessage = Optional.ofNullable(mail.getMessage());
-            optionalMimeMessage.ifPresent(processMimeMessage());
+        Optional.ofNullable(mail).filter(isMailValid(payloadDocumentMaxSize))
+                .ifPresent(processMessage());
         }
-    }
 
+    private Predicate<Mail> isMailValid(long payloadDocumentMaxSize) {
+        return mail -> {
+            try {
+                return mail.getMessageSize() < payloadDocumentMaxSize &&
+                        Optional.ofNullable(mail.getMessage()).isPresent();
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
     @Override
     public String getMailetInfo() {
         return this.getClass().getSimpleName() + " Mailet";
     }
 
-    public Consumer<MimeMessage> processMimeMessage() {
-        return mimeMessage -> {
+    public Consumer<Mail> processMessage() {
+        return mail -> {
         };
     }
 
@@ -69,17 +84,20 @@ public class BasicMailCollector extends GenericMailet {
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()));
     }
 
-    protected static Source getMailSource(MimeMessage mimeMessage) throws MessagingException,
-            IOException {
+    public static Source getMailSource(MimeMessage mimeMessage) {
         var out = new ByteArrayOutputStream();
-        mimeMessage.writeTo(out);
-        return Source.builder()
-                .id(new ObjectId())
-                .msgid(mimeMessage.getMessageID())
-                .data(out.toString(StandardCharsets.UTF_8))
-                .attachments(getAttachments(mimeMessage))
-                .createdAt(Instant.now())
-                .build();
+        try {
+            mimeMessage.writeTo(out);
+            return Source.builder()
+                    .id(new ObjectId())
+                    .msgid(mimeMessage.getMessageID())
+                    .data(out.toString(StandardCharsets.UTF_8))
+                    .attachments(getAttachments(mimeMessage))
+                    .createdAt(Instant.now())
+                    .build();
+        } catch (IOException | MessagingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected static List<Attachment> getAttachments(Message message) throws IOException, MessagingException {
@@ -110,31 +128,34 @@ public class BasicMailCollector extends GenericMailet {
                 .build();
     }
 
-    protected static MailMessage getMailMessage(MimeMessage mimeMessage) throws MessagingException, IOException {
+    protected static MailMessage getMailMessage(MimeMessage mimeMessage) {
         List<Attachment> attachments;
-        attachments = getAttachments(mimeMessage);
-
-        return MailMessage.builder()
-                .id(new ObjectId())
-                .accountId("")
-                .msgid(Optional.ofNullable(mimeMessage.getMessageID()).orElse(""))
-                .from(mapJavaxMailAddressToAddress(mimeMessage.getFrom()))
-                .to(mapJavaxMailAddressToAddress(mimeMessage.getRecipients(Message.RecipientType.TO)))
-                .cc(mapJavaxMailAddressToAddress(mimeMessage.getRecipients(Message.RecipientType.CC)))
-                .bcc(mapJavaxMailAddressToAddress(mimeMessage.getRecipients(Message.RecipientType.BCC)))
-                .subject(Optional.ofNullable(mimeMessage.getSubject()).orElse(""))
-                .isUnread(true)
-                .isFlagged(mimeMessage.getFlags().getSystemFlags().length > 0)
-                .isDeleted(false)
-                .text(getTextFromMessage(mimeMessage))
-                .html(getHtmlParts(mimeMessage))
-                .hasAttachment(!attachments.isEmpty())
-                .attachments(attachments)
-                .size(mimeMessage.getSize())
-                .sentDate(getInstant(mimeMessage))
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
-                .build();
+        try {
+            attachments = getAttachments(mimeMessage);
+            return MailMessage.builder()
+                    .id(new ObjectId())
+                    .accountId("")
+                    .msgid(Optional.ofNullable(mimeMessage.getMessageID()).orElse(""))
+                    .from(mapJavaxMailAddressToAddress(mimeMessage.getFrom()))
+                    .to(mapJavaxMailAddressToAddress(mimeMessage.getRecipients(Message.RecipientType.TO)))
+                    .cc(mapJavaxMailAddressToAddress(mimeMessage.getRecipients(Message.RecipientType.CC)))
+                    .bcc(mapJavaxMailAddressToAddress(mimeMessage.getRecipients(Message.RecipientType.BCC)))
+                    .subject(Optional.ofNullable(mimeMessage.getSubject()).orElse(""))
+                    .isUnread(true)
+                    .isFlagged(mimeMessage.getFlags().getSystemFlags().length > 0)
+                    .isDeleted(false)
+                    .text(getTextFromMessage(mimeMessage))
+                    .html(getHtmlParts(mimeMessage))
+                    .hasAttachment(!attachments.isEmpty())
+                    .attachments(attachments)
+                    .size(mimeMessage.getSize())
+                    .sentDate(getInstant(mimeMessage))
+                    .createdAt(Instant.now())
+                    .updatedAt(Instant.now())
+                    .build();
+        } catch (IOException | MessagingException e) {
+            throw new UnsupportedOperationException();
+        }
     }
 
     protected static List<String> getHtmlParts(Message message) throws MessagingException, IOException {

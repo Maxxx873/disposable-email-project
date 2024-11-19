@@ -42,8 +42,8 @@ class MailServiceTest {
     @Disabled
     @RepeatedTest(1)
     void shouldSendMail() {
-        ExecutorService executorService = Executors.newFixedThreadPool(50);
-        for (int i = 0; i < 500; i++) {
+        ExecutorService executorService = Executors.newFixedThreadPool(150);
+        for (int i = 0; i < 1000; i++) {
             executorService.submit(() -> sendMail());
         }
         executorService.shutdown();
@@ -59,8 +59,8 @@ class MailServiceTest {
         MimeMessageHelper helper = null;
         try {
             helper = new MimeMessageHelper(mailMessage, true);
-            helper.setFrom("21test@example.com");
-            helper.setTo("20test@example.com");
+            helper.setFrom("201test@example.com");
+            helper.setTo("204test@example.com");
             helper.setSubject("Hello Java Mail");
             helper.setText("<html> <body><h1>Hello </h1> </body></html>", true);
             String htmlContent = """
