@@ -46,6 +46,12 @@
                 <messageCollectionName>message</messageCollectionName>
                 <accountCollectionName>account</accountCollectionName>
             </mailet>
+            <mailet match="All" class="com.disposableemail.apache.james.mailet.producer.kafka.KafkaProducerMailet">
+                <bootstrapServer>kafka0:9092</bootstrapServer>
+                <topicName>disposable-email-received</topicName>
+                <partitions>2</partitions>
+                <replication>1</replication>
+            </mailet>
             <mailet match="All" class="PostmasterAlias"/>
             <mailet match="RelayLimit=30" class="Null"/>
             <mailet match="com.disposableemail.apache.james.matcher.NotBigMessage" class="ToProcessor">

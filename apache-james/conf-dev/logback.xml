@@ -48,5 +48,6 @@
         <logger name="com.disposableemail.apache.james.mailet.collector.SyncSourceCollector" level="INFO" />
         <logger name="com.disposableemail.apache.james.mailet.collector.subscriber.SourceCollectorSubscriber" level="INFO" />
         <logger name="com.disposableemail.apache.james.mailet.collector.subscriber.MessageCollectorSubscriber" level="INFO" />
+        <logger name="com.disposableemail.apache.james.mailet.producer.kafka.KafkaProducerMailet" level="INFO" />
 
 </configuration>

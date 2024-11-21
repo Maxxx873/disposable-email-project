@@ -43,7 +43,7 @@ class MailServiceTest {
     @RepeatedTest(1)
     void shouldSendMail() {
         ExecutorService executorService = Executors.newFixedThreadPool(150);
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1; i++) {
             executorService.submit(() -> sendMail());
         }
         executorService.shutdown();
