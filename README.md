@@ -36,7 +36,7 @@ Processing emails is based on distributed [Apache James](https://james.apache.or
 Incoming messages are processed and added to the `MongoDB` database.
 
 <p align="center">
-  <img src="img/topology.png" width="1000" title="topology">
+  <img src="img/architecture.png" width="1000" title="topology">
 </p>
 
 
