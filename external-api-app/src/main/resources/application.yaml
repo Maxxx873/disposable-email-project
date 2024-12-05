@@ -42,6 +42,17 @@ spring:
       direct:
         prefetch: 1
 
+  kafka:
+    topic: disposable-email-received
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+    consumer:
+      group-id: mail-receiving-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        auto.offset.reset: latest
+        max.poll.records: 200
+
   security:
     oauth2:
       resourceserver:

@@ -36,7 +36,11 @@
             <artifactId>disposable-email-service-facades</artifactId>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.disposableemail</groupId>
+            <artifactId>disposable-email-event-bus</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
