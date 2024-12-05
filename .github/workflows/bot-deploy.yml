@@ -24,6 +24,18 @@ jobs:
         run: mvn -B package --file pom.xml
         working-directory: telegram-spring-boot-starter
 
+      - name: 📂 Upload telegram starter
+        uses: actions/upload-artifact@v3
+        with:
+          name: disposable-email-telegram-spring-boot-starter
+          path: telegram-spring-boot-starter/target/disposable-email-telegram-spring-boot-starter-*.jar
+
+      - name: 📂 Download telegram starter
+        uses: actions/download-artifact@v3
+        with:
+          name: disposable-email-telegram-spring-boot-starter
+          path: telegram-bot/target/
+
       - name: 📦 Build with Maven
         run: mvn -B package --file pom.xml
         working-directory: telegram-bot
