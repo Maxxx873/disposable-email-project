@@ -15,7 +15,7 @@ class MeApiDelegateImplTest extends AbstractSpringControllerIntegrationTest {
     @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldGetMeAccountItem() {
-        when(accountHelperService.getAuthorizedAccountWithUsedSize()).thenReturn(Mono.just(testAccountEntity));
+        when(accountHelperService.getAuthorizedAccount()).thenReturn(Mono.just(testAccountEntity));
 
         webTestClient.get().uri("/api/v1/me")
                 .exchange()
@@ -23,12 +23,12 @@ class MeApiDelegateImplTest extends AbstractSpringControllerIntegrationTest {
                 .expectBody(Account.class)
                 .isEqualTo(testAccount);
 
-        verify(accountHelperService, times(1)).getAuthorizedAccountWithUsedSize();
+        verify(accountHelperService, times(1)).getAuthorizedAccount();
     }
 
     @Test
     void shouldNotGetMeAccountItemWithUnauthorizedAccount() {
-        when(accountHelperService.getAuthorizedAccountWithUsedSize()).thenReturn(Mono.empty());
+        when(accountHelperService.getAuthorizedAccount()).thenReturn(Mono.empty());
 
         webTestClient.get().uri("/api/v1/me")
                 .exchange()
@@ -39,12 +39,12 @@ class MeApiDelegateImplTest extends AbstractSpringControllerIntegrationTest {
     @WithMockJwtAuth(authorities = {"account1@example.com", "ROLE_USER"},
             claims = @OpenIdClaims(preferredUsername = "account1@example.com"))
     void shouldGetMeAccountItemWithError() {
-        when(accountHelperService.getAuthorizedAccountWithUsedSize()).thenReturn(Mono.empty());
+        when(accountHelperService.getAuthorizedAccount()).thenReturn(Mono.empty());
 
         webTestClient.get().uri("/api/v1/me")
                 .exchange()
                 .expectStatus().isNotFound();
 
-        verify(accountHelperService, times(1)).getAuthorizedAccountWithUsedSize();
+        verify(accountHelperService, times(1)).getAuthorizedAccount();
     }
 }

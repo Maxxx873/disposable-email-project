@@ -63,6 +63,9 @@ Running [Apache James](apache-james/README.md) with third party dependencies:
 * RabbitMQ
 * MongoDB
 * Keycloak
+* Redis
+* Kafka
+* Kafka UI
 
 ```bash
 docker compose -f apache-james/docker-compose.yml up
