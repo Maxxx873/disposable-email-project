@@ -34,4 +34,6 @@ public interface MailServerClientService {
     Mono<ResponseEntity<Void>> updateQuotaSize(Credentials credentials);
 
     Mono<Integer> getUsedSize(String username);
+
+    Mono<Integer> getUpdatableUsedSize(String username, Integer oldUsedSize);
 }

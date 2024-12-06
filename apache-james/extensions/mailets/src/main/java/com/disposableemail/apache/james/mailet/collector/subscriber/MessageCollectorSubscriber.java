@@ -32,6 +32,7 @@ public class MessageCollectorSubscriber implements Subscriber<Account> {
     private final MailMessage message;
     private final MimeMessage mimeMessage;
     private final long messageSize;
+    private final boolean enableUsedSizeUpdating;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageCollectorSubscriber.class);
 
@@ -45,15 +46,21 @@ public class MessageCollectorSubscriber implements Subscriber<Account> {
     public void onNext(final Account account) {
         LOGGER.info("Received Id for Account {} | Id: {}", account.getAddress(), account.getId());
         long increasedSize = messageSize + account.getUsed();
-        if (increasedSize <= account.getQuota()) {
+        message.setAccountId(account.getId().toString());
+        var insertMessage = messageCollection.insertOne(message);
+        var insertSource = sourceCollection.insertOne(getMailSource(mimeMessage));
+
+        if (increasedSize <= account.getQuota() && enableUsedSizeUpdating) {
             Document updateAccountDoc = new Document("$set", new Document()
                     .append("used", increasedSize)
                     .append("updatedAt", Instant.now()));
             var updateAccount = accountCollection.updateOne(eq("address", account.getAddress()), updateAccountDoc);
-            message.setAccountId(account.getId().toString());
-            var insertMessage = messageCollection.insertOne(message);
-            var insertSource = sourceCollection.insertOne(getMailSource(mimeMessage));
             Flux.merge(insertMessage, updateAccount, insertSource)
+                    .doOnNext(data -> LOGGER.info("Received data for Account {} | Id: {} | {}", account.getAddress(),
+                            account.getId(), data.toString()))
+                    .subscribe(new SourceCollectorSubscriber<>());
+        } else {
+            Flux.merge(insertMessage, insertSource)
                     .doOnNext(data -> LOGGER.info("Received data for Account {} | Id: {} | {}", account.getAddress(),
                             account.getId(), data.toString()))
                     .subscribe(new SourceCollectorSubscriber<>());

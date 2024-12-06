@@ -46,6 +46,7 @@ public class BasicMailCollector extends GenericMailet {
     protected String messageCollectionName;
     protected String accountCollectionName;
     protected CodecRegistry pojoCodecRegistry;
+    protected boolean enableUsedSizeUpdating = false;
 
     @Override
     public void service(Mail mail) throws MessagingException {
@@ -82,6 +83,7 @@ public class BasicMailCollector extends GenericMailet {
         accountCollectionName = getInitParameter("accountCollectionName");
         pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+        enableUsedSizeUpdating = Boolean.parseBoolean(getInitParameter("enableUsedSizeUpdating"));
     }
 
     public static Source getMailSource(MimeMessage mimeMessage) {

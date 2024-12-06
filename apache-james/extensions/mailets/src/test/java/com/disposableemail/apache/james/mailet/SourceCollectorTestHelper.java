@@ -61,6 +61,7 @@ public class SourceCollectorTestHelper {
                 .setProperty("sourceCollectionName", SOURCE_COLLECTION_NAME)
                 .setProperty("messageCollectionName", MESSAGE_COLLECTION_NAME)
                 .setProperty("accountCollectionName", ACCOUNT_COLLECTION_NAME)
+                .setProperty("enableUsedSizeUpdating", "true")
                 .build();
 
         var starter = MongodStarter.getDefaultInstance();

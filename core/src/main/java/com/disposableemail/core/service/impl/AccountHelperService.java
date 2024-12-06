@@ -53,6 +53,13 @@ public class AccountHelperService {
                 .doOnError(err -> log.error("Error getting Used size", err));
     }
 
+    public Mono<AccountEntity> getAuthorizedAccount() {
+        return getCredentialsFromJwt()
+                .switchIfEmpty(Mono.error(new AccessDeniedException("Access denied")))
+                .map(UserCredentials::getPreferredUsername)
+                .flatMap(accountService::getAccountByAddress);
+    }
+
     public Mono<AccountEntity> setMailboxId(Credentials credentials) {
         log.info("Setting a mailbox id for an Account {} | ", credentials.getAddress());
 

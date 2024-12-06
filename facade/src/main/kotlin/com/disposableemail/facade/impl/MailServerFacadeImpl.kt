@@ -27,9 +27,9 @@ class MailServerFacadeImpl(
                         val quotaSize = async { mailService.getQuotaSize(credentials.address).awaitSingle() }
                         val mailBoxId = async { mailService.getMailboxId(credentials, inbox).awaitSingle() }
                         AccountEntity.createDefault().apply {
-                            this.address = credentials.address
-                            this.mailboxId = mailBoxId.await()
-                            this.quota = quotaSize.await()
+                            address = credentials.address
+                            mailboxId = mailBoxId.await()
+                            quota = quotaSize.await()
                         }
                     }
                 }

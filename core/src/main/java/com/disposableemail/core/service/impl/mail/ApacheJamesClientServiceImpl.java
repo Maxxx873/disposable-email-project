@@ -1,23 +1,15 @@
 package com.disposableemail.core.service.impl.mail;
 
-import com.disposableemail.core.dao.entity.DomainEntity;
-import com.disposableemail.core.event.Event;
-import com.disposableemail.core.event.producer.EventProducer;
-import com.disposableemail.core.exception.custom.DomainNotAvailableException;
-import com.disposableemail.core.exception.custom.MailServerConnectException;
-import com.disposableemail.core.exception.custom.MailboxNotFoundException;
-import com.disposableemail.core.model.Credentials;
-import com.disposableemail.core.service.api.mail.MailServerClientService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.resilience4j.retry.RetryRegistry;
-import io.github.resilience4j.retry.annotation.Retry;
+import static com.disposableemail.core.event.Event.Type;
+import static reactor.util.retry.Retry.fixedDelay;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,15 +17,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.disposableemail.core.dao.entity.DomainEntity;
+import com.disposableemail.core.event.Event;
+import com.disposableemail.core.event.producer.EventProducer;
+import com.disposableemail.core.exception.custom.DomainNotAvailableException;
+import com.disposableemail.core.exception.custom.MailServerConnectException;
+import com.disposableemail.core.exception.custom.MailServerUpdateUsedSizeException;
+import com.disposableemail.core.exception.custom.MailboxNotFoundException;
+import com.disposableemail.core.model.Credentials;
+import com.disposableemail.core.service.api.mail.MailServerClientService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.github.resilience4j.retry.RetryRegistry;
+import io.github.resilience4j.retry.annotation.Retry;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-
-import static com.disposableemail.core.event.Event.Type;
-import static reactor.util.retry.Retry.fixedDelay;
 
 @Slf4j
 @Service
@@ -277,4 +281,29 @@ public class ApacheJamesClientServiceImpl implements MailServerClientService {
                 });
     }
 
+    @Override
+    public Mono<Integer> getUpdatableUsedSize(String username, Integer oldUsedSize) {
+        log.info("Getting updatable used size for a user | User: {}", username);
+
+        return mailServerApiClient.get()
+                .uri(quotaPath + username)
+                .retrieve()
+                .bodyToMono(String.class)
+                .<Integer>handle((body, sink) -> {
+                    try {
+                        var occupation = mapper.readTree(body).get("occupation");
+                        int newUsedSize = occupation.get("size").asInt();
+                        if (newUsedSize > oldUsedSize) {
+                            sink.next(newUsedSize);
+                        } else {
+                            sink.error(new MailServerUpdateUsedSizeException());
+                        }
+                    } catch (JsonProcessingException ex) {
+                        sink.error(new MailboxNotFoundException());
+                    }
+                })
+                .retryWhen(fixedDelay(MAX_ATTEMPTS, Duration.ofSeconds(DURATION_SECONDS))
+                        .filter(throwable -> throwable instanceof MailServerUpdateUsedSizeException))
+                .onErrorResume(e -> Mono.just(oldUsedSize));
+    }
 }

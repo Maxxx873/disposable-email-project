@@ -1,5 +1,16 @@
 package com.disposableemail.core.service.impl;
 
+import static com.disposableemail.core.dao.entity.AccountEntity.createAccountEntityFromCredentials;
+import static com.disposableemail.core.event.Event.Type.AUTH_DELETING_ACCOUNT;
+import static com.disposableemail.core.event.Event.Type.MAIL_DELETING_ACCOUNT;
+import static com.disposableemail.core.security.SecurityUtils.getCredentialsFromJwt;
+import static reactor.function.TupleUtils.function;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
+import org.springframework.stereotype.Service;
+
 import com.disposableemail.core.dao.entity.AccountEntity;
 import com.disposableemail.core.dao.entity.DomainEntity;
 import com.disposableemail.core.dao.repository.AccountRepository;
@@ -12,20 +23,11 @@ import com.disposableemail.core.model.Credentials;
 import com.disposableemail.core.service.api.AccountService;
 import com.disposableemail.core.service.api.DomainService;
 import com.disposableemail.core.util.EmailUtils;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.crypto.encrypt.TextEncryptor;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import static com.disposableemail.core.dao.entity.AccountEntity.createAccountEntityFromCredentials;
-import static com.disposableemail.core.event.Event.Type.AUTH_DELETING_ACCOUNT;
-import static com.disposableemail.core.event.Event.Type.MAIL_DELETING_ACCOUNT;
-import static com.disposableemail.core.security.SecurityUtils.getCredentialsFromJwt;
-import static reactor.function.TupleUtils.function;
 
 @Slf4j
 @Service
@@ -95,6 +97,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Mono<AccountEntity> updateAccount(AccountEntity accountEntity) {
+        log.info("Updating an Account by address {}", accountEntity.getAddress());
+
+        return accountRepository.save(accountEntity);
+    }
+
+
+    @Override
     public Mono<AccountEntity> deleteAccount(String id) {
         log.info("Deleting an Account {}", id);
 
@@ -113,9 +123,7 @@ public class AccountServiceImpl implements AccountService {
     public Mono<AccountEntity> softDeleteAccount(String id) {
         log.info("Soft deleting an Account {}", id);
 
-        var sIdMono = getCredentialsFromJwt();
-        var accountEntityMono = accountRepository.findById(id);
-        var result = accountEntityMono.zipWith(sIdMono)
+        return accountRepository.findById(id).zipWith(getCredentialsFromJwt())
                 .flatMap(function((accountEntity, userCredentials) -> {
                     log.info("Get authorized Account | address: {}, subject: {}",
                             userCredentials.getPreferredUsername(), userCredentials.getSub());
@@ -129,8 +137,6 @@ public class AccountServiceImpl implements AccountService {
                                 eventProducer.send(new Event<>(MAIL_DELETING_ACCOUNT, accountEntity.getAddress()));
                             });
                 }));
-        result.subscribe();
-        return result;
     }
 
     @Override

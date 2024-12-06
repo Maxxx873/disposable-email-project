@@ -5,6 +5,7 @@ import static com.mongodb.client.model.Filters.eq;
 import java.util.function.Consumer;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 import org.apache.mailet.Mail;
 import org.slf4j.Logger;
@@ -54,18 +55,23 @@ public class ReactiveSourceCollector extends BasicMailCollector {
                 message.getTo().forEach(address ->
                         accountCollection.find(eq("address", address.getAddress()))
                                 .first()
-                                .subscribe(MessageCollectorSubscriber.builder()
-                                        .messageCollection(messageCollection)
-                                        .accountCollection(accountCollection)
-                                        .sourceCollection(sourceCollection)
-                                        .message(message)
-                                        .messageSize(messageSize)
-                                        .mimeMessage(mimeMessage)
-                                        .build()));
+                                .subscribe(buildSubscriber(message, messageSize, mimeMessage)));
             } catch (MessagingException e) {
                 throw new RuntimeException(e);
             }
         };
+    }
+
+    private MessageCollectorSubscriber buildSubscriber(MailMessage message, long messageSize, MimeMessage mimeMessage) {
+        return MessageCollectorSubscriber.builder()
+                .messageCollection(messageCollection)
+                .accountCollection(accountCollection)
+                .sourceCollection(sourceCollection)
+                .message(message)
+                .messageSize(messageSize)
+                .mimeMessage(mimeMessage)
+                .enableUsedSizeUpdating(enableUsedSizeUpdating)
+                .build();
     }
 
     public void setupDatabase() {

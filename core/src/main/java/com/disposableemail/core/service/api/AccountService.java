@@ -44,6 +44,14 @@ public interface AccountService {
     Mono<AccountEntity> getAccountByAddress(String address);
 
     /**
+     * Updates an account.
+     *
+     * @param accountEntity the entity for the account
+     * @return a Mono that emits the updated account entity
+     */
+    Mono<AccountEntity> updateAccount(AccountEntity accountEntity);
+
+    /**
      * Deletes an account by its ID.
      *
      * @param id the ID of the account to delete

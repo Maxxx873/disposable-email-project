@@ -45,6 +45,7 @@
                 <sourceCollectionName>source</sourceCollectionName>
                 <messageCollectionName>message</messageCollectionName>
                 <accountCollectionName>account</accountCollectionName>
+                <enableUsedSizeUpdating>false</enableUsedSizeUpdating>
             </mailet>
             <mailet match="All" class="com.disposableemail.apache.james.mailet.producer.kafka.KafkaProducerMailet">
                 <bootstrapServer>kafka0:9092</bootstrapServer>
