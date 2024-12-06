@@ -52,4 +52,27 @@
 
 	</dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.coderplus.maven.plugins</groupId>
+				<artifactId>copy-rename-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<id>copy-file</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<sourceFile>target/disposable-email-telegram-spring-boot-starter-0.0.1-SNAPSHOT.jar</sourceFile>
+							<destinationFile>../telegram-bot/lib/disposable-email-telegram-spring-boot-starter-0.0.1-SNAPSHOT.jar</destinationFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
